@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "title": "DAON — Korean Restaurant",
+    "description": "DAON is a Korean restaurant serving handmade ramen, Korean BBQ, hot pots and kimbap. Browse the menu and reserve your table.",
+    "menuTitle": "Menu — DAON Korean Restaurant",
+    "reservationTitle": "Book a Table — DAON Korean Restaurant"
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "about": "About",
+    "reservation": "Reservation",
+    "contact": "Contact",
+    "openMenu": "Open navigation",
+    "closeMenu": "Close navigation",
+    "language": "Language",
+    "skipToContent": "Skip to content"
+  },
+  "hero": {
+    "eyebrow": "Korean Restaurant",
+    "tagline": "다온 · a good day comes",
+    "lead": "Charcoal, broth and fermentation — the three things a Korean kitchen is built on. We cook the way a family cooks at home, and we set the table the same way: everything at once, shared, still steaming.",
+    "viewMenu": "View Menu",
+    "bookTable": "Book a Table",
+    "scroll": "Scroll"
+  },
+  "home": {
+    "about": {
+      "eyebrow": "About us",
+      "title": "A table set the Korean way",
+      "body": "A 한상차림 — hansangcharim — is a table laid all at once, where nothing waits its turn. Grilled meat next to stew, rice next to a dozen small side dishes, everyone reaching across. That is how we serve at DAON, whether you come for a bowl of handmade ramen at noon or spend the evening around the grill.",
+      "note": "Every dish on this site is taken from our printed menu — same names, same prices.",
+      "stats": {
+        "dishes": "dishes on the menu",
+        "chapters": "chapters",
+        "from": "from"
+      }
+    },
+    "signature": {
+      "eyebrow": "Signature",
+      "title": "What people order",
+      "subtitle": "A few plates that leave the kitchen most often.",
+      "all": "See the full menu"
+    },
+    "categories": {
+      "eyebrow": "The menu",
+      "title": "Thirteen chapters",
+      "subtitle": "From summer noodles to hot pots for four."
+    },
+    "visit": {
+      "eyebrow": "Visit",
+      "title": "Find us",
+      "hours": "Opening hours",
+      "contact": "Contact",
+      "address": "Address",
+      "directions": "Open in maps"
+    },
+    "cta": {
+      "title": "Reserve a table",
+      "body": "Pick a date, a time and the table you want to sit at. It takes under a minute.",
+      "button": "Book a Table"
+    }
+  },
+  "menu": {
+    "eyebrow": "Menu",
+    "title": "Our menu",
+    "subtitle": "Prices in PLN. Tap a dish for the full description.",
+    "all": "All",
+    "search": "Search dishes",
+    "searchPlaceholder": "Search by name…",
+    "empty": "Nothing matches that search.",
+    "clear": "Clear",
+    "from": "from",
+    "options": "Choose",
+    "portion": "Portion",
+    "serves": "Serves {count}",
+    "itemNo": "No. {no}",
+    "close": "Close",
+    "details": "Dish details",
+    "categoryJump": "Jump to category",
+    "results": "{count} dishes",
+    "photoNote": "Photograph from the DAON menu"
+  },
+  "tags": {
+    "vegetarian": "Vegetarian",
+    "extraSpicy": "Extra spicy",
+    "mildAvailable": "Mild version available",
+    "sharing": "For sharing"
+  },
+  "reservation": {
+    "eyebrow": "Reservation",
+    "title": "Book a table",
+    "subtitle": "Date, time, guests, table. Four steps, nothing more.",
+    "steps": {
+      "date": "Date",
+      "time": "Time",
+      "guests": "Guests",
+      "table": "Table",
+      "confirm": "Confirm"
+    },
+    "stepOf": "Step {current} of {total}",
+    "date": {
+      "title": "When would you like to come?",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "closed": "Closed",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month"
+    },
+    "time": {
+      "title": "Pick a time",
+      "subtitle": "Tables are held for 15 minutes after the booked time.",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "none": "No times left on this date."
+    },
+    "guests": {
+      "title": "How many of you?",
+      "person": "guest",
+      "people": "guests",
+      "sixPlus": "6+",
+      "large": "For {count} guests or more, please call us at {phone} so we can put tables together.",
+      "custom": "Number of guests"
+    },
+    "table": {
+      "title": "Choose your table",
+      "subtitle": "Grey tables are already taken for this time.",
+      "legend": {
+        "available": "Available",
+        "selected": "Selected",
+        "occupied": "Taken",
+        "disabled": "Not in service"
+      },
+      "seats": "{count} seats",
+      "tableLabel": "Table {label}",
+      "tooSmall": "Seats {seats} — too small for {guests}",
+      "none": "No table fits {guests} guests at this time. Try another time.",
+      "selected": "Table {label} · {zone} · {seats} seats",
+      "hint": "Pinch or scroll to zoom the plan on a small screen.",
+      "list": "Table list"
+    },
+    "details": {
+      "title": "Who is the table for?",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "phone": "Phone",
+      "phonePlaceholder": "+48 …",
+      "notes": "Anything we should know?",
+      "notesPlaceholder": "Allergies, a birthday, a high chair… (optional)",
+      "required": "Required"
+    },
+    "summary": {
+      "title": "Your reservation",
+      "date": "Date",
+      "time": "Time",
+      "guests": "Guests",
+      "table": "Table",
+      "name": "Name",
+      "phone": "Phone",
+      "notes": "Notes",
+      "confirm": "Confirm Booking",
+      "sending": "Sending…"
+    },
+    "success": {
+      "title": "Your table has been reserved",
+      "body": "We are looking forward to seeing you. A confirmation goes out to {phone}.",
+      "reference": "Reference",
+      "addAnother": "Make another reservation",
+      "backHome": "Back to the home page"
+    },
+    "back": "Back",
+    "next": "Continue",
+    "change": "Change",
+    "errors": {
+      "nameRequired": "Please tell us a name for the booking.",
+      "phoneRequired": "We need a phone number in case anything changes.",
+      "phoneInvalid": "That does not look like a phone number.",
+      "generic": "The reservation could not be saved. Please try again.",
+      "unavailable": "That table was just taken. Please pick another one.",
+      "retry": "Try again"
+    },
+    "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}."
+  },
+  "floorPlan": {
+    "title": "Restaurant plan",
+    "zones": {
+      "window": "Window",
+      "hall": "Main hall",
+      "bbq": "BBQ counter",
+      "private": "Private room"
+    },
+    "fixtures": {
+      "window": "Window",
+      "kitchen": "Kitchen",
+      "bar": "Bar",
+      "entrance": "Entrance",
+      "restroom": "Restrooms"
+    },
+    "grill": "Built-in grill",
+    "placeholder": "Layout shown is provisional."
+  },
+  "footer": {
+    "tagline": "Korean Restaurant",
+    "explore": "Explore",
+    "visit": "Visit us",
+    "follow": "Follow",
+    "instagram": "Instagram",
+    "rights": "All rights reserved.",
+    "hours": "Opening hours"
+  },
+  "days": {
+    "long": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "short": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
+    "narrow": [
+      "S",
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S"
+    ]
+  },
+  "months": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  "common": {
+    "loading": "Loading…",
+    "closed": "Closed",
+    "notFound": "Page not found",
+    "notFoundBody": "That page does not exist. The menu and the reservation form are still here.",
+    "backHome": "Back to the home page"
+  }
+}

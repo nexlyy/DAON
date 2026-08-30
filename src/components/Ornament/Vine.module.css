@@ -1,0 +1,17 @@
+.vine {
+  color: var(--gold-line);
+  opacity: 0.55;
+  pointer-events: none;
+  width: clamp(90px, 11vw, 160px);
+  height: auto;
+}
+
+.vine[data-flip] {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 860px) {
+  .vine {
+    display: none;
+  }
+}

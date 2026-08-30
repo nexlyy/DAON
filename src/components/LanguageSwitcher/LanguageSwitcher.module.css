@@ -1,0 +1,125 @@
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.85em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease);
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  border-color: var(--clay);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.current {
+  font-weight: 400;
+}
+
+.chevron {
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.3s var(--ease);
+}
+
+.chevron[data-open] {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+.list {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  z-index: 60;
+  min-width: 10.5rem;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  background: var(--white);
+  border: 1px solid rgba(198, 176, 150, 0.5);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.26s var(--ease),
+    transform 0.26s var(--ease),
+    visibility 0.26s;
+}
+
+.list[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2em;
+  width: 100%;
+  padding: 0.6em 0.8em;
+  border-radius: var(--radius-s);
+  font-size: var(--step--1);
+  color: var(--text);
+  transition: background-color 0.22s var(--ease), color 0.22s var(--ease);
+}
+
+.option:hover {
+  background: var(--paper-warm);
+}
+
+.option[aria-selected='true'] {
+  color: var(--ink);
+  background: var(--gold-wash);
+}
+
+.optionCode {
+  font-size: 0.78em;
+  letter-spacing: 0.18em;
+  color: var(--text-faint);
+}
+
+.option[aria-selected='true'] .optionCode {
+  color: var(--gold-text);
+}
+
+.inline {
+  display: inline-flex;
+  gap: 0.4rem;
+  padding: 0.3rem;
+  border: 1px solid rgba(198, 176, 150, 0.5);
+  border-radius: var(--radius-pill);
+}
+
+.inlineOption {
+  padding: 0.5em 1.05em;
+  border-radius: var(--radius-pill);
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  color: var(--text-soft);
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.inlineOption:hover {
+  color: var(--ink);
+}
+
+.inlineOption[aria-current] {
+  background: var(--ink);
+  color: var(--paper);
+}

@@ -1,0 +1,28 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.25em 0.7em;
+  border: 1px solid rgba(198, 176, 150, 0.6);
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.tag[data-tag='vegetarian'] {
+  border-color: rgba(122, 148, 96, 0.5);
+  color: #5b7440;
+}
+
+.tag[data-tag='extraSpicy'] {
+  border-color: rgba(196, 84, 70, 0.45);
+  color: #b04437;
+}
+
+.tag[data-tag='sharing'] {
+  border-color: rgba(47, 66, 86, 0.28);
+  color: var(--ink-soft);
+}

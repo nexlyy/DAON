@@ -1,0 +1,28 @@
+.page {
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(217, 191, 178, 0.22), transparent 70%),
+    var(--paper);
+}
+
+.head {
+  padding-block: clamp(7rem, 13vh, 10rem) clamp(2rem, 4vw, 3rem);
+}
+
+.head .shell {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+}
+
+.title {
+  font-size: var(--step-4);
+}
+
+.subtitle {
+  max-width: 44ch;
+}
+
+.body {
+  padding-top: 0.5rem;
+}

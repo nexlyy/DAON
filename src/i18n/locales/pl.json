@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "title": "DAON — Restauracja koreańska",
+    "description": "DAON to koreańska restauracja: ramen domowej roboty, grill koreański, kociołki i kimbap. Zobacz menu i zarezerwuj stolik.",
+    "menuTitle": "Menu — DAON Restauracja koreańska",
+    "reservationTitle": "Rezerwacja stolika — DAON Restauracja koreańska"
+  },
+  "nav": {
+    "home": "Strona główna",
+    "menu": "Menu",
+    "about": "O nas",
+    "reservation": "Rezerwacja",
+    "contact": "Kontakt",
+    "openMenu": "Otwórz nawigację",
+    "closeMenu": "Zamknij nawigację",
+    "language": "Język",
+    "skipToContent": "Przejdź do treści"
+  },
+  "hero": {
+    "eyebrow": "Restauracja koreańska",
+    "tagline": "다온 · nadchodzi dobry dzień",
+    "lead": "Węgiel drzewny, bulion i fermentacja — na tych trzech rzeczach stoi koreańska kuchnia. Gotujemy tak, jak gotuje się w domu, i tak samo nakrywamy do stołu: wszystko naraz, do dzielenia się, jeszcze parujące.",
+    "viewMenu": "Zobacz menu",
+    "bookTable": "Zarezerwuj stolik",
+    "scroll": "Przewiń"
+  },
+  "home": {
+    "about": {
+      "eyebrow": "O nas",
+      "title": "Stół nakryty po koreańsku",
+      "body": "한상차림 — hansangcharim — to stół zastawiony naraz, na którym nic nie czeka na swoją kolej. Grillowane mięso obok gulaszu, ryż obok kilkunastu małych dodatków, wszyscy sięgają przez stół. Tak podajemy w DAON — czy wpadasz na miskę domowego ramenu w południe, czy spędzasz wieczór przy grillu.",
+      "note": "Każde danie na tej stronie pochodzi z naszego drukowanego menu — te same nazwy, te same ceny.",
+      "stats": {
+        "dishes": "dań w menu",
+        "chapters": "rozdziałów",
+        "from": "od"
+      }
+    },
+    "signature": {
+      "eyebrow": "Polecane",
+      "title": "Co zamawiają goście",
+      "subtitle": "Kilka dań, które najczęściej wychodzą z kuchni.",
+      "all": "Zobacz całe menu"
+    },
+    "categories": {
+      "eyebrow": "Menu",
+      "title": "Trzynaście rozdziałów",
+      "subtitle": "Od letnich makaronów po kociołki dla czterech osób."
+    },
+    "visit": {
+      "eyebrow": "Odwiedź nas",
+      "title": "Znajdź nas",
+      "hours": "Godziny otwarcia",
+      "contact": "Kontakt",
+      "address": "Adres",
+      "directions": "Otwórz w mapach"
+    },
+    "cta": {
+      "title": "Zarezerwuj stolik",
+      "body": "Wybierz datę, godzinę i stolik, przy którym chcesz usiąść. Zajmie to mniej niż minutę.",
+      "button": "Zarezerwuj stolik"
+    }
+  },
+  "menu": {
+    "eyebrow": "Menu",
+    "title": "Nasze menu",
+    "subtitle": "Ceny w PLN. Kliknij danie, aby zobaczyć pełny opis.",
+    "all": "Wszystko",
+    "search": "Szukaj dań",
+    "searchPlaceholder": "Szukaj po nazwie…",
+    "empty": "Nic nie pasuje do tego wyszukiwania.",
+    "clear": "Wyczyść",
+    "from": "od",
+    "options": "Do wyboru",
+    "portion": "Porcja",
+    "serves": "Dla {count} osób",
+    "itemNo": "Nr {no}",
+    "close": "Zamknij",
+    "details": "Szczegóły dania",
+    "categoryJump": "Przejdź do kategorii",
+    "results": "{count} dań",
+    "photoNote": "Zdjęcie z menu DAON"
+  },
+  "tags": {
+    "vegetarian": "Wegetariańskie",
+    "extraSpicy": "Bardzo ostre",
+    "mildAvailable": "Dostępny łagodny smak",
+    "sharing": "Do dzielenia"
+  },
+  "reservation": {
+    "eyebrow": "Rezerwacja",
+    "title": "Zarezerwuj stolik",
+    "subtitle": "Data, godzina, goście, stolik. Cztery kroki, nic więcej.",
+    "steps": {
+      "date": "Data",
+      "time": "Godzina",
+      "guests": "Goście",
+      "table": "Stolik",
+      "confirm": "Potwierdzenie"
+    },
+    "stepOf": "Krok {current} z {total}",
+    "date": {
+      "title": "Kiedy chcesz do nas przyjść?",
+      "today": "Dziś",
+      "tomorrow": "Jutro",
+      "closed": "Zamknięte",
+      "previousMonth": "Poprzedni miesiąc",
+      "nextMonth": "Następny miesiąc"
+    },
+    "time": {
+      "title": "Wybierz godzinę",
+      "subtitle": "Stolik trzymamy 15 minut po zarezerwowanej godzinie.",
+      "lunch": "Obiad",
+      "dinner": "Kolacja",
+      "none": "Brak wolnych godzin tego dnia."
+    },
+    "guests": {
+      "title": "Ile osób?",
+      "person": "osoba",
+      "people": "osób",
+      "sixPlus": "6+",
+      "large": "Przy {count} osobach i więcej zadzwoń do nas pod {phone} — zestawimy stoliki.",
+      "custom": "Liczba osób"
+    },
+    "table": {
+      "title": "Wybierz stolik",
+      "subtitle": "Szare stoliki są już zajęte o tej godzinie.",
+      "legend": {
+        "available": "Wolny",
+        "selected": "Wybrany",
+        "occupied": "Zajęty",
+        "disabled": "Nieczynny"
+      },
+      "seats": "{count} miejsc",
+      "tableLabel": "Stolik {label}",
+      "tooSmall": "{seats} miejsc — za mało dla {guests}",
+      "none": "Żaden stolik nie pomieści {guests} osób o tej godzinie. Wybierz inną godzinę.",
+      "selected": "Stolik {label} · {zone} · {seats} miejsc",
+      "hint": "Na małym ekranie przybliż plan gestem lub przewiń w bok.",
+      "list": "Lista stolików"
+    },
+    "details": {
+      "title": "Na kogo rezerwacja?",
+      "name": "Imię",
+      "namePlaceholder": "Twoje imię",
+      "phone": "Telefon",
+      "phonePlaceholder": "+48 …",
+      "notes": "Coś, o czym powinniśmy wiedzieć?",
+      "notesPlaceholder": "Alergie, urodziny, krzesełko dla dziecka… (opcjonalnie)",
+      "required": "Wymagane"
+    },
+    "summary": {
+      "title": "Twoja rezerwacja",
+      "date": "Data",
+      "time": "Godzina",
+      "guests": "Goście",
+      "table": "Stolik",
+      "name": "Imię",
+      "phone": "Telefon",
+      "notes": "Uwagi",
+      "confirm": "Potwierdź rezerwację",
+      "sending": "Wysyłanie…"
+    },
+    "success": {
+      "title": "Stolik zarezerwowany",
+      "body": "Czekamy na Ciebie. Potwierdzenie wyślemy na {phone}.",
+      "reference": "Numer rezerwacji",
+      "addAnother": "Zrób kolejną rezerwację",
+      "backHome": "Wróć na stronę główną"
+    },
+    "back": "Wstecz",
+    "next": "Dalej",
+    "change": "Zmień",
+    "errors": {
+      "nameRequired": "Podaj imię do rezerwacji.",
+      "phoneRequired": "Potrzebujemy numeru telefonu, gdyby coś się zmieniło.",
+      "phoneInvalid": "To nie wygląda na numer telefonu.",
+      "generic": "Nie udało się zapisać rezerwacji. Spróbuj ponownie.",
+      "unavailable": "Ten stolik właśnie został zajęty. Wybierz inny.",
+      "retry": "Spróbuj ponownie"
+    },
+    "demoNotice": "Rezerwacja demonstracyjna — zapisujemy ją tylko w tej przeglądarce i nie trafia jeszcze do restauracji. Aby zarezerwować naprawdę, zadzwoń pod {phone}."
+  },
+  "floorPlan": {
+    "title": "Plan restauracji",
+    "zones": {
+      "window": "Przy oknie",
+      "hall": "Sala główna",
+      "bbq": "Strefa grillowa",
+      "private": "Sala prywatna"
+    },
+    "fixtures": {
+      "window": "Okno",
+      "kitchen": "Kuchnia",
+      "bar": "Bar",
+      "entrance": "Wejście",
+      "restroom": "Toalety"
+    },
+    "grill": "Wbudowany grill",
+    "placeholder": "Pokazany układ jest tymczasowy."
+  },
+  "footer": {
+    "tagline": "Restauracja koreańska",
+    "explore": "Nawigacja",
+    "visit": "Odwiedź nas",
+    "follow": "Obserwuj",
+    "instagram": "Instagram",
+    "rights": "Wszelkie prawa zastrzeżone.",
+    "hours": "Godziny otwarcia"
+  },
+  "days": {
+    "long": [
+      "Niedziela",
+      "Poniedziałek",
+      "Wtorek",
+      "Środa",
+      "Czwartek",
+      "Piątek",
+      "Sobota"
+    ],
+    "short": [
+      "Nd",
+      "Pn",
+      "Wt",
+      "Śr",
+      "Cz",
+      "Pt",
+      "Sb"
+    ],
+    "narrow": [
+      "N",
+      "P",
+      "W",
+      "Ś",
+      "C",
+      "P",
+      "S"
+    ]
+  },
+  "months": [
+    "styczeń",
+    "luty",
+    "marzec",
+    "kwiecień",
+    "maj",
+    "czerwiec",
+    "lipiec",
+    "sierpień",
+    "wrzesień",
+    "październik",
+    "listopad",
+    "grudzień"
+  ],
+  "common": {
+    "loading": "Ładowanie…",
+    "closed": "Zamknięte",
+    "notFound": "Nie znaleziono strony",
+    "notFoundBody": "Taka strona nie istnieje. Menu i formularz rezerwacji są na swoim miejscu.",
+    "backHome": "Wróć na stronę główną"
+  }
+}

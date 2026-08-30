@@ -1,0 +1,119 @@
+.calendar {
+  width: min(100%, 26rem);
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+  background: var(--white);
+  border: 1px solid rgba(198, 176, 150, 0.45);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-soft);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.month {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.month span {
+  color: var(--text-faint);
+  font-size: 0.8em;
+}
+
+.nav {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid rgba(198, 176, 150, 0.5);
+  border-radius: 50%;
+  color: var(--ink);
+  transition: border-color 0.25s var(--ease), background-color 0.25s var(--ease);
+}
+
+.nav:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: var(--paper-warm);
+}
+
+.nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.weekdays,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.28rem;
+}
+
+.weekdays {
+  margin-bottom: 0.45rem;
+}
+
+.weekdays span {
+  padding-block: 0.3rem;
+  text-align: center;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.pad {
+  aspect-ratio: 1;
+}
+
+.day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  transition:
+    background-color 0.24s var(--ease),
+    color 0.24s var(--ease),
+    border-color 0.24s var(--ease);
+}
+
+.day:hover:not(:disabled) {
+  border-color: var(--gold-line);
+  background: var(--paper-warm);
+}
+
+.day:disabled {
+  color: var(--text-faint);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.day[data-today]:not([aria-pressed='true']) {
+  border-color: var(--clay);
+}
+
+.day[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.closedMark {
+  position: absolute;
+  bottom: 18%;
+  width: 40%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}

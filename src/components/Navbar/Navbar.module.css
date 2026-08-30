@@ -1,0 +1,225 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  transition: transform 0.5s var(--ease), background-color 0.4s var(--ease),
+    box-shadow 0.4s var(--ease), backdrop-filter 0.4s var(--ease);
+}
+
+.header[data-scrolled] {
+  background: rgba(251, 248, 243, 0.86);
+  backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow: 0 1px 0 rgba(198, 176, 150, 0.4);
+}
+
+.header[data-hidden] {
+  transform: translateY(-104%);
+}
+
+.bar {
+  /* Above the drawer so the burger stays reachable while it is open. */
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  width: min(100% - var(--gutter) * 2, var(--max-w));
+  margin-inline: auto;
+  padding-block: clamp(0.85rem, 1.6vw, 1.35rem);
+}
+
+.brand {
+  font-size: 0.94rem;
+  flex: none;
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.1rem, 2.4vw, 2.4rem);
+  margin-inline: auto;
+}
+
+.navLink {
+  position: relative;
+  padding-block: 0.35em;
+  font-size: var(--step--1);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  transition: color 0.3s var(--ease);
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease);
+}
+
+.navLink:hover,
+.navLinkActive,
+.navLink[data-active] {
+  color: var(--ink);
+}
+
+.navLink:hover::after,
+.navLinkActive::after,
+.navLink[data-active]::after {
+  transform: scaleX(1);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: none;
+}
+
+.cta {
+  padding: 0.72em 1.5em;
+  min-height: 2.6rem;
+  font-size: 0.72rem;
+}
+
+.burger {
+  display: none;
+  padding: 0.55rem;
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+}
+
+.burgerBox {
+  display: grid;
+  gap: 5px;
+  width: 22px;
+}
+
+.burgerBox span {
+  height: 1.4px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform 0.38s var(--ease), opacity 0.24s var(--ease), width 0.38s var(--ease);
+}
+
+.burgerBox span:last-child {
+  width: 15px;
+  justify-self: end;
+}
+
+.burgerBox[data-open] span:first-child {
+  transform: translateY(6.4px) rotate(45deg);
+}
+
+.burgerBox[data-open] span:nth-child(2) {
+  opacity: 0;
+}
+
+.burgerBox[data-open] span:last-child {
+  width: 22px;
+  transform: translateY(-6.4px) rotate(-45deg);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: rgba(41, 33, 24, 0.34);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s var(--ease), visibility 0.4s;
+}
+
+.scrim[data-open] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 2;
+  width: min(86vw, 24rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 5rem var(--gutter) 3rem;
+  background: var(--paper-warm);
+  border-left: 1px solid rgba(198, 176, 150, 0.5);
+  transform: translateX(101%);
+  visibility: hidden;
+  transition: transform 0.55s var(--ease-out), visibility 0.55s;
+}
+
+.drawer[data-open] {
+  transform: none;
+  visibility: visible;
+}
+
+.drawerNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.drawerLink {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 0.65rem;
+  border-bottom: 1px solid rgba(198, 176, 150, 0.35);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  color: var(--ink);
+  opacity: 0;
+  transform: translateX(14px);
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease-out);
+}
+
+.drawer[data-open] .drawerLink {
+  opacity: 1;
+  transform: none;
+}
+
+.drawerIndex {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: var(--gold-text);
+}
+
+.drawerFooter {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 960px) {
+  .desktopNav {
+    display: none;
+  }
+
+  .burger {
+    display: inline-flex;
+  }
+
+  .actions .cta {
+    display: none;
+  }
+
+  .actions {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    font-size: 0.84rem;
+  }
+}

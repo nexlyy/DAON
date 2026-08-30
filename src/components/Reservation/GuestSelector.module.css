@@ -1,0 +1,124 @@
+.wrap {
+  display: grid;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  gap: 0.6rem;
+  max-width: 34rem;
+}
+
+.option {
+  display: grid;
+  gap: 0.15rem;
+  place-items: center;
+  padding: 1.1em 0.5em;
+  border: 1px solid rgba(198, 176, 150, 0.55);
+  border-radius: var(--radius-m);
+  background: var(--white);
+  transition:
+    background-color 0.28s var(--ease),
+    border-color 0.28s var(--ease),
+    color 0.28s var(--ease),
+    transform 0.28s var(--ease);
+}
+
+.option:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.option[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.option[aria-pressed='true'] .number {
+  color: var(--paper);
+}
+
+.caption {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.option[aria-pressed='true'] .caption {
+  color: var(--gold-line);
+}
+
+.stepper {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.stepperLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.stepperControls {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(198, 176, 150, 0.55);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.stepperControls button {
+  width: 2.8rem;
+  height: 2.8rem;
+  font-size: 1.15rem;
+  color: var(--ink);
+  transition: background-color 0.22s var(--ease);
+}
+
+.stepperControls button:hover {
+  background: var(--paper-warm);
+}
+
+.stepperControls input {
+  width: 3.6rem;
+  padding-block: 0.6rem;
+  border: none;
+  border-inline: 1px solid rgba(198, 176, 150, 0.55);
+  outline: none;
+  background: none;
+  text-align: center;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.stepperControls input::-webkit-outer-spin-button,
+.stepperControls input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.note {
+  max-width: 46ch;
+  padding: 0.85rem 1.1rem;
+  border-left: 2px solid var(--gold-line);
+  background: var(--gold-wash);
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+}

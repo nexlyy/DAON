@@ -1,0 +1,87 @@
+.groups {
+  display: grid;
+  gap: clamp(1.2rem, 2.5vw, 2rem);
+  width: 100%;
+}
+
+.group {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.groupLabel {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr));
+  gap: 0.5rem;
+}
+
+.slot {
+  padding: 0.75em 0.4em;
+  border: 1px solid rgba(198, 176, 150, 0.55);
+  border-radius: var(--radius-m);
+  background: var(--white);
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  transition:
+    background-color 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.slot:hover:not(:disabled) {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.slot:disabled {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-faint);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slot[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.skeleton span {
+  height: 2.9rem;
+  border-radius: var(--radius-m);
+  background: linear-gradient(90deg, var(--paper-warm), var(--sand), var(--paper-warm));
+  background-size: 220% 100%;
+  animation: shimmer 1.5s var(--ease) infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+.none {
+  padding: 2rem 0;
+  font-size: var(--step-0);
+  color: var(--text-soft);
+}

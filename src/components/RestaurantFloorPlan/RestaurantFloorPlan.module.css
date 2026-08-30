@@ -1,0 +1,215 @@
+.wrap {
+  display: grid;
+  gap: 0.75rem;
+  /* The step panel lays its children out with `justify-items: start`, so the
+     plan has to claim the full column itself. */
+  width: 100%;
+  transition: opacity 0.3s var(--ease);
+}
+
+.wrap[data-loading] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.scroller {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border-radius: var(--radius-l);
+  -webkit-overflow-scrolling: touch;
+}
+
+.plan {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 33rem;
+}
+
+.room {
+  fill: var(--paper-warm);
+  stroke: var(--gold-line);
+  stroke-width: 1.4;
+}
+
+.zone {
+  fill: rgba(255, 255, 255, 0.55);
+  stroke: rgba(198, 176, 150, 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 5 6;
+}
+
+.zoneLabel {
+  font-family: var(--font-body);
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: var(--gold-text);
+}
+
+.fixture rect {
+  fill: var(--sand);
+  stroke: rgba(198, 176, 150, 0.7);
+  stroke-width: 1;
+}
+
+.fixture text {
+  font-family: var(--font-body);
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-anchor: middle;
+  fill: var(--text-soft);
+}
+
+.fixture[data-kind='kitchen'] rect {
+  fill: var(--beige);
+}
+
+.fixture[data-kind='window'] rect {
+  fill: var(--ink-faint);
+  opacity: 0.45;
+}
+
+.fixture[data-kind='entrance'] rect {
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 2;
+  stroke-dasharray: 10 7;
+}
+
+/* Tables ----------------------------------------------------------------- */
+
+.table {
+  transition: transform 0.35s var(--ease-out);
+}
+
+.table[data-selectable] {
+  cursor: pointer;
+}
+
+.table[data-selectable]:hover {
+  transform-box: fill-box;
+}
+
+.body {
+  fill: var(--white);
+  stroke: var(--clay);
+  stroke-width: 1.6;
+  transition: fill 0.32s var(--ease), stroke 0.32s var(--ease);
+}
+
+.seats circle {
+  fill: var(--sand);
+  stroke: var(--clay);
+  stroke-width: 1;
+  transition: fill 0.32s var(--ease), stroke 0.32s var(--ease);
+}
+
+.tableLabel {
+  font-family: var(--font-display);
+  font-size: 26px;
+  text-anchor: middle;
+  fill: var(--ink);
+  pointer-events: none;
+  transition: fill 0.32s var(--ease);
+}
+
+.grill {
+  fill: none;
+  stroke: var(--clay);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 4;
+}
+
+.table[data-selectable]:hover .body {
+  stroke: var(--ink);
+  fill: var(--gold-wash);
+}
+
+.table[data-state='selected'] .body {
+  fill: var(--ink);
+  stroke: var(--ink);
+}
+
+.table[data-state='selected'] .tableLabel {
+  fill: var(--paper);
+}
+
+.table[data-state='selected'] .seats circle {
+  fill: var(--ink-soft);
+  stroke: var(--ink-soft);
+}
+
+.table[data-state='selected'] .grill {
+  stroke: var(--gold-line);
+}
+
+.ring {
+  stroke: var(--gold);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 6;
+  opacity: 0.9;
+  animation: ring-spin 14s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.table[data-state='occupied'] .body {
+  fill: #e4ded4;
+  stroke: #cdc4b6;
+}
+
+.table[data-state='occupied'] .tableLabel {
+  fill: #a89e90;
+}
+
+.table[data-state='occupied'] .seats circle {
+  fill: #ddd6ca;
+  stroke: #cdc4b6;
+}
+
+.table[data-state='disabled'] .body,
+.table[data-state='tooSmall'] .body {
+  fill: url(#daon-hatch);
+  stroke: var(--clay);
+  stroke-dasharray: 5 5;
+  opacity: 0.7;
+}
+
+.table[data-state='disabled'] .tableLabel,
+.table[data-state='tooSmall'] .tableLabel {
+  fill: var(--text-faint);
+}
+
+.table[data-state='disabled'] .seats circle,
+.table[data-state='tooSmall'] .seats circle {
+  fill: transparent;
+  stroke: var(--clay);
+  opacity: 0.6;
+}
+
+.table:focus-visible {
+  outline: none;
+}
+
+.table:focus-visible .body {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.hint {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+@media (min-width: 720px) {
+  .hint {
+    display: none;
+  }
+}

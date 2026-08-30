@@ -1,0 +1,9 @@
+.main {
+  min-height: 60dvh;
+  transition: opacity 0.28s var(--ease);
+}
+
+/* Language changes cross-fade rather than snapping between scripts. */
+.main[data-switching] {
+  opacity: 0.32;
+}

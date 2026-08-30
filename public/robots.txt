@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nexlyy.github.io/DAON/sitemap.xml

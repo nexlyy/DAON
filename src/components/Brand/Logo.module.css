@@ -1,0 +1,50 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  color: var(--ink);
+  line-height: 1;
+}
+
+/* The mark is a 600x182 alpha mask painted with the inherited colour. */
+.mark {
+  display: block;
+  flex: none;
+  width: 3.3em;
+  aspect-ratio: 600 / 182;
+  background-color: currentColor;
+  -webkit-mask-image: var(--mark-src);
+  mask-image: var(--mark-src);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.word {
+  font-family: var(--font-display);
+  font-size: 1.42em;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  line-height: 0.9;
+}
+
+.tagline {
+  font-size: 0.48em;
+  font-weight: 400;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.logo[data-variant='mark'] .mark {
+  width: 100%;
+}

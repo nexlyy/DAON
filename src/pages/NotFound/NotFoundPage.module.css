@@ -1,0 +1,31 @@
+.page {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.1rem;
+  min-height: 72dvh;
+  padding: 8rem var(--gutter) 4rem;
+  text-align: center;
+}
+
+.mark {
+  width: 5.5rem;
+  color: var(--clay);
+}
+
+.title {
+  font-size: var(--step-3);
+}
+
+.body {
+  max-width: 40ch;
+  color: var(--text-soft);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}

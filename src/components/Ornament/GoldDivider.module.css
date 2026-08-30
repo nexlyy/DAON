@@ -1,0 +1,20 @@
+.divider {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.8rem, 2vw, 1.6rem);
+  color: var(--gold-line);
+  width: 100%;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-line) 22%, var(--gold-line) 78%, transparent);
+}
+
+.bloom {
+  width: clamp(24px, 3vw, 32px);
+  height: auto;
+  flex: none;
+  opacity: 0.9;
+}

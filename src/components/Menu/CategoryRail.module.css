@@ -1,0 +1,59 @@
+.rail {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-block: 0.4rem 0.9rem;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: thin;
+  scrollbar-color: var(--clay) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rail::-webkit-scrollbar {
+  height: 3px;
+}
+
+.rail::-webkit-scrollbar-thumb {
+  background: var(--clay);
+  border-radius: 999px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  flex: none;
+  padding: 0.62em 1.15em;
+  border: 1px solid rgba(198, 176, 150, 0.55);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: var(--text-soft);
+  white-space: nowrap;
+  transition:
+    background-color 0.3s var(--ease),
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+.chip:hover {
+  border-color: var(--gold-line);
+  color: var(--ink);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.ko {
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  color: var(--gold-text);
+}
+
+.chip[aria-pressed='true'] .ko {
+  color: var(--gold-line);
+}
