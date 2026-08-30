@@ -44,7 +44,7 @@ export function Footer() {
           <div className={styles.col}>
             <h2 className={styles.colTitle}>{t('footer.visit')}</h2>
             <address className={styles.address}>
-              {restaurant.address.street}
+              {restaurant.address.street ?? t('home.visit.addressPending')}
               <br />
               {restaurant.address.city}, {restaurant.address.country}
             </address>

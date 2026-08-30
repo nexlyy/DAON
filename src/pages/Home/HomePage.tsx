@@ -154,7 +154,7 @@ export function HomePage() {
             <div className={styles.visitBlock}>
               <h3>{t('home.visit.address')}</h3>
               <address>
-                {restaurant.address.street}
+                {restaurant.address.street ?? t('home.visit.addressPending')}
                 <br />
                 {restaurant.address.city}, {restaurant.address.country}
               </address>

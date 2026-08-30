@@ -12,9 +12,9 @@ export const restaurant = {
   /** From the Instagram QR caption in the menu footer. */
   instagram: 'daonpoland',
   instagramUrl: 'https://instagram.com/daonpoland',
-  /** PLACEHOLDER — street address has not been supplied. */
   address: {
-    street: 'ul. — (PLACEHOLDER)',
+    /** PLACEHOLDER — the street address has not been supplied yet. */
+    street: null as string | null,
     city: 'Warszawa',
     country: 'Polska',
     mapsUrl: 'https://www.google.com/maps/search/?api=1&query=DAON+Korean+Restaurant',

@@ -213,3 +213,10 @@
     display: none;
   }
 }
+
+.note {
+  font-size: 0.72rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}

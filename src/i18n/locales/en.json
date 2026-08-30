@@ -53,7 +53,8 @@
       "hours": "Opening hours",
       "contact": "Contact",
       "address": "Address",
-      "directions": "Open in maps"
+      "directions": "Open in maps",
+      "addressPending": "Address to be confirmed"
     },
     "cta": {
       "title": "Reserve a table",
@@ -78,8 +79,7 @@
     "close": "Close",
     "details": "Dish details",
     "categoryJump": "Jump to category",
-    "results": "{count} dishes",
-    "photoNote": "Photograph from the DAON menu"
+    "results": "{count} dishes"
   },
   "tags": {
     "vegetarian": "Vegetarian",
@@ -101,8 +101,6 @@
     "stepOf": "Step {current} of {total}",
     "date": {
       "title": "When would you like to come?",
-      "today": "Today",
-      "tomorrow": "Tomorrow",
       "closed": "Closed",
       "previousMonth": "Previous month",
       "nextMonth": "Next month"
@@ -176,8 +174,7 @@
       "phoneRequired": "We need a phone number in case anything changes.",
       "phoneInvalid": "That does not look like a phone number.",
       "generic": "The reservation could not be saved. Please try again.",
-      "unavailable": "That table was just taken. Please pick another one.",
-      "retry": "Try again"
+      "unavailable": "That table was just taken. Please pick another one."
     },
     "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}."
   },
@@ -203,8 +200,6 @@
     "tagline": "Korean Restaurant",
     "explore": "Explore",
     "visit": "Visit us",
-    "follow": "Follow",
-    "instagram": "Instagram",
     "rights": "All rights reserved.",
     "hours": "Opening hours"
   },

@@ -119,6 +119,7 @@ export function RestaurantFloorPlan({
       </div>
 
       <p className={styles.hint}>{t('reservation.table.hint')}</p>
+      <p className={styles.note}>{t('floorPlan.placeholder')}</p>
     </div>
   )
 }
