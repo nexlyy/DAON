@@ -23,26 +23,19 @@
   display: block;
   width: 100%;
   height: auto;
-  min-width: 33rem;
+  min-width: 30rem;
 }
 
 .room {
   fill: var(--paper-warm);
-  stroke: var(--gold-line);
-  stroke-width: 1.4;
+  stroke: var(--ink-soft);
+  stroke-width: 2.4;
 }
 
-.zone {
-  fill: rgba(255, 255, 255, 0.55);
-  stroke: rgba(198, 176, 150, 0.55);
-  stroke-width: 1;
-  stroke-dasharray: 5 6;
-}
-
-.zoneLabel {
+.roomLabel {
   font-family: var(--font-body);
-  font-size: 15px;
-  letter-spacing: 0.16em;
+  font-size: 21px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   fill: var(--gold-text);
 }
@@ -53,10 +46,16 @@
   stroke-width: 1;
 }
 
+.fixture rect {
+  fill: var(--sand);
+  stroke: var(--ink-soft);
+  stroke-width: 2.4;
+}
+
 .fixture text {
   font-family: var(--font-body);
-  font-size: 15px;
-  letter-spacing: 0.12em;
+  font-size: 21px;
+  letter-spacing: 0.14em;
   text-anchor: middle;
   fill: var(--text-soft);
 }
@@ -65,16 +64,9 @@
   fill: var(--beige);
 }
 
-.fixture[data-kind='window'] rect {
-  fill: var(--ink-faint);
-  opacity: 0.45;
-}
-
 .fixture[data-kind='entrance'] rect {
   fill: none;
-  stroke: var(--ink-soft);
-  stroke-width: 2;
-  stroke-dasharray: 10 7;
+  stroke-dasharray: 12 8;
 }
 
 /* Tables ----------------------------------------------------------------- */
@@ -107,18 +99,11 @@
 
 .tableLabel {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 32px;
   text-anchor: middle;
   fill: var(--ink);
   pointer-events: none;
   transition: fill 0.32s var(--ease);
-}
-
-.grill {
-  fill: none;
-  stroke: var(--clay);
-  stroke-width: 1.2;
-  stroke-dasharray: 4 4;
 }
 
 .table[data-selectable]:hover .body {
@@ -138,10 +123,6 @@
 .table[data-state='selected'] .seats circle {
   fill: var(--ink-soft);
   stroke: var(--ink-soft);
-}
-
-.table[data-state='selected'] .grill {
-  stroke: var(--gold-line);
 }
 
 .ring {
@@ -174,7 +155,7 @@
 }
 
 .table[data-state='disabled'] .body,
-.table[data-state='tooSmall'] .body {
+.table[data-state='noJoin'] .body {
   fill: url(#daon-hatch);
   stroke: var(--clay);
   stroke-dasharray: 5 5;
@@ -182,12 +163,12 @@
 }
 
 .table[data-state='disabled'] .tableLabel,
-.table[data-state='tooSmall'] .tableLabel {
+.table[data-state='noJoin'] .tableLabel {
   fill: var(--text-faint);
 }
 
 .table[data-state='disabled'] .seats circle,
-.table[data-state='tooSmall'] .seats circle {
+.table[data-state='noJoin'] .seats circle {
   fill: transparent;
   stroke: var(--clay);
   opacity: 0.6;

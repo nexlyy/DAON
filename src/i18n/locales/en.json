@@ -117,12 +117,12 @@
       "person": "guest",
       "people": "guests",
       "sixPlus": "6+",
-      "large": "For {count} guests or more, please call us at {phone} so we can put tables together.",
+      "large": "We can seat up to {count} guests online, with tables pushed together. For a larger party call us at {phone} and we will lay out the room for you.",
       "custom": "Number of guests"
     },
     "table": {
       "title": "Choose your table",
-      "subtitle": "Grey tables are already taken for this time.",
+      "subtitle": "Grey tables are already taken for this time. Pick where you would like to sit — for more than four we push tables together.",
       "legend": {
         "available": "Available",
         "selected": "Selected",
@@ -131,11 +131,12 @@
       },
       "seats": "{count} seats",
       "tableLabel": "Table {label}",
-      "tooSmall": "Seats {seats} — too small for {guests}",
-      "none": "No table fits {guests} guests at this time. Try another time.",
-      "selected": "Table {label} · {zone} · {seats} seats",
+      "none": "No table seats {guests} guests at this time. Try another time.",
+      "selected": "Table {tables} · {zone} · {seats} seats",
       "hint": "Pinch or scroll to zoom the plan on a small screen.",
-      "list": "Table list"
+      "list": "Table list",
+      "noJoin": "no free table next to it for {guests} guests",
+      "selectedJoined": "Tables {tables} pushed together · {zone} · {seats} seats"
     },
     "details": {
       "title": "Who is the table for?",
@@ -157,7 +158,8 @@
       "phone": "Phone",
       "notes": "Notes",
       "confirm": "Confirm Booking",
-      "sending": "Sending…"
+      "sending": "Sending…",
+      "tables": "Tables"
     },
     "success": {
       "title": "Your table has been reserved",
@@ -181,20 +183,17 @@
   "floorPlan": {
     "title": "Restaurant plan",
     "zones": {
-      "window": "Window",
-      "hall": "Main hall",
-      "bbq": "BBQ counter",
-      "private": "Private room"
+      "sala1": "Room 1",
+      "srodek": "Middle",
+      "sala2": "Room 2",
+      "ogrodek": "Garden"
     },
     "fixtures": {
-      "window": "Window",
       "kitchen": "Kitchen",
       "bar": "Bar",
-      "entrance": "Entrance",
-      "restroom": "Restrooms"
+      "entrance": "Entrance"
     },
-    "grill": "Built-in grill",
-    "placeholder": "Layout shown is provisional."
+    "joinNote": "Every table seats four. Larger parties are seated at tables pushed together."
   },
   "footer": {
     "tagline": "Korean Restaurant",

@@ -117,12 +117,12 @@
       "person": "osoba",
       "people": "osób",
       "sixPlus": "6+",
-      "large": "Przy {count} osobach i więcej zadzwoń do nas pod {phone} — zestawimy stoliki.",
+      "large": "Przez stronę zarezerwujesz stolik dla maksymalnie {count} osób — zestawiamy stoliki razem. Przy większej grupie zadzwoń pod {phone}, a przygotujemy salę.",
       "custom": "Liczba osób"
     },
     "table": {
       "title": "Wybierz stolik",
-      "subtitle": "Szare stoliki są już zajęte o tej godzinie.",
+      "subtitle": "Szare stoliki są już zajęte o tej godzinie. Wybierz, gdzie chcesz usiąść — powyżej czterech osób zestawiamy stoliki.",
       "legend": {
         "available": "Wolny",
         "selected": "Wybrany",
@@ -131,11 +131,12 @@
       },
       "seats": "{count} miejsc",
       "tableLabel": "Stolik {label}",
-      "tooSmall": "{seats} miejsc — za mało dla {guests}",
       "none": "Żaden stolik nie pomieści {guests} osób o tej godzinie. Wybierz inną godzinę.",
-      "selected": "Stolik {label} · {zone} · {seats} miejsc",
+      "selected": "Stolik {tables} · {zone} · {seats} miejsc",
       "hint": "Na małym ekranie przybliż plan gestem lub przewiń w bok.",
-      "list": "Lista stolików"
+      "list": "Lista stolików",
+      "noJoin": "brak wolnego stolika obok dla {guests} osób",
+      "selectedJoined": "Stoliki {tables} zestawione razem · {zone} · {seats} miejsc"
     },
     "details": {
       "title": "Na kogo rezerwacja?",
@@ -157,7 +158,8 @@
       "phone": "Telefon",
       "notes": "Uwagi",
       "confirm": "Potwierdź rezerwację",
-      "sending": "Wysyłanie…"
+      "sending": "Wysyłanie…",
+      "tables": "Stoliki"
     },
     "success": {
       "title": "Stolik zarezerwowany",
@@ -181,20 +183,17 @@
   "floorPlan": {
     "title": "Plan restauracji",
     "zones": {
-      "window": "Przy oknie",
-      "hall": "Sala główna",
-      "bbq": "Strefa grillowa",
-      "private": "Sala prywatna"
+      "sala1": "Sala 1",
+      "srodek": "Środek",
+      "sala2": "Sala 2",
+      "ogrodek": "Ogródek"
     },
     "fixtures": {
-      "window": "Okno",
       "kitchen": "Kuchnia",
       "bar": "Bar",
-      "entrance": "Wejście",
-      "restroom": "Toalety"
+      "entrance": "Wejście"
     },
-    "grill": "Wbudowany grill",
-    "placeholder": "Pokazany układ jest tymczasowy."
+    "joinNote": "Każdy stolik jest na cztery osoby. Dla większych grup zestawiamy stoliki razem."
   },
   "footer": {
     "tagline": "Restauracja koreańska",

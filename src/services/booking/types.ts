@@ -21,7 +21,8 @@ export interface BookingRequest {
   date: string
   time: string
   partySize: number
-  tableId: string
+  /** One id for a party of four or fewer; several when tables are pushed together. */
+  tableIds: string[]
   name: string
   phone: string
   notes?: string

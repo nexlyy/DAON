@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { floorPlan, tableById, zoneById } from '@/data/tables/floorPlan'
+import {
+  floorPlan,
+  formatTableLabels,
+  resolveTableGroup,
+  seatsOf,
+  tableById,
+  zoneById,
+} from '@/data/tables/floorPlan'
 import type { FloorTable } from '@/data/tables/floorPlan'
 import { restaurant, reservation as reservationConfig } from '@/data/restaurant'
 import { bookingApi, isDemoBooking, toISODate } from '@/services/booking'
@@ -24,7 +31,7 @@ export function ReservationFlow() {
   const [date, setDate] = useState<string | null>(null)
   const [time, setTime] = useState<string | null>(null)
   const [partySize, setPartySize] = useState<number | null>(null)
-  const [tableId, setTableId] = useState<string | null>(null)
+  const [tableIds, setTableIds] = useState<string[]>([])
 
   const [closedDates, setClosedDates] = useState<string[]>([])
   const [slots, setSlots] = useState<TimeSlot[]>([])
@@ -114,15 +121,16 @@ export function ReservationFlow() {
     }
   }, [date, time, partySize])
 
-  // Drop a table that no longer seats the party or has just been taken.
+  // A change of party size or a table going in the meantime can invalidate the
+  // group; rebuild it around the same first table, and drop it if that fails.
   useEffect(() => {
-    if (!tableId) return
-    const table = tableById.get(tableId)
-    if (!table) return
-    if ((partySize && table.seats < partySize) || status[tableId] === 'occupied') {
-      setTableId(null)
-    }
-  }, [partySize, status, tableId])
+    if (tableIds.length === 0) return
+    const stillFree = (id: string) =>
+      (status[id] ?? 'available') === 'available' || tableIds.includes(id)
+    const rebuilt = resolveTableGroup(tableIds[0], partySize ?? 1, stillFree)
+    const unchanged = rebuilt?.length === tableIds.length && rebuilt.every((id, i) => id === tableIds[i])
+    if (!unchanged) setTableIds(rebuilt ?? [])
+  }, [partySize, status, tableIds])
 
   // Move focus to the new step so keyboard and screen-reader users follow along.
   useEffect(() => {
@@ -134,24 +142,32 @@ export function ReservationFlow() {
   }, [step])
 
   const stepIndex = STEPS.indexOf(step)
-  const selectedTable = tableId ? tableById.get(tableId) ?? null : null
+  const primaryTable = tableIds.length > 0 ? tableById.get(tableIds[0]) ?? null : null
 
   const fittingTables = useMemo(
     () =>
       floorPlan.tables.filter(
-        (table) => tableState(table, status, tableId, partySize ?? 1) === 'available',
+        (table) => tableState(table, status, tableIds, partySize ?? 1) === 'available',
       ),
-    [status, tableId, partySize],
+    [status, tableIds, partySize],
   )
 
-  /** Free tables plus the one already chosen, for the compact list on phones. */
+  /** Free tables plus the ones already chosen, for the compact list on phones. */
   const selectableTables = useMemo(
     () =>
       floorPlan.tables.filter((table) => {
-        const state = tableState(table, status, tableId, partySize ?? 1)
+        const state = tableState(table, status, tableIds, partySize ?? 1)
         return state === 'available' || state === 'selected'
       }),
-    [status, tableId, partySize],
+    [status, tableIds, partySize],
+  )
+
+  const chooseTable = useCallback(
+    (primaryId: string) => {
+      const isFree = (id: string) => (status[id] ?? 'available') === 'available'
+      setTableIds(resolveTableGroup(primaryId, partySize ?? 1, isFree) ?? [])
+    },
+    [partySize, status],
   )
 
   const canContinue = useMemo(() => {
@@ -163,11 +179,11 @@ export function ReservationFlow() {
       case 'guests':
         return Boolean(partySize)
       case 'table':
-        return Boolean(tableId)
+        return tableIds.length > 0
       default:
         return false
     }
-  }, [step, date, time, partySize, tableId])
+  }, [step, date, time, partySize, tableIds])
 
   const goTo = useCallback((next: Step) => {
     setSubmitError(null)
@@ -178,7 +194,7 @@ export function ReservationFlow() {
   const next = () => stepIndex < STEPS.length - 1 && canContinue && goTo(STEPS[stepIndex + 1])
 
   const submit = async () => {
-    if (!date || !time || !partySize || !tableId) return
+    if (!date || !time || !partySize || tableIds.length === 0) return
 
     const errors: { name?: string; phone?: string } = {}
     if (!name.trim()) errors.name = t('reservation.errors.nameRequired')
@@ -195,7 +211,7 @@ export function ReservationFlow() {
         date,
         time,
         partySize,
-        tableId,
+        tableIds,
         name: name.trim(),
         phone: phone.trim(),
         notes: notes.trim() || undefined,
@@ -206,7 +222,7 @@ export function ReservationFlow() {
       const code = error instanceof BookingError ? error.code : 'generic'
       setSubmitError(t(`reservation.errors.${code}`))
       if (code === 'unavailable') {
-        setTableId(null)
+        setTableIds([])
         goTo('table')
       }
     } finally {
@@ -220,7 +236,7 @@ export function ReservationFlow() {
     setDate(null)
     setTime(null)
     setPartySize(null)
-    setTableId(null)
+    setTableIds([])
     setName('')
     setPhone('')
     setNotes('')
@@ -283,10 +299,10 @@ export function ReservationFlow() {
 
               <RestaurantFloorPlan
                 status={status}
-                selectedId={tableId}
+                selectedIds={tableIds}
                 partySize={partySize ?? 1}
                 loading={statusLoading}
-                onSelect={(table: FloorTable) => setTableId(table.id)}
+                onSelect={(table: FloorTable) => chooseTable(table.id)}
               />
 
               {/* Phones get a plain list as well: tapping a 40px table inside a
@@ -300,8 +316,8 @@ export function ReservationFlow() {
                         key={table.id}
                         type="button"
                         className={styles.tableListItem}
-                        aria-pressed={tableId === table.id}
-                        onClick={() => setTableId(table.id)}
+                        aria-pressed={tableIds.includes(table.id)}
+                        onClick={() => chooseTable(table.id)}
                       >
                         <span className={styles.tableListLabel}>
                           {t('reservation.table.tableLabel', { label: table.label })}
@@ -316,20 +332,18 @@ export function ReservationFlow() {
                 </div>
               )}
 
-              {!statusLoading && fittingTables.length === 0 && !tableId && (
+              {!statusLoading && fittingTables.length === 0 && tableIds.length === 0 && (
                 <p className={styles.warning}>
                   {t('reservation.table.none', { guests: partySize ?? 1 })}
                 </p>
               )}
 
-              {selectedTable && (
+              {primaryTable && (
                 <p className={styles.selectedTable}>
-                  {t('reservation.table.selected', {
-                    label: selectedTable.label,
-                    zone: t(
-                      `floorPlan.zones.${zoneById.get(selectedTable.zone)?.labelKey ?? 'hall'}`,
-                    ),
-                    seats: selectedTable.seats,
+                  {t(tableIds.length > 1 ? 'reservation.table.selectedJoined' : 'reservation.table.selected', {
+                    tables: formatTableLabels(tableIds),
+                    zone: t(`floorPlan.zones.${zoneById.get(primaryTable.zone)?.labelKey ?? 'sala1'}`),
+                    seats: seatsOf(tableIds),
                   })}
                 </p>
               )}
@@ -425,13 +439,15 @@ export function ReservationFlow() {
               editLabel={t('reservation.change')}
             />
             <SummaryRow
-              label={t('reservation.summary.table')}
+              label={t(tableIds.length > 1 ? 'reservation.summary.tables' : 'reservation.summary.table')}
               value={
-                selectedTable
-                  ? t('reservation.table.tableLabel', { label: selectedTable.label })
-                  : null
+                tableIds.length === 0
+                  ? null
+                  : tableIds.length > 1
+                    ? formatTableLabels(tableIds)
+                    : t('reservation.table.tableLabel', { label: formatTableLabels(tableIds) })
               }
-              onEdit={selectedTable ? () => goTo('table') : undefined}
+              onEdit={tableIds.length > 0 ? () => goTo('table') : undefined}
               editLabel={t('reservation.change')}
             />
           </dl>

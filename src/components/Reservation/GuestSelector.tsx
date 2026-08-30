@@ -15,7 +15,7 @@ export function GuestSelector({ value, onChange }: Props) {
 
   const [expanded, setExpanded] = useState(() => value !== null && value > largest)
 
-  const showLargeNote = (value ?? 0) >= largest
+  const showLargeNote = (value ?? 0) >= maxPartySize
 
   return (
     <div className={styles.wrap}>

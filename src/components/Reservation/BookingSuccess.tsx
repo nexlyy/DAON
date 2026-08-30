@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { tableById, zoneById } from '@/data/tables/floorPlan'
+import { formatTableLabels, tableById, zoneById } from '@/data/tables/floorPlan'
 import type { Booking } from '@/services/booking'
 import { useI18n } from '@/i18n/useI18n'
 import { RoofMark } from '@/components/Brand/Logo'
@@ -8,8 +8,9 @@ import styles from './BookingSuccess.module.css'
 
 export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset: () => void }) {
   const { t, formatDate } = useI18n()
-  const table = tableById.get(booking.tableId)
-  const zone = table ? zoneById.get(table.zone) : undefined
+  const primary = tableById.get(booking.tableIds[0])
+  const zone = primary ? zoneById.get(primary.zone) : undefined
+  const joined = booking.tableIds.length > 1
 
   return (
     <div className={styles.wrap}>
@@ -44,9 +45,11 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
             <dd>{booking.partySize}</dd>
           </div>
           <div>
-            <dt>{t('reservation.summary.table')}</dt>
+            <dt>{t(joined ? 'reservation.summary.tables' : 'reservation.summary.table')}</dt>
             <dd>
-              {table ? t('reservation.table.tableLabel', { label: table.label }) : booking.tableId}
+              {joined
+                ? formatTableLabels(booking.tableIds)
+                : t('reservation.table.tableLabel', { label: formatTableLabels(booking.tableIds) })}
               {zone && <span className={styles.zone}>{t(`floorPlan.zones.${zone.labelKey}`)}</span>}
             </dd>
           </div>

@@ -62,17 +62,24 @@ name: { en: 'Bulgogi', ko: '불고기' },
 
 ## The floor plan
 
-`src/data/tables/floorPlan.ts` is a placeholder room, not the real one. The
-picker draws entirely from that file — tables, zones, fixtures, seat counts —
-so replacing it with the real layout needs no component changes:
+`src/data/tables/floorPlan.ts` holds the real room: Sala 1, Środek, Sala 2 and
+the Ogródek, plus the kitchen, bar and entrance. Nineteen tables, numbered the
+way the restaurant numbers them. The picker draws entirely from that file, so
+moving a table is a coordinate change and nothing else:
 
 ```ts
-{ id: 'H1', label: '5', seats: 4, zone: 'hall', shape: 'rect',
-  x: 150, y: 300, w: 140, h: 92 }
+{ ...TABLE, id: 'T4', label: '4', zone: 'sala1', x: 275, y: 489,
+  joinsWith: ['T6', 'T1', 'T3'] }
 ```
 
 Coordinates live in the SVG user space set by `size`; the component scales that
-box to whatever width it is given.
+box to whatever width it is given. Table positions are tidied onto a grid — what
+is faithful is which room a table is in, its number and which tables it sits next
+to.
+
+Every table seats four. `joinsWith` lists the tables staff can push against this
+one, and `resolveTableGroup` uses it: pick a table for a party of six and the
+picker pulls in a free neighbour, selects both, and the booking records both.
 
 ## Reservations
 
@@ -93,6 +100,5 @@ Frontend → BookingApi → (mock | HTTP → your service)
 
 - Street address, e-mail and opening hours are placeholders in
   `src/data/restaurant.ts`.
-- The floor plan is provisional.
 - Menu items 25–31 are missing from the source scans, as are the last two pages
   (drinks and desserts, going by the page numbering).

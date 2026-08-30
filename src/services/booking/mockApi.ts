@@ -1,4 +1,4 @@
-import { floorPlan } from '@/data/tables/floorPlan'
+import { floorPlan, resolveTableGroup } from '@/data/tables/floorPlan'
 import { openingHours, reservation as reservationConfig } from '@/data/restaurant'
 import { BookingError } from './types'
 import type {
@@ -127,12 +127,15 @@ export function createMockBookingApi(): BookingApi {
         if (isToday && toMinutes(time) <= nowMinutes + 60) {
           return { time, available: false }
         }
-        // A slot is offered while at least one table can still seat the party.
-        const anySeat = floorPlan.tables.some(
-          (table) =>
-            !table.disabled &&
-            table.seats >= partySize &&
-            hash(`${date}|${time}|${table.id}`) >= occupancyPressure(date, time),
+        // A slot stays on offer while the party can still be seated somewhere —
+        // for more than four that means enough free tables side by side.
+        const pressure = occupancyPressure(date, time)
+        const isFree = (id: string) => {
+          const table = floorPlan.tables.find((entry) => entry.id === id)
+          return Boolean(table && !table.disabled && hash(`${date}|${time}|${id}`) >= pressure)
+        }
+        const anySeat = floorPlan.tables.some((table) =>
+          Boolean(resolveTableGroup(table.id, partySize, isFree)),
         )
         return { time, available: anySeat }
       })
@@ -143,7 +146,7 @@ export function createMockBookingApi(): BookingApi {
       const booked = new Set(
         readStored()
           .filter((b) => b.date === date && b.time === time && b.status === 'confirmed')
-          .map((b) => b.tableId),
+          .flatMap((b) => b.tableIds),
       )
       const pressure = occupancyPressure(date, time)
 
@@ -165,7 +168,7 @@ export function createMockBookingApi(): BookingApi {
         time: request.time,
         partySize: request.partySize,
       })
-      if (status[request.tableId] !== 'available') {
+      if (request.tableIds.some((id) => status[id] !== 'available')) {
         throw new BookingError('Table is no longer available', 'unavailable')
       }
 
