@@ -23,6 +23,9 @@ export function DishDialog({ dish, onClose }: Props) {
   useEffect(() => {
     if (!dish) return
 
+    // Focus goes into the dialog and back to the card that opened it, so a
+    // keyboard user does not land at the top of the page on close.
+    const opener = document.activeElement as HTMLElement | null
     closeRef.current?.focus()
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -50,7 +53,10 @@ export function DishDialog({ dish, onClose }: Props) {
     }
 
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      opener?.focus?.()
+    }
   }, [dish, onClose])
 
   if (!dish) return null

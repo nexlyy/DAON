@@ -74,7 +74,8 @@ export function Hero() {
             src={asset('images/titles/daon.webp')}
             alt=""
             aria-hidden="true"
-            loading="lazy"
+            width={122}
+            height={268}
             decoding="async"
           />
         </div>
