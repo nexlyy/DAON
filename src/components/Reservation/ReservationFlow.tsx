@@ -13,6 +13,7 @@ import { bookingApi, isDemoBooking, toISODate } from '@/services/booking'
 import type { Booking, TableAvailability, TimeSlot } from '@/services/booking'
 import { BookingError } from '@/services/booking/types'
 import { useI18n } from '@/i18n/useI18n'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { RestaurantFloorPlan, tableState } from '@/components/RestaurantFloorPlan/RestaurantFloorPlan'
 import { DatePicker } from './DatePicker'
 import { TimePicker } from './TimePicker'
@@ -24,14 +25,21 @@ import styles from './ReservationFlow.module.css'
 const STEPS = ['date', 'time', 'guests', 'table', 'confirm'] as const
 type Step = (typeof STEPS)[number]
 
+/** Środek has no tables, so it never becomes a room tab. */
+const zonesWithTables = floorPlan.zones.filter((zone) =>
+  floorPlan.tables.some((table) => table.zone === zone.id),
+)
+
 export function ReservationFlow() {
   const { t, formatDate, locale } = useI18n()
+  const isPhone = useMediaQuery('(max-width: 720px)')
 
   const [step, setStep] = useState<Step>('date')
   const [date, setDate] = useState<string | null>(null)
   const [time, setTime] = useState<string | null>(null)
   const [partySize, setPartySize] = useState<number | null>(null)
   const [tableIds, setTableIds] = useState<string[]>([])
+  const [focusZone, setFocusZone] = useState(zonesWithTables[0].id)
 
   const [closedDates, setClosedDates] = useState<string[]>([])
   const [slots, setSlots] = useState<TimeSlot[]>([])
@@ -166,9 +174,16 @@ export function ReservationFlow() {
     (primaryId: string) => {
       const isFree = (id: string) => (status[id] ?? 'available') === 'available'
       setTableIds(resolveTableGroup(primaryId, partySize ?? 1, isFree) ?? [])
+      const zone = tableById.get(primaryId)?.zone
+      if (zone) setFocusZone(zone)
     },
     [partySize, status],
   )
+
+  /** On a phone the picker works one room at a time, list included. */
+  const listedTables = isPhone
+    ? selectableTables.filter((table) => table.zone === focusZone)
+    : selectableTables
 
   const canContinue = useMemo(() => {
     switch (step) {
@@ -297,21 +312,41 @@ export function ReservationFlow() {
 
               <Legend />
 
+              {/* Room tabs replace sideways scrolling on a phone. */}
+              <div className={styles.zoneTabs} role="group" aria-label={t('floorPlan.title')}>
+                {zonesWithTables.map((zone) => {
+                  const free = fittingTables.filter((table) => table.zone === zone.id).length
+                  return (
+                    <button
+                      key={zone.id}
+                      type="button"
+                      className={styles.zoneTab}
+                      aria-pressed={focusZone === zone.id}
+                      onClick={() => setFocusZone(zone.id)}
+                    >
+                      {t(`floorPlan.zones.${zone.labelKey}`)}
+                      <span className={styles.zoneTabCount}>{free}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
               <RestaurantFloorPlan
                 status={status}
                 selectedIds={tableIds}
                 partySize={partySize ?? 1}
                 loading={statusLoading}
+                focusZone={isPhone ? focusZone : null}
                 onSelect={(table: FloorTable) => chooseTable(table.id)}
               />
 
               {/* Phones get a plain list as well: tapping a 40px table inside a
                   scrolled plan is fiddly, and this is what screen readers read. */}
-              {selectableTables.length > 0 && (
+              {listedTables.length > 0 && (
                 <div className={styles.tableList}>
                   <p className={styles.tableListTitle}>{t('reservation.table.list')}</p>
                   <div className={styles.tableListItems}>
-                    {selectableTables.map((table) => (
+                    {listedTables.map((table) => (
                       <button
                         key={table.id}
                         type="button"
@@ -415,7 +450,11 @@ export function ReservationFlow() {
           )}
         </div>
 
-        <aside className={styles.summary} aria-label={t('reservation.summary.title')}>
+        <aside
+          className={styles.summary}
+          data-empty={!(date || time || partySize || tableIds.length) || undefined}
+          aria-label={t('reservation.summary.title')}
+        >
           <p className={styles.summaryBrand}>DAON</p>
           <h2 className={styles.summaryTitle}>{t('reservation.summary.title')}</h2>
 

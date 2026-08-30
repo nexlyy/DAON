@@ -26,3 +26,21 @@
 .body {
   padding-top: 0.5rem;
 }
+
+@media (max-width: 640px) {
+  .head {
+    padding-block: 5.5rem 1.2rem;
+  }
+
+  .head .shell {
+    gap: 0.6rem;
+  }
+
+  .title {
+    font-size: var(--step-3);
+  }
+
+  .subtitle {
+    font-size: var(--step-0);
+  }
+}

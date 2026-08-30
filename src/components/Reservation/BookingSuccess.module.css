@@ -127,3 +127,26 @@
   gap: 0.8rem;
   margin-top: 1.8rem;
 }
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1.6rem 1.2rem 1.8rem;
+  }
+
+  .title {
+    font-size: var(--step-2);
+  }
+
+  .details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.2rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}

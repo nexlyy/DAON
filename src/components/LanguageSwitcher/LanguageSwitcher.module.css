@@ -6,6 +6,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
+  min-height: 2.75rem;
   padding: 0.5em 0.85em;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
@@ -72,6 +73,7 @@
   justify-content: space-between;
   gap: 1.2em;
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.6em 0.8em;
   border-radius: var(--radius-s);
   font-size: var(--step--1);
@@ -107,6 +109,7 @@
 }
 
 .inlineOption {
+  min-height: 2.6rem;
   padding: 0.5em 1.05em;
   border-radius: var(--radius-pill);
   font-size: var(--step--1);

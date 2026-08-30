@@ -86,8 +86,29 @@
 }
 
 @media (max-width: 560px) {
+  .steps {
+    gap: 0.2rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .step {
+    min-width: 3.1rem;
+  }
+
+  .step:not(:last-child)::after {
+    top: 0.82rem;
+    left: calc(50% + 1.1rem);
+    right: calc(-50% + 1.1rem);
+  }
+
+  .dot {
+    width: 1.65rem;
+    height: 1.65rem;
+    font-size: 0.66rem;
+  }
+
   .label {
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
   }
 }

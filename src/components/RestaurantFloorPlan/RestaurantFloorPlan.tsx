@@ -1,4 +1,4 @@
-import { floorPlan, resolveTableGroup } from '@/data/tables/floorPlan'
+import { floorPlan, resolveTableGroup, zoneById } from '@/data/tables/floorPlan'
 import type { FloorTable } from '@/data/tables/floorPlan'
 import type { TableAvailability } from '@/services/booking'
 import { useI18n } from '@/i18n/useI18n'
@@ -13,6 +13,12 @@ interface Props {
   partySize: number
   onSelect: (table: FloorTable) => void
   loading?: boolean
+  /**
+   * Crops the drawing to one room. The whole plan is 1220 units wide; on a
+   * phone that means either unreadable tables or sideways scrolling, so the
+   * picker shows one room at a time instead.
+   */
+  focusZone?: string | null
 }
 
 const isFreeIn = (status: Record<string, TableAvailability>) => (id: string) =>
@@ -40,16 +46,24 @@ export function RestaurantFloorPlan({
   partySize,
   onSelect,
   loading = false,
+  focusZone = null,
 }: Props) {
   const { t } = useI18n()
   const { size, tables, fixtures, zones } = floorPlan
+
+  const focus = focusZone ? zoneById.get(focusZone) : undefined
+  const pad = 26
+  const viewBox = focus
+    ? `${focus.x - pad} ${focus.y - pad} ${focus.w + pad * 2} ${focus.h + pad * 2}`
+    : `0 0 ${size.width} ${size.height}`
 
   return (
     <div className={styles.wrap} data-loading={loading || undefined}>
       <div className={styles.scroller}>
         <svg
           className={styles.plan}
-          viewBox={`0 0 ${size.width} ${size.height}`}
+          data-focused={focus ? '' : undefined}
+          viewBox={viewBox}
           role="group"
           aria-label={t('floorPlan.title')}
         >
@@ -62,20 +76,34 @@ export function RestaurantFloorPlan({
           {zones.map((zone) => (
             <g key={zone.id}>
               <rect x={zone.x} y={zone.y} width={zone.w} height={zone.h} className={styles.room} />
-              <text x={zone.x + 18} y={zone.y + 34} className={styles.roomLabel}>
-                {t(`floorPlan.zones.${zone.labelKey}`)}
-              </text>
+              {/* Neighbouring rooms keep their walls for context but lose their
+                  names, which would otherwise be sliced in half at the edge. */}
+              {(!focus || focus.id === zone.id) && (
+                <text x={zone.x + 18} y={zone.y + 34} className={styles.roomLabel}>
+                  {t(`floorPlan.zones.${zone.labelKey}`)}
+                </text>
+              )}
             </g>
           ))}
 
-          {fixtures.map((fixture) => (
-            <g key={fixture.id} className={styles.fixture} data-kind={fixture.kind}>
-              <rect x={fixture.x} y={fixture.y} width={fixture.w} height={fixture.h} />
-              <text x={fixture.x + fixture.w / 2} y={fixture.y + fixture.h / 2 + 7}>
-                {t(`floorPlan.fixtures.${fixture.labelKey}`)}
-              </text>
-            </g>
-          ))}
+          {fixtures.map((fixture) => {
+            const inside =
+              !focus ||
+              (fixture.x > focus.x - pad &&
+                fixture.x + fixture.w < focus.x + focus.w + pad &&
+                fixture.y > focus.y - pad &&
+                fixture.y + fixture.h < focus.y + focus.h + pad)
+            return (
+              <g key={fixture.id} className={styles.fixture} data-kind={fixture.kind}>
+                <rect x={fixture.x} y={fixture.y} width={fixture.w} height={fixture.h} />
+                {inside && (
+                  <text x={fixture.x + fixture.w / 2} y={fixture.y + fixture.h / 2 + 7}>
+                    {t(`floorPlan.fixtures.${fixture.labelKey}`)}
+                  </text>
+                )}
+              </g>
+            )
+          })}
 
           {tables.map((table) => (
             <TableNode
@@ -139,6 +167,13 @@ function TableNode({
         }
       }}
     >
+      <rect
+        className={styles.hitArea}
+        x={-half.w - 26}
+        y={-half.h - 26}
+        width={table.w + 52}
+        height={table.h + 52}
+      />
       <Seats table={table} />
 
       {table.shape === 'round' ? (

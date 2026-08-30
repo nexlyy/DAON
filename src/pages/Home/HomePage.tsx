@@ -95,9 +95,15 @@ export function HomePage() {
             <p className="lede">{t('home.signature.subtitle')}</p>
           </header>
 
-          <div className={styles.signatureGrid}>
+          <div className={`${styles.signatureGrid} shelf`}>
             {featured.map((dish, index) => (
-              <DishCard key={dish.id} dish={dish} index={index} onOpen={setOpenDish} />
+              <DishCard
+                key={dish.id}
+                dish={dish}
+                index={index}
+                variant="card"
+                onOpen={setOpenDish}
+              />
             ))}
           </div>
 
@@ -118,7 +124,7 @@ export function HomePage() {
             <p className="lede">{t('home.categories.subtitle')}</p>
           </header>
 
-          <ul className={styles.categoryList}>
+          <ul className={`${styles.categoryList} shelf`}>
             {categories.map((category) => {
               const count = dishes.filter((dish) => dish.categoryId === category.id).length
               return (

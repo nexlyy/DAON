@@ -26,3 +26,11 @@
   border-color: rgba(47, 66, 86, 0.28);
   color: var(--ink-soft);
 }
+
+@media (max-width: 640px) {
+  .tag {
+    padding: 0.2em 0.55em;
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+  }
+}

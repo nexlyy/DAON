@@ -76,11 +76,20 @@
   color: var(--ink);
 }
 
-/* The menu prints prices on small white slips, slightly off-square */
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+/* The menu prints prices on small white slips, slightly off-square. On wide
+   screens the slip hangs over the bottom of the photo — `bottom: 100%` puts it
+   just above the text block, which is exactly where the photo ends. */
 .price {
   position: absolute;
-  right: 0.85rem;
-  bottom: 0.85rem;
+  right: 0.5rem;
+  bottom: calc(100% + 0.85rem);
   z-index: 3;
   display: inline-flex;
   align-items: baseline;
@@ -108,6 +117,7 @@
 }
 
 .body {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -148,4 +158,87 @@
   letter-spacing: 0.1em;
   color: var(--text-soft);
   white-space: nowrap;
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────
+   A photo-led card per dish means 70 of them scroll for the length of a
+   novel. Below 640px each dish becomes a row you can scan: thumbnail, name,
+   price, one line of description. Tapping still opens the full card. */
+
+@media (max-width: 640px) {
+  .card[data-variant='auto'] {
+    display: grid;
+    grid-template-columns: 6.2rem minmax(0, 1fr);
+    border-radius: var(--radius-m);
+  }
+
+  .card[data-variant='auto']:hover,
+  .card[data-variant='auto']:focus-within {
+    transform: none;
+  }
+
+  .card[data-variant='auto'] .media {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 6.2rem;
+  }
+
+  .card[data-variant='auto']:hover .photo,
+  .card[data-variant='auto']:focus-within .photo {
+    transform: none;
+  }
+
+  .card[data-variant='auto'] .number {
+    top: 0.35rem;
+    left: 0.35rem;
+    padding: 0.2em 0.42em;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  .card[data-variant='auto'] .body {
+    gap: 0.3rem;
+    padding: 0.75rem 0.85rem 0.8rem;
+  }
+
+  .card[data-variant='auto'] .name {
+    font-size: 1.02rem;
+    line-height: 1.24;
+  }
+
+  .card[data-variant='auto'] .price {
+    position: static;
+    flex: none;
+    padding: 0;
+    box-shadow: none;
+    transform: none;
+    font-size: 0.86rem;
+    white-space: nowrap;
+  }
+
+  .card[data-variant='auto']:hover .price {
+    transform: none;
+  }
+
+  .card[data-variant='auto'] .priceFrom {
+    font-size: 0.62em;
+    margin-right: 0.15em;
+  }
+
+  .card[data-variant='auto'] .desc {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: 0.79rem;
+    line-height: 1.5;
+  }
+
+  .card[data-variant='auto'] .meta {
+    gap: 0.3rem;
+    padding-top: 0.15rem;
+  }
+
+  .card[data-variant='auto'] .chip {
+    font-size: 0.62rem;
+    padding: 0.2em 0.55em;
+  }
 }

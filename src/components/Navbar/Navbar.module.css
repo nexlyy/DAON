@@ -29,6 +29,10 @@
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-block: 0.6rem;
   font-size: 0.94rem;
   flex: none;
 }
@@ -90,7 +94,9 @@
 
 .burger {
   display: none;
-  padding: 0.55rem;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--radius-pill);
   color: var(--ink);
 }
@@ -206,7 +212,7 @@
   }
 
   .burger {
-    display: inline-flex;
+    display: grid;
   }
 
   .actions .cta {

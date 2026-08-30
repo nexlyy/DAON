@@ -375,8 +375,58 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
+  .aboutTitle,
+  .sectionHead h2,
+  .visitCopy h2 {
+    font-size: var(--step-2);
+  }
+
+  .aboutMedia {
+    width: min(100%, 19rem);
+  }
+
+  .stats {
+    gap: 1.4rem 2rem;
+  }
+
+  .sectionHead {
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sectionHead .lede,
+  .aboutBody {
+    font-size: var(--step-0);
+  }
+
+  /* Both shelves keep their own item width; the shelf utility does the rest. */
+  .signatureGrid {
+    --shelf-item: 15rem;
+  }
+
   .categoryList {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+    --shelf-item: 9.5rem;
+  }
+
+  .categoryCard {
+    gap: 0.4rem;
+    padding: 1.1rem 0.7rem 0.9rem;
+  }
+
+  .categoryCard img {
+    width: 40px;
+  }
+
+  .categoryName {
+    font-size: 0.92rem;
+  }
+
+  .sectionAction {
+    margin-top: 1.2rem;
+  }
+
+  .ctaCopy h2 {
+    font-size: var(--step-3);
   }
 }

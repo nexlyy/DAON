@@ -11,15 +11,25 @@ interface Props {
   onOpen: (dish: Dish) => void
   /** Staggers the reveal animation across a grid. */
   index?: number
+  /**
+   * `auto` becomes a compact row on phones, which is what a 70-dish menu needs.
+   * `card` keeps the photo-led card at every width — for the shelf on the home
+   * page, where there are only six of them.
+   */
+  variant?: 'auto' | 'card'
 }
 
-export function DishCard({ dish, onOpen, index = 0 }: Props) {
+export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
   const { t, resolve, formatPrice } = useI18n()
   const name = resolve(dish.name)
   const hasOptions = Boolean(dish.options?.length)
 
   return (
-    <article className={styles.card} style={{ '--delay': `${(index % 12) * 55}ms` } as CSSProperties}>
+    <article
+      className={styles.card}
+      data-variant={variant}
+      style={{ '--delay': `${(index % 12) * 55}ms` } as CSSProperties}
+    >
       <button type="button" className={styles.hit} onClick={() => onOpen(dish)}>
         <span className="visually-hidden">
           {name} — {t('menu.details')}
@@ -44,15 +54,18 @@ export function DishCard({ dish, onOpen, index = 0 }: Props) {
         )}
 
         {dish.no !== null && <span className={styles.number}>{String(dish.no).padStart(2, '0')}</span>}
-
-        <span className={styles.price}>
-          {hasOptions && <span className={styles.priceFrom}>{t('menu.from')}</span>}
-          {formatPrice(dishFromPrice(dish))}
-        </span>
       </div>
 
       <div className={styles.body}>
-        <h3 className={styles.name}>{name}</h3>
+        {/* The price sits over the photo on wide screens and beside the name on
+            phones; one element, moved by CSS rather than duplicated. */}
+        <div className={styles.titleRow}>
+          <h3 className={styles.name}>{name}</h3>
+          <span className={styles.price}>
+            {hasOptions && <span className={styles.priceFrom}>{t('menu.from')}</span>}
+            {formatPrice(dishFromPrice(dish))}
+          </span>
+        </div>
         {dish.description && <p className={styles.desc}>{resolve(dish.description)}</p>}
 
         <div className={styles.meta}>

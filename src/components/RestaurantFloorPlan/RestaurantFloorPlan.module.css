@@ -26,6 +26,26 @@
   min-width: 30rem;
 }
 
+/* Cropped to one room, the drawing fits any width — no sideways scrolling.
+   A wide room like the Ogródek then scales down a long way, so the type is
+   sized up in user units to stay readable at whatever scale it lands on. */
+.plan[data-focused] {
+  min-width: 0;
+}
+
+.plan[data-focused] .tableLabel {
+  font-size: 40px;
+}
+
+.plan[data-focused] .roomLabel,
+.plan[data-focused] .fixture text {
+  font-size: 26px;
+}
+
+.hitArea {
+  fill: transparent;
+}
+
 .room {
   fill: var(--paper-warm);
   stroke: var(--ink-soft);
@@ -131,6 +151,9 @@
   stroke-dasharray: 3 6;
   opacity: 0.9;
   animation: ring-spin 14s linear infinite;
+  /* Without fill-box, `center` resolves against the whole SVG viewport and the
+     ring orbits the middle of the room instead of spinning around its table. */
+  transform-box: fill-box;
   transform-origin: center;
 }
 
@@ -184,15 +207,7 @@
 }
 
 .hint {
-  font-size: 0.74rem;
-  letter-spacing: 0.1em;
-  color: var(--text-faint);
-}
-
-@media (min-width: 720px) {
-  .hint {
-    display: none;
-  }
+  display: none;
 }
 
 .note {
