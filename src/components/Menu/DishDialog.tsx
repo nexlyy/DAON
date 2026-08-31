@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { categoryById } from '@/data/menu/categories'
+import { dishAllergens } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
@@ -63,6 +64,7 @@ export function DishDialog({ dish, onClose }: Props) {
 
   const name = resolve(dish.name)
   const category = categoryById.get(dish.categoryId)
+  const allergens = dishAllergens(dish)
 
   return (
     <div className={styles.overlay} role="presentation" onClick={onClose}>
@@ -142,6 +144,13 @@ export function DishDialog({ dish, onClose }: Props) {
             dish.price !== undefined && (
               <p className={styles.singlePrice}>{formatPrice(dish.price)}</p>
             )
+          )}
+
+          {allergens.length > 0 && (
+            <p className={styles.allergens}>
+              <span className={styles.allergensLabel}>{t('allergens.contains')}</span>
+              {allergens.map((allergen) => t(`allergens.names.${allergen}`)).join(' · ')}
+            </p>
           )}
 
           <div className={styles.meta}>

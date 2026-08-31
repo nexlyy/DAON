@@ -34,7 +34,7 @@
 }
 
 .plan[data-focused] .tableLabel {
-  font-size: 40px;
+  font-size: 32px;
 }
 
 .plan[data-focused] .roomLabel,
@@ -49,7 +49,12 @@
 .room {
   fill: var(--paper-warm);
   stroke: var(--ink-soft);
-  stroke-width: 2.4;
+  stroke-width: 3;
+}
+
+/* The Ogródek is a terrace, not a room. */
+.room[data-outdoor] {
+  fill: #f2f0e4;
 }
 
 .roomLabel {
@@ -69,7 +74,23 @@
 .fixture rect {
   fill: var(--sand);
   stroke: var(--ink-soft);
-  stroke-width: 2.4;
+  stroke-width: 3;
+}
+
+.fixture[data-small] rect {
+  fill: none;
+  stroke: rgba(198, 176, 150, 0.85);
+  stroke-width: 1.6;
+}
+
+.fixture[data-small] text {
+  font-size: 17px;
+  letter-spacing: 0.1em;
+  fill: var(--text-faint);
+}
+
+.fixture[data-kind='utility'] rect {
+  fill: rgba(255, 255, 255, 0.55);
 }
 
 .fixture text {
@@ -86,7 +107,7 @@
 
 .fixture[data-kind='entrance'] rect {
   fill: none;
-  stroke-dasharray: 12 8;
+  stroke-dasharray: 14 9;
 }
 
 /* Tables ----------------------------------------------------------------- */
@@ -105,21 +126,21 @@
 
 .body {
   fill: var(--white);
-  stroke: var(--clay);
-  stroke-width: 1.6;
+  stroke: var(--ink-soft);
+  stroke-width: 2.6;
   transition: fill 0.32s var(--ease), stroke 0.32s var(--ease);
 }
 
 .seats circle {
-  fill: var(--sand);
-  stroke: var(--clay);
-  stroke-width: 1;
+  fill: var(--ink-soft);
+  stroke: none;
   transition: fill 0.32s var(--ease), stroke 0.32s var(--ease);
 }
 
 .tableLabel {
-  font-family: var(--font-display);
-  font-size: 32px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 27px;
   text-anchor: middle;
   fill: var(--ink);
   pointer-events: none;
@@ -141,8 +162,7 @@
 }
 
 .table[data-state='selected'] .seats circle {
-  fill: var(--ink-soft);
-  stroke: var(--ink-soft);
+  fill: var(--ink);
 }
 
 .ring {
@@ -173,8 +193,7 @@
 }
 
 .table[data-state='occupied'] .seats circle {
-  fill: #ddd6ca;
-  stroke: #cdc4b6;
+  fill: #bdb4a6;
 }
 
 .table[data-state='disabled'] .body,
@@ -192,9 +211,8 @@
 
 .table[data-state='disabled'] .seats circle,
 .table[data-state='noJoin'] .seats circle {
-  fill: transparent;
-  stroke: var(--clay);
-  opacity: 0.6;
+  fill: var(--clay);
+  opacity: 0.45;
 }
 
 .table:focus-visible {

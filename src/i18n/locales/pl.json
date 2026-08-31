@@ -18,7 +18,7 @@
   },
   "hero": {
     "eyebrow": "Restauracja koreańska",
-    "tagline": "다온 · nadchodzi dobry dzień",
+    "tagline": "Posiłek pełen troski",
     "lead": "Węgiel drzewny, bulion i fermentacja — na tych trzech rzeczach stoi koreańska kuchnia. Gotujemy tak, jak gotuje się w domu, i tak samo nakrywamy do stołu: wszystko naraz, do dzielenia się, jeszcze parujące.",
     "viewMenu": "Zobacz menu",
     "bookTable": "Zarezerwuj stolik",
@@ -27,14 +27,15 @@
   "home": {
     "about": {
       "eyebrow": "O nas",
-      "title": "Stół nakryty po koreańsku",
-      "body": "한상차림 — hansangcharim — to stół zastawiony naraz, na którym nic nie czeka na swoją kolej. Grillowane mięso obok gulaszu, ryż obok kilkunastu małych dodatków, wszyscy sięgają przez stół. Tak podajemy w DAON — czy wpadasz na miskę domowego ramenu w południe, czy spędzasz wieczór przy grillu.",
+      "title": "Posiłek pełen troski",
+      "body": "Daon to restauracja koreańska, łącząca autentyczne smaki z nowoczesnym akcentem, aby przenieść na Twój stół smak i kulturę Korei. Dzięki świeżym składnikom i pasji w gotowaniu oferujemy niezapomniane doznania kulinarne dla mieszkańców i gości.",
       "note": "Każde danie na tej stronie pochodzi z naszego drukowanego menu — te same nazwy, te same ceny.",
       "stats": {
         "dishes": "dań w menu",
         "chapters": "rozdziałów",
         "from": "od"
-      }
+      },
+      "quote": "Wszystkie dania przygotowujemy wyłącznie z najwyższej jakości, najświeższych składników, starannie dobranych, aby zapewnić najlepszy smak i autentyczne doznania."
     },
     "signature": {
       "eyebrow": "Polecane",
@@ -191,7 +192,11 @@
     "fixtures": {
       "kitchen": "Kuchnia",
       "bar": "Bar",
-      "entrance": "Wejście"
+      "entrance": "Wejście",
+      "till": "Kasa",
+      "starters": "Przystawki",
+      "wcMen": "WC — męski",
+      "wcWomen": "WC — damski"
     },
     "joinNote": "Każdy stolik jest na cztery osoby. Dla większych grup zestawiamy stoliki razem."
   },
@@ -251,5 +256,22 @@
     "notFound": "Nie znaleziono strony",
     "notFoundBody": "Taka strona nie istnieje. Menu i formularz rezerwacji są na swoim miejscu.",
     "backHome": "Wróć na stronę główną"
+  },
+  "allergens": {
+    "title": "Informacja o alergenach",
+    "lead": "Prosimy o poinformowanie nas o alergiach pokarmowych przed złożeniem zamówienia.",
+    "body": "Jeśli masz jakiekolwiek alergie, poinformuj nasz personel. Możemy przygotować wybrane danie, wykluczając składniki alergenne, jeśli to możliwe.",
+    "widespread": "Zawarte w większości dań",
+    "contains": "Zawiera",
+    "names": {
+      "gluten": "Gluten",
+      "nuts": "Orzechy / orzeszki ziemne",
+      "dairy": "Nabiał",
+      "eggs": "Jaja",
+      "shellfish": "Skorupiaki / owoce morza",
+      "soy": "Soja",
+      "fish": "Ryby",
+      "sesame": "Sezam"
+    }
   }
 }

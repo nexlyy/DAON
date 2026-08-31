@@ -206,6 +206,25 @@
   color: var(--ink);
 }
 
+.allergens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0.7rem 0.9rem;
+  border-left: 2px solid var(--rose-deep);
+  background: rgba(217, 191, 178, 0.16);
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+.allergensLabel {
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+
 .meta {
   display: flex;
   flex-wrap: wrap;

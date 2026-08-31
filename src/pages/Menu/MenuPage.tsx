@@ -9,6 +9,7 @@ import { CategoryRail } from '@/components/Menu/CategoryRail'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
+import { widespreadAllergens } from '@/data/menu/allergens'
 import styles from './MenuPage.module.css'
 
 export function MenuPage() {
@@ -127,6 +128,20 @@ export function MenuPage() {
           ))
         )}
       </div>
+
+      {/* The notice printed at the back of the menu. */}
+      <section className={`shell ${styles.allergy}`} aria-labelledby="allergy-title">
+        <GoldDivider />
+        <h2 className={styles.allergyTitle} id="allergy-title">
+          {t('allergens.title')}
+        </h2>
+        <p className={styles.allergyLead}>{t('allergens.lead')}</p>
+        <p className={styles.allergyNote}>
+          <span>{t('allergens.widespread')}:</span>{' '}
+          {widespreadAllergens.map((allergen) => t(`allergens.names.${allergen}`)).join(' · ')}
+        </p>
+        <p className={styles.allergyBody}>{t('allergens.body')}</p>
+      </section>
 
       <DishDialog dish={openDish} onClose={() => setOpenDish(null)} />
     </>

@@ -6,8 +6,9 @@
 
 .options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(4.6rem, 1fr));
+  gap: 0.5rem;
+  width: 100%;
   max-width: 34rem;
 }
 
@@ -121,4 +122,23 @@
   font-size: 0.84rem;
   line-height: 1.7;
   color: var(--text-soft);
+}
+
+@media (max-width: 640px) {
+  .options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .option {
+    padding: 0.85em 0.4em;
+  }
+
+  .number {
+    font-size: var(--step-1);
+  }
+
+  .note {
+    max-width: none;
+    font-size: 0.8rem;
+  }
 }

@@ -41,6 +41,12 @@ export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
           <img
             className={styles.photo}
             src={asset(`images/dishes/${dish.photo}.webp`)}
+            // The phone layout shows a 100px thumbnail; there is no reason to
+            // pull a 760px photograph for it.
+            srcSet={`${asset(`images/dishes/sm/${dish.photo}.webp`)} 320w, ${asset(
+              `images/dishes/${dish.photo}.webp`,
+            )} 760w`}
+            sizes="(max-width: 640px) 120px, (max-width: 900px) 50vw, 400px"
             alt={name}
             width={760}
             height={760}

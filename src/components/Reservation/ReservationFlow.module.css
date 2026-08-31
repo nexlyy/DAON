@@ -12,7 +12,10 @@
 .panel {
   display: grid;
   gap: 1.15rem;
-  justify-items: start;
+  /* `justify-items: start` made every child shrink-to-fit, which let the guest
+     grid size itself to six columns of max-content and pushed the page wider
+     than the screen. Children that want to be narrow say so themselves. */
+  justify-items: stretch;
   padding: clamp(1.3rem, 3vw, 2.4rem);
   background: var(--paper-warm);
   border: 1px solid rgba(198, 176, 150, 0.45);
@@ -59,6 +62,7 @@
 }
 
 .selectedTable {
+  justify-self: start;
   padding: 0.7rem 1.1rem;
   border: 1px solid var(--gold-line);
   border-radius: var(--radius-pill);

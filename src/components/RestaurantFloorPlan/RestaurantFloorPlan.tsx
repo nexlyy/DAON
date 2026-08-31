@@ -75,7 +75,14 @@ export function RestaurantFloorPlan({
 
           {zones.map((zone) => (
             <g key={zone.id}>
-              <rect x={zone.x} y={zone.y} width={zone.w} height={zone.h} className={styles.room} />
+              <rect
+                x={zone.x}
+                y={zone.y}
+                width={zone.w}
+                height={zone.h}
+                className={styles.room}
+                data-outdoor={zone.outdoor || undefined}
+              />
               {/* Neighbouring rooms keep their walls for context but lose their
                   names, which would otherwise be sliced in half at the edge. */}
               {(!focus || focus.id === zone.id) && (
@@ -94,10 +101,15 @@ export function RestaurantFloorPlan({
                 fixture.y > focus.y - pad &&
                 fixture.y + fixture.h < focus.y + focus.h + pad)
             return (
-              <g key={fixture.id} className={styles.fixture} data-kind={fixture.kind}>
+              <g
+                key={fixture.id}
+                className={styles.fixture}
+                data-kind={fixture.kind}
+                data-small={fixture.small || undefined}
+              >
                 <rect x={fixture.x} y={fixture.y} width={fixture.w} height={fixture.h} />
                 {inside && (
-                  <text x={fixture.x + fixture.w / 2} y={fixture.y + fixture.h / 2 + 7}>
+                  <text x={fixture.x + fixture.w / 2} y={fixture.y + fixture.h / 2 + 6}>
                     {t(`floorPlan.fixtures.${fixture.labelKey}`)}
                   </text>
                 )}
@@ -152,7 +164,7 @@ function TableNode({
       className={styles.table}
       data-state={state}
       data-selectable={selectable || undefined}
-      transform={`translate(${table.x} ${table.y})${table.rotation ? ` rotate(${table.rotation})` : ''}`}
+      transform={`translate(${table.x} ${table.y})`}
       role="button"
       tabIndex={selectable ? 0 : -1}
       aria-disabled={!selectable}
@@ -189,7 +201,7 @@ function TableNode({
         />
       )}
 
-      <text className={styles.tableLabel} y="9">
+      <text className={styles.tableLabel} y="8">
         {table.label}
       </text>
 
@@ -200,52 +212,32 @@ function TableNode({
   )
 }
 
-/**
- * Chairs around the table, shared between the four sides in proportion to the
- * side lengths — a square four-top gets one per side, a long six-top two along
- * each long side and one at each end.
- */
+/** Chairs on the sides the restaurant's plan puts them on. */
 function Seats({ table }: { table: FloorTable }) {
   const seats: { x: number; y: number }[] = []
-  const gap = 15
+  const gap = 13
+  const half = { w: table.w / 2, h: table.h / 2 }
 
-  if (table.shape === 'round') {
-    const radius = table.w / 2 + gap
-    for (let i = 0; i < table.seats; i += 1) {
-      const angle = (i / table.seats) * Math.PI * 2 - Math.PI / 2
-      seats.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius })
-    }
-  } else {
-    const perimeter = 2 * (table.w + table.h)
-    const perHorizontal = Math.round((table.seats * table.w) / perimeter)
-    const perVertical = Math.round((table.seats - perHorizontal * 2) / 2)
-    const sides = [
-      { count: perHorizontal, axis: 'x' as const, offset: -(table.h / 2 + gap) },
-      { count: perHorizontal, axis: 'x' as const, offset: table.h / 2 + gap },
-      { count: perVertical, axis: 'y' as const, offset: -(table.w / 2 + gap) },
-      {
-        count: table.seats - perHorizontal * 2 - perVertical,
-        axis: 'y' as const,
-        offset: table.w / 2 + gap,
-      },
-    ]
-
-    for (const side of sides) {
-      for (let i = 0; i < side.count; i += 1) {
-        const fraction = (i + 1) / (side.count + 1)
-        if (side.axis === 'x') {
-          seats.push({ x: -table.w / 2 + fraction * table.w, y: side.offset })
-        } else {
-          seats.push({ x: side.offset, y: -table.h / 2 + fraction * table.h })
-        }
+  const place = (count: number, axis: 'x' | 'y', offset: number) => {
+    for (let i = 0; i < count; i += 1) {
+      const fraction = (i + 1) / (count + 1)
+      if (axis === 'x') {
+        seats.push({ x: -half.w + fraction * table.w, y: offset })
+      } else {
+        seats.push({ x: offset, y: -half.h + fraction * table.h })
       }
     }
   }
 
+  place(table.seating.top ?? 0, 'x', -(half.h + gap))
+  place(table.seating.bottom ?? 0, 'x', half.h + gap)
+  place(table.seating.left ?? 0, 'y', -(half.w + gap))
+  place(table.seating.right ?? 0, 'y', half.w + gap)
+
   return (
     <g className={styles.seats} aria-hidden="true">
       {seats.map((seat, index) => (
-        <circle key={index} cx={seat.x} cy={seat.y} r="8" />
+        <circle key={index} cx={seat.x} cy={seat.y} r="7" />
       ))}
     </g>
   )

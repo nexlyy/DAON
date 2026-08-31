@@ -47,18 +47,32 @@ src/
 
 ## The menu data
 
-Every dish name, price and description in `src/data/menu/dishes.ts` is
-transcribed from the printed DAON menu (English/Polish edition). Photographs in
-`public/images/dishes/` and the brush headings in `public/images/titles/` are
-cropped from the same pages. Nothing is invented.
+All 98 numbered items in `src/data/menu/dishes.ts` are transcribed from the two
+menu files the restaurant supplied — "Eng and PL (2026.01.09)" and
+"Kor (2025.01.09)". Numbers, prices and badges follow the English/Polish
+edition, which is the newer of the two. Photographs in `public/images/dishes/`
+and the brush headings in `public/images/titles/` are cropped from those same
+pages. Nothing is invented.
 
-Korean copy for the dishes is not in the data yet — the Korean edition of the
-menu has not been supplied. Text resolution falls back to English for `ko`, so
-adding it later means filling in one field per entry:
+The Korean edition is not a translation: it tells where each dish comes from.
+So `ko` carries its own text rather than a rendering of the English.
 
-```ts
-name: { en: 'Bulgogi', ko: '불고기' },
-```
+`src/data/menu/allergens.ts` holds the allergy notice from the back of the
+menu — four allergens listed against particular dish numbers, four marked
+"contained in most dishes" and shown as a standing note instead.
+
+### Where the two files disagree
+
+Three entries differ between the English/Polish and Korean editions. The site
+follows the newer English/Polish file; each is marked with a `sourceNote`
+comment in `dishes.ts`.
+
+| No. | English / Polish | Korean |
+| --- | --- | --- |
+| 26–29 | beef, pork, chicken, tofu | pork, chicken, beef, tofu |
+| 38–43 | fried / spicy / sweet | plain / seasoned / garlic-soy |
+| 47 | Dwaeji Galbi | 양념돼지목살 — marinated pork neck |
+| 52 | Boneless ShortRib, 100 PLN | 양념 차돌박이 — marinated brisket, 105 PLN |
 
 ## The floor plan
 
@@ -100,5 +114,4 @@ Frontend → BookingApi → (mock | HTTP → your service)
 
 - Street address, e-mail and opening hours are placeholders in
   `src/data/restaurant.ts`.
-- Menu items 25–31 are missing from the source scans, as are the last two pages
-  (drinks and desserts, going by the page numbering).
+- The four rows in the table above, where the two menu files disagree.

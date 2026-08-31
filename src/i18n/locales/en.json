@@ -18,7 +18,7 @@
   },
   "hero": {
     "eyebrow": "Korean Restaurant",
-    "tagline": "다온 · a good day comes",
+    "tagline": "A Meal Made with Care",
     "lead": "Charcoal, broth and fermentation — the three things a Korean kitchen is built on. We cook the way a family cooks at home, and we set the table the same way: everything at once, shared, still steaming.",
     "viewMenu": "View Menu",
     "bookTable": "Book a Table",
@@ -27,14 +27,15 @@
   "home": {
     "about": {
       "eyebrow": "About us",
-      "title": "A table set the Korean way",
-      "body": "A 한상차림 — hansangcharim — is a table laid all at once, where nothing waits its turn. Grilled meat next to stew, rice next to a dozen small side dishes, everyone reaching across. That is how we serve at DAON, whether you come for a bowl of handmade ramen at noon or spend the evening around the grill.",
+      "title": "A meal made with care",
+      "body": "Daon is a Korean restaurant that blends authentic flavors with a modern touch, bringing the taste and culture of Korea to your table. Using fresh ingredients and heartfelt cooking, we offer a memorable dining experience for both locals and visitors.",
       "note": "Every dish on this site is taken from our printed menu — same names, same prices.",
       "stats": {
         "dishes": "dishes on the menu",
         "chapters": "chapters",
         "from": "from"
-      }
+      },
+      "quote": "We prepare every dish using only the finest quality and the freshest ingredients, carefully selected to ensure the best taste and authentic experience."
     },
     "signature": {
       "eyebrow": "Signature",
@@ -191,7 +192,11 @@
     "fixtures": {
       "kitchen": "Kitchen",
       "bar": "Bar",
-      "entrance": "Entrance"
+      "entrance": "Entrance",
+      "till": "Till",
+      "starters": "Starters",
+      "wcMen": "WC — men",
+      "wcWomen": "WC — women"
     },
     "joinNote": "Every table seats four. Larger parties are seated at tables pushed together."
   },
@@ -251,5 +256,22 @@
     "notFound": "Page not found",
     "notFoundBody": "That page does not exist. The menu and the reservation form are still here.",
     "backHome": "Back to the home page"
+  },
+  "allergens": {
+    "title": "Allergy notice",
+    "lead": "Please inform us of any food allergies before ordering.",
+    "body": "If you have any allergies, please inform our staff. We can prepare your selected dish by excluding allergenic ingredients whenever possible.",
+    "widespread": "Contained in most dishes",
+    "contains": "Contains",
+    "names": {
+      "gluten": "Gluten",
+      "nuts": "Peanuts / nuts",
+      "dairy": "Dairy",
+      "eggs": "Eggs",
+      "shellfish": "Shellfish / seafood",
+      "soy": "Soy",
+      "fish": "Fish",
+      "sesame": "Sesame"
+    }
   }
 }
