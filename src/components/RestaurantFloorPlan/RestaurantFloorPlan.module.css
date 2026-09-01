@@ -67,18 +67,12 @@
 
 .fixture rect {
   fill: var(--sand);
-  stroke: rgba(198, 176, 150, 0.7);
-  stroke-width: 1;
-}
-
-.fixture rect {
-  fill: var(--sand);
   stroke: var(--ink-soft);
   stroke-width: 3;
 }
 
 .fixture[data-small] rect {
-  fill: none;
+  fill: rgba(255, 255, 255, 0.55);
   stroke: rgba(198, 176, 150, 0.85);
   stroke-width: 1.6;
 }
@@ -87,10 +81,6 @@
   font-size: 17px;
   letter-spacing: 0.1em;
   fill: var(--text-faint);
-}
-
-.fixture[data-kind='utility'] rect {
-  fill: rgba(255, 255, 255, 0.55);
 }
 
 .fixture text {
@@ -118,10 +108,6 @@
 
 .table[data-selectable] {
   cursor: pointer;
-}
-
-.table[data-selectable]:hover {
-  transform-box: fill-box;
 }
 
 .body {
@@ -165,24 +151,6 @@
   fill: var(--ink);
 }
 
-.ring {
-  stroke: var(--gold);
-  stroke-width: 1.6;
-  stroke-dasharray: 3 6;
-  opacity: 0.9;
-  animation: ring-spin 14s linear infinite;
-  /* Without fill-box, `center` resolves against the whole SVG viewport and the
-     ring orbits the middle of the room instead of spinning around its table. */
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-@keyframes ring-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .table[data-state='occupied'] .body {
   fill: #e4ded4;
   stroke: #cdc4b6;
@@ -222,10 +190,6 @@
 .table:focus-visible .body {
   stroke: var(--ink);
   stroke-width: 3;
-}
-
-.hint {
-  display: none;
 }
 
 .note {

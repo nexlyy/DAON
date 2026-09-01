@@ -128,13 +128,13 @@
         "available": "Available",
         "selected": "Selected",
         "occupied": "Taken",
-        "disabled": "Not in service"
+        "disabled": "Not in service",
+        "noJoin": "No room to join"
       },
       "seats": "{count} seats",
       "tableLabel": "Table {label}",
       "none": "No table seats {guests} guests at this time. Try another time.",
       "selected": "Table {tables} · {zone} · {seats} seats",
-      "hint": "Pinch or scroll to zoom the plan on a small screen.",
       "list": "Table list",
       "noJoin": "no free table next to it for {guests} guests",
       "selectedJoined": "Tables {tables} pushed together · {zone} · {seats} seats"

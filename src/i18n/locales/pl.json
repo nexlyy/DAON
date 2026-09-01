@@ -128,13 +128,13 @@
         "available": "Wolny",
         "selected": "Wybrany",
         "occupied": "Zajęty",
-        "disabled": "Nieczynny"
+        "disabled": "Nieczynny",
+        "noJoin": "Nie da się zestawić"
       },
       "seats": "{count} miejsc",
       "tableLabel": "Stolik {label}",
       "none": "Żaden stolik nie pomieści {guests} osób o tej godzinie. Wybierz inną godzinę.",
       "selected": "Stolik {tables} · {zone} · {seats} miejsc",
-      "hint": "Na małym ekranie przybliż plan gestem lub przewiń w bok.",
       "list": "Lista stolików",
       "noJoin": "brak wolnego stolika obok dla {guests} osób",
       "selectedJoined": "Stoliki {tables} zestawione razem · {zone} · {seats} miejsc"

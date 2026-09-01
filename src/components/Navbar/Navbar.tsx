@@ -44,10 +44,20 @@ export function Navbar() {
 
   // Anything else that sticks to the top of the page (the menu filter bar) reads
   // `--nav-offset` so it tucks under the bar and rides up with it when it hides.
+  // The bar is a different height on a phone, so a rotation has to re-measure.
   useEffect(() => {
-    const height = headerRef.current?.offsetHeight ?? 0
-    const offset = hidden && !drawerOpen ? 0 : height
-    document.documentElement.style.setProperty('--nav-offset', `${offset}px`)
+    const header = headerRef.current
+    if (!header) return
+
+    const publish = () => {
+      const offset = hidden && !drawerOpen ? 0 : header.offsetHeight
+      document.documentElement.style.setProperty('--nav-offset', `${offset}px`)
+    }
+
+    publish()
+    const observer = new ResizeObserver(publish)
+    observer.observe(header)
+    return () => observer.disconnect()
   }, [hidden, drawerOpen, scrolled])
 
   useEffect(() => {

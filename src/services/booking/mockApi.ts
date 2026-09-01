@@ -1,4 +1,4 @@
-import { floorPlan, resolveTableGroup } from '@/data/tables/floorPlan'
+import { floorPlan, resolveTableGroup, tableById } from '@/data/tables/floorPlan'
 import { openingHours, reservation as reservationConfig } from '@/data/restaurant'
 import { BookingError } from './types'
 import type {
@@ -104,7 +104,7 @@ function occupancyPressure(iso: string, time: string): number {
 }
 
 export function createMockBookingApi(): BookingApi {
-  return {
+  const api: BookingApi = {
     async getClosedDates(fromISO, toISO) {
       await wait(LATENCY_MS / 2)
       const closed: string[] = []
@@ -122,17 +122,26 @@ export function createMockBookingApi(): BookingApi {
       const now = new Date()
       const isToday = toISODate(now) === date
       const nowMinutes = now.getHours() * 60 + now.getMinutes()
+      const stored = readStored()
 
       return slotsForDate(date).map<TimeSlot>((time) => {
         if (isToday && toMinutes(time) <= nowMinutes + 60) {
           return { time, available: false }
         }
         // A slot stays on offer while the party can still be seated somewhere —
-        // for more than four that means enough free tables side by side.
+        // for more than four that means enough free tables side by side. This
+        // has to agree with getTableStatus, bookings included, or a slot can be
+        // offered that leaves the guest at a table step with nothing to pick.
         const pressure = occupancyPressure(date, time)
+        const booked = new Set(
+          stored
+            .filter((b) => b.date === date && b.time === time && b.status === 'confirmed')
+            .flatMap((b) => b.tableIds),
+        )
         const isFree = (id: string) => {
-          const table = floorPlan.tables.find((entry) => entry.id === id)
-          return Boolean(table && !table.disabled && hash(`${date}|${time}|${id}`) >= pressure)
+          const table = tableById.get(id)
+          if (!table || table.disabled || booked.has(id)) return false
+          return hash(`${date}|${time}|${id}`) >= pressure
         }
         const anySeat = floorPlan.tables.some((table) =>
           Boolean(resolveTableGroup(table.id, partySize, isFree)),
@@ -163,7 +172,7 @@ export function createMockBookingApi(): BookingApi {
 
     async createBooking(request: BookingRequest) {
       await wait(LATENCY_MS * 2)
-      const status = await this.getTableStatus({
+      const status = await api.getTableStatus({
         date: request.date,
         time: request.time,
         partySize: request.partySize,
@@ -184,4 +193,6 @@ export function createMockBookingApi(): BookingApi {
       return booking
     },
   }
+
+  return api
 }

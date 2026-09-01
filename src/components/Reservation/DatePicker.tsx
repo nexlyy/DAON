@@ -22,11 +22,8 @@ export function DatePicker({ value, closedDates, onChange }: Props) {
     return new Date(base.getFullYear(), base.getMonth(), 1)
   })
 
-  const lastBookable = useMemo(() => {
-    const date = new Date(today)
-    date.setDate(date.getDate() + reservationConfig.maxDaysAhead)
-    return date
-  }, [today])
+  const lastBookable = new Date(today)
+  lastBookable.setDate(lastBookable.getDate() + reservationConfig.maxDaysAhead)
 
   const months = list('months')
   const dayNames = list('days.narrow')
@@ -85,7 +82,7 @@ export function DatePicker({ value, closedDates, onChange }: Props) {
         ))}
       </div>
 
-      <div className={styles.grid} role="grid">
+      <div className={styles.grid}>
         {cells.map((date, index) => {
           if (!date) return <span key={`pad-${index}`} className={styles.pad} />
 

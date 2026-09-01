@@ -394,6 +394,18 @@
   transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease);
 }
 
+.tableListItem:disabled {
+  cursor: not-allowed;
+  background: transparent;
+  border-style: dashed;
+}
+
+.tableListItem[data-state='occupied'] {
+  background: #efeae2;
+  border-color: #ddd6ca;
+  border-style: solid;
+}
+
 .tableListItem[aria-pressed='true'] {
   background: var(--ink);
   border-color: var(--ink);
@@ -406,6 +418,10 @@
 
 .tableListMeta {
   font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.tableListItem:disabled .tableListLabel {
   color: var(--text-faint);
 }
 

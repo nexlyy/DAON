@@ -11,7 +11,7 @@ import { Hero } from '@/components/Hero/Hero'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import styles from './HomePage.module.css'
 
 const weekOrder = [1, 2, 3, 4, 5, 6, 0]
@@ -19,6 +19,9 @@ const weekOrder = [1, 2, 3, 4, 5, 6, 0]
 export function HomePage() {
   const { t, resolve, list, formatPrice, locale } = useI18n()
   const [openDish, setOpenDish] = useState<Dish | null>(null)
+  // Stable identity: the dialog's focus effect depends on it, and a new
+  // arrow every render would re-run that effect and yank focus.
+  const closeDish = useCallback(() => setOpenDish(null), [])
 
   useDocumentMeta({ title: t('meta.title'), description: t('meta.description') })
 
@@ -222,7 +225,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <DishDialog dish={openDish} onClose={() => setOpenDish(null)} />
+      <DishDialog dish={openDish} onClose={closeDish} />
     </>
   )
 }

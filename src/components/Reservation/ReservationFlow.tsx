@@ -133,8 +133,7 @@ export function ReservationFlow() {
   // group; rebuild it around the same first table, and drop it if that fails.
   useEffect(() => {
     if (tableIds.length === 0) return
-    const stillFree = (id: string) =>
-      (status[id] ?? 'available') === 'available' || tableIds.includes(id)
+    const stillFree = (id: string) => (status[id] ?? 'available') === 'available'
     const rebuilt = resolveTableGroup(tableIds[0], partySize ?? 1, stillFree)
     const unchanged = rebuilt?.length === tableIds.length && rebuilt.every((id, i) => id === tableIds[i])
     if (!unchanged) setTableIds(rebuilt ?? [])
@@ -160,16 +159,6 @@ export function ReservationFlow() {
     [status, tableIds, partySize],
   )
 
-  /** Free tables plus the ones already chosen, for the compact list on phones. */
-  const selectableTables = useMemo(
-    () =>
-      floorPlan.tables.filter((table) => {
-        const state = tableState(table, status, tableIds, partySize ?? 1)
-        return state === 'available' || state === 'selected'
-      }),
-    [status, tableIds, partySize],
-  )
-
   const chooseTable = useCallback(
     (primaryId: string) => {
       const isFree = (id: string) => (status[id] ?? 'available') === 'available'
@@ -180,10 +169,14 @@ export function ReservationFlow() {
     [partySize, status],
   )
 
-  /** On a phone the picker works one room at a time, list included. */
-  const listedTables = isPhone
-    ? selectableTables.filter((table) => table.zone === focusZone)
-    : selectableTables
+  /**
+   * The list under the plan mirrors the room the guest is looking at — every
+   * table in it, taken ones included, so the numbers match what they can see.
+   */
+  const listedTables = useMemo(
+    () => floorPlan.tables.filter((table) => table.zone === focusZone),
+    [focusZone],
+  )
 
   const canContinue = useMemo(() => {
     switch (step) {
@@ -315,7 +308,13 @@ export function ReservationFlow() {
               {/* Room tabs replace sideways scrolling on a phone. */}
               <div className={styles.zoneTabs} role="group" aria-label={t('floorPlan.title')}>
                 {zonesWithTables.map((zone) => {
-                  const free = fittingTables.filter((table) => table.zone === zone.id).length
+                  const free = floorPlan.tables.filter(
+                    (table) =>
+                      table.zone === zone.id &&
+                      ['available', 'selected'].includes(
+                        tableState(table, status, tableIds, partySize ?? 1),
+                      ),
+                  ).length
                   return (
                     <button
                       key={zone.id}
@@ -346,23 +345,31 @@ export function ReservationFlow() {
                 <div className={styles.tableList}>
                   <p className={styles.tableListTitle}>{t('reservation.table.list')}</p>
                   <div className={styles.tableListItems}>
-                    {listedTables.map((table) => (
-                      <button
-                        key={table.id}
-                        type="button"
-                        className={styles.tableListItem}
-                        aria-pressed={tableIds.includes(table.id)}
-                        onClick={() => chooseTable(table.id)}
-                      >
-                        <span className={styles.tableListLabel}>
-                          {t('reservation.table.tableLabel', { label: table.label })}
-                        </span>
-                        <span className={styles.tableListMeta}>
-                          {t(`floorPlan.zones.${zoneById.get(table.zone)?.labelKey ?? 'hall'}`)} ·{' '}
-                          {t('reservation.table.seats', { count: table.seats })}
-                        </span>
-                      </button>
-                    ))}
+                    {listedTables.map((table) => {
+                      const state = tableState(table, status, tableIds, partySize ?? 1)
+                      const free = state === 'available' || state === 'selected'
+                      return (
+                        <button
+                          key={table.id}
+                          type="button"
+                          className={styles.tableListItem}
+                          data-state={state}
+                          disabled={!free}
+                          aria-pressed={state === 'selected'}
+                          onClick={() => chooseTable(table.id)}
+                        >
+                          <span className={styles.tableListLabel}>
+                            {t('reservation.table.tableLabel', { label: table.label })}
+                          </span>
+                          <span className={styles.tableListMeta}>
+                            {t('reservation.table.seats', { count: table.seats })} ·{' '}
+                            {state === 'noJoin'
+                              ? t('reservation.table.legend.noJoin')
+                              : t(`reservation.table.legend.${state}`)}
+                          </span>
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               )}
@@ -562,7 +569,9 @@ function SummaryRow({
 
 function Legend() {
   const { t } = useI18n()
-  const states = ['available', 'selected', 'occupied', 'disabled'] as const
+  // `disabled` is for tables out of service, of which there are none; the
+  // hatched tables a guest sees are the ones with no free neighbour to join.
+  const states = ['available', 'selected', 'occupied', 'noJoin'] as const
 
   return (
     <ul className={styles.legend}>

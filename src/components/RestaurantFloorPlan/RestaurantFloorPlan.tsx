@@ -129,7 +129,6 @@ export function RestaurantFloorPlan({
         </svg>
       </div>
 
-      <p className={styles.hint}>{t('reservation.table.hint')}</p>
       <p className={styles.note}>{t('floorPlan.joinNote')}</p>
     </div>
   )
@@ -204,10 +203,6 @@ function TableNode({
       <text className={styles.tableLabel} y="8">
         {table.label}
       </text>
-
-      {state === 'selected' && (
-        <circle className={styles.ring} r={Math.max(half.w, half.h) + 15} fill="none" />
-      )}
     </g>
   )
 }

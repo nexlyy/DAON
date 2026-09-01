@@ -128,13 +128,13 @@
         "available": "예약 가능",
         "selected": "선택함",
         "occupied": "예약됨",
-        "disabled": "사용 불가"
+        "disabled": "사용 불가",
+        "noJoin": "붙일 자리 없음"
       },
       "seats": "{count}석",
       "tableLabel": "{label}번 테이블",
       "none": "이 시간에 {guests}명이 앉을 자리가 없습니다. 다른 시간을 골라 주세요.",
       "selected": "{tables}번 테이블 · {zone} · {seats}석",
-      "hint": "화면이 작으면 손가락으로 확대하거나 옆으로 넘겨 보세요.",
       "list": "테이블 목록",
       "noJoin": "{guests}명을 위해 붙일 옆 자리가 없습니다",
       "selectedJoined": "{tables}번 테이블을 붙임 · {zone} · {seats}석"

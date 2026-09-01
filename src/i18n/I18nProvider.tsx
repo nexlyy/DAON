@@ -54,22 +54,26 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => resolveInitialLocale())
   const [switching, setSwitching] = useState(false)
   const timer = useRef<number | undefined>(undefined)
+  const current = useRef(locale)
 
   useEffect(() => {
+    current.current = locale
     document.documentElement.lang = LOCALE_META[locale].htmlLang
   }, [locale])
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
+  // A state updater has to be pure — React may call it more than once — so the
+  // "did it actually change" check reads a ref instead of the previous state.
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState((current) => {
-      if (current === next) return current
-      storeLocale(next)
-      setSwitching(true)
-      window.clearTimeout(timer.current)
-      timer.current = window.setTimeout(() => setSwitching(false), 320)
-      return next
-    })
+    if (current.current === next) return
+    current.current = next
+
+    storeLocale(next)
+    setLocaleState(next)
+    setSwitching(true)
+    window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setSwitching(false), 320)
   }, [])
 
   const value = useMemo<I18nValue>(() => {

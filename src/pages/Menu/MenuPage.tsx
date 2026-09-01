@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { categories } from '@/data/menu/categories'
 import { dishes } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
@@ -17,6 +17,9 @@ export function MenuPage() {
   const [category, setCategory] = useState('all')
   const [query, setQuery] = useState('')
   const [openDish, setOpenDish] = useState<Dish | null>(null)
+  // Stable identity: the dialog's focus effect depends on it, and a new
+  // arrow every render would re-run that effect and yank focus.
+  const closeDish = useCallback(() => setOpenDish(null), [])
   const deferredQuery = useDeferredValue(query)
 
   useDocumentMeta({ title: t('meta.menuTitle'), description: t('meta.description') })
@@ -143,7 +146,7 @@ export function MenuPage() {
         <p className={styles.allergyBody}>{t('allergens.body')}</p>
       </section>
 
-      <DishDialog dish={openDish} onClose={() => setOpenDish(null)} />
+      <DishDialog dish={openDish} onClose={closeDish} />
     </>
   )
 }
