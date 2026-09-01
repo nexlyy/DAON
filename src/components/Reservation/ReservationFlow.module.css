@@ -109,7 +109,8 @@
   border-color: #cdc4b6;
 }
 
-.swatch[data-state='disabled'] {
+.swatch[data-state='disabled'],
+.swatch[data-state='noJoin'] {
   background: repeating-linear-gradient(
     45deg,
     transparent 0 3px,
