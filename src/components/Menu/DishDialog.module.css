@@ -43,8 +43,8 @@
   z-index: 5;
   display: grid;
   place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: 50%;
   background: rgba(251, 248, 243, 0.92);
   color: var(--ink);

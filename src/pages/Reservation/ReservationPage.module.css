@@ -44,3 +44,17 @@
     font-size: var(--step-0);
   }
 }
+
+@media (max-height: 560px) {
+  .head {
+    padding-block: 4.5rem 0.6rem;
+  }
+
+  .title {
+    font-size: var(--step-2);
+  }
+
+  .subtitle {
+    display: none;
+  }
+}

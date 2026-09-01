@@ -67,12 +67,24 @@
   }
 
   .chip {
-    padding: 0.5em 0.9em;
-    font-size: 0.74rem;
+    min-height: 2.6rem;
+    padding: 0.5em 0.95em;
+    font-size: 0.78rem;
     letter-spacing: 0.06em;
   }
 
   .ko {
     display: none;
+  }
+}
+
+@media (max-height: 560px) {
+  .rail {
+    padding-block: 0.1rem 0.35rem;
+  }
+
+  .chip {
+    min-height: 2.4rem;
+    padding-block: 0.35em;
   }
 }

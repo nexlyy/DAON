@@ -287,6 +287,12 @@
     order: -1;
   }
 
+  /* Stacked above the panel, an empty summary is four dashes between the
+     guest and the calendar. */
+  .summary[data-empty] {
+    display: none;
+  }
+
   .summary .confirm,
   .summary .back {
     display: none;
@@ -450,10 +456,6 @@
     padding: 0.75rem 0.9rem;
     border-radius: var(--radius-m);
     box-shadow: none;
-  }
-
-  .summary[data-empty] {
-    display: none;
   }
 
   .summaryBrand,

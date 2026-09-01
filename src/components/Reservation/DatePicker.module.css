@@ -117,3 +117,24 @@
   background: currentColor;
   opacity: 0.55;
 }
+
+@media (max-width: 640px) {
+  .calendar {
+    width: 100%;
+    padding: 0.9rem 0.5rem 0.7rem;
+  }
+
+  .weekdays,
+  .grid {
+    gap: 0.15rem;
+  }
+
+  .nav {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .day {
+    font-size: 0.9rem;
+  }
+}

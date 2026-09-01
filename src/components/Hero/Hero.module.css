@@ -239,3 +239,19 @@
     width: min(100%, 21rem);
   }
 }
+
+@media (max-height: 560px) {
+  .hero {
+    min-height: auto;
+    padding-block: 5.5rem 2.5rem;
+  }
+
+  .lead {
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .scroll {
+    display: none;
+  }
+}

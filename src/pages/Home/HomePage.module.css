@@ -376,6 +376,13 @@
 }
 
 @media (max-width: 640px) {
+  .visitLink,
+  .visitBlock address {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.6rem;
+  }
+
   .aboutTitle,
   .sectionHead h2,
   .visitCopy h2 {

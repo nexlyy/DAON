@@ -242,6 +242,23 @@ p {
   }
 }
 
+/* Short viewports ---------------------------------------------------------
+   A phone in landscape is 375px tall but 800px wide, so the width-based rules
+   leave it with the desktop's vertical chrome — on the menu page that was a
+   71px bar over a 150px filter strip, better than half the screen. Section
+   padding and display type shrink by height here, whatever the width. */
+
+@media (max-height: 560px) {
+  :root {
+    --section-y: 2.5rem;
+  }
+
+  .btn {
+    min-height: 2.6rem;
+    padding-block: 0.7em;
+  }
+}
+
 /* Motion ----------------------------------------------------------------- */
 
 @keyframes daon-rise {

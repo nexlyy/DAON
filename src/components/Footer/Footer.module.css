@@ -126,7 +126,13 @@
   }
 
   .link {
-    padding-block: 0.28rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.6rem;
+  }
+
+  .col {
+    gap: 0.1rem;
   }
 
   .hours {
