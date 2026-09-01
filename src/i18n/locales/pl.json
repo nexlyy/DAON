@@ -55,7 +55,7 @@
       "contact": "Kontakt",
       "address": "Adres",
       "directions": "Otwórz w mapach",
-      "addressPending": "Adres do potwierdzenia"
+      "delivery": "Zamów dostawę"
     },
     "cta": {
       "title": "Zarezerwuj stolik",
@@ -72,8 +72,6 @@
     "searchPlaceholder": "Szukaj po nazwie…",
     "empty": "Nic nie pasuje do tego wyszukiwania.",
     "clear": "Wyczyść",
-    "from": "od",
-    "options": "Do wyboru",
     "portion": "Porcja",
     "serves": "Dla {count} osób",
     "itemNo": "Nr {no}",
@@ -205,7 +203,8 @@
     "explore": "Nawigacja",
     "visit": "Odwiedź nas",
     "rights": "Wszelkie prawa zastrzeżone.",
-    "hours": "Godziny otwarcia"
+    "hours": "Godziny otwarcia",
+    "delivery": "Zamów dostawę"
   },
   "days": {
     "long": [

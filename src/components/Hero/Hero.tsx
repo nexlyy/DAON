@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
+import { Calligraphy } from '@/components/Media/Calligraphy'
+import { DishPhoto } from '@/components/Media/DishPhoto'
 import { RoofMark } from '@/components/Brand/Logo'
 import { Vine } from '@/components/Ornament/Vine'
 import { useI18n } from '@/i18n/useI18n'
-import { asset } from '@/lib/asset'
 import styles from './Hero.module.css'
 
 /**
@@ -42,42 +43,28 @@ export function Hero() {
 
         <div className={styles.collage}>
           <figure className={`${styles.plate} ${styles.plateOne}`}>
-            <img
-              src={asset('images/dishes/03.webp')}
+            <DishPhoto
+              photo="03"
               alt="Bulgogi served with rice and side dishes"
-              width={760}
-              height={760}
-              fetchPriority="high"
-              decoding="async"
+              sizes="(max-width: 900px) 46vw, 340px"
+              priority
             />
           </figure>
           <figure className={`${styles.plate} ${styles.plateTwo}`}>
-            <img
-              src={asset('images/dishes/38.webp')}
+            <DishPhoto
+              photo="38"
               alt="Korean fried chicken glazed and scattered with spring onion"
-              width={760}
-              height={760}
-              decoding="async"
+              sizes="(max-width: 900px) 36vw, 250px"
             />
           </figure>
           <figure className={`${styles.plate} ${styles.plateThree}`}>
-            <img
-              src={asset('images/dishes/60.webp')}
+            <DishPhoto
+              photo="60"
               alt="Kimchi-jjigae simmering in a stone pot"
-              width={760}
-              height={760}
-              decoding="async"
+              sizes="(max-width: 900px) 30vw, 210px"
             />
           </figure>
-          <img
-            className={styles.seal}
-            src={asset('images/titles/daon.webp')}
-            alt=""
-            aria-hidden="true"
-            width={122}
-            height={268}
-            decoding="async"
-          />
+          <Calligraphy className={styles.seal} name="daon" />
         </div>
       </div>
 

@@ -261,6 +261,11 @@
   box-shadow: var(--shadow-soft);
 }
 
+.deliveryButton {
+  justify-self: start;
+  margin-top: 0.4rem;
+}
+
 .hoursTitle {
   font-family: var(--font-body);
   font-size: 0.7rem;
@@ -268,41 +273,6 @@
   letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--gold-text);
-}
-
-.hours {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0;
-}
-
-.hours div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.88rem;
-  color: var(--text-soft);
-}
-
-.hours div[data-today] {
-  color: var(--ink);
-}
-
-.hours div[data-today] dt::before {
-  content: '';
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  margin-right: 0.5em;
-  border-radius: 50%;
-  background: var(--seal);
-  vertical-align: middle;
-}
-
-.hours dd {
-  margin: 0;
-  font-variant-numeric: tabular-nums;
 }
 
 /* CTA -------------------------------------------------------------------- */

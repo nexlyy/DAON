@@ -109,13 +109,6 @@
   transform: rotate(0deg) translateY(-2px);
 }
 
-.priceFrom {
-  font-size: 0.68em;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
 .body {
   position: relative;
   display: flex;
@@ -220,12 +213,7 @@
     transform: none;
   }
 
-  .card[data-variant='auto'] .priceFrom {
-    font-size: 0.62em;
-    margin-right: 0.15em;
-  }
-
-  .card[data-variant='auto'] .desc {
+  .card[data-variant='auto']   .card[data-variant='auto'] .desc {
     -webkit-line-clamp: 2;
     line-clamp: 2;
     font-size: 0.79rem;

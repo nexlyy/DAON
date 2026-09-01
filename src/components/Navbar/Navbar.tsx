@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Logo } from '@/components/Brand/Logo'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
+import { restaurant } from '@/data/restaurant'
 import { useI18n } from '@/i18n/useI18n'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import styles from './Navbar.module.css'
@@ -95,6 +96,14 @@ export function Navbar() {
 
         <div className={styles.actions}>
           <LanguageSwitcher />
+          <a
+            className={`btn btn--delivery ${styles.cta}`}
+            href={restaurant.links.uberEats}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('home.visit.delivery')}
+          </a>
           <Link to="/reservation" className={`btn ${styles.cta}`}>
             {t('nav.reservation')}
           </Link>
@@ -138,6 +147,14 @@ export function Navbar() {
           ))}
         </nav>
         <div className={styles.drawerFooter}>
+          <a
+            className="btn btn--delivery"
+            href={restaurant.links.uberEats}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('home.visit.delivery')}
+          </a>
           <LanguageSwitcher variant="inline" />
         </div>
       </div>

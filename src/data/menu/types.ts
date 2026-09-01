@@ -13,24 +13,19 @@ export type DishTag =
   | 'mildAvailable'
   | 'sharing'
 
-/** A numbered choice inside one dish, e.g. "7. Łagodny / 8. Ostry". */
-export interface DishOption {
-  /** Number printed in the menu. */
-  no: number
-  price: number
-  label: LocalizedText
-}
-
 export interface Dish {
   id: string
-  /** Number printed in the menu; null when the dish is a group of options. */
-  no: number | null
+  /**
+   * The number as printed in the menu, zero-padded — "01", "47". It is the
+   * only number the interface ever shows, so reordering or regrouping the
+   * list can never renumber a dish.
+   */
+  number: string
   categoryId: string
   name: LocalizedText
   description?: LocalizedText
-  /** Single price in PLN. Dishes with `options` price each option instead. */
-  price?: number
-  options?: DishOption[]
+  /** Price in PLN. */
+  price: number
   /** File name (without extension) in /images/dishes. */
   photo?: string
   tags?: DishTag[]

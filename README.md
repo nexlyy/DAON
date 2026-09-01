@@ -61,9 +61,27 @@ So `ko` carries its own text rather than a rendering of the English.
 menu — four allergens listed against particular dish numbers, four marked
 "contained in most dishes" and shown as a standing note instead.
 
+### Photographs
+
+The photographs are pulled from the PDF at the size they are stored there —
+around 400px square — rather than re-cropped from a page raster, which is what
+an earlier pass did and which cost a resample. Each one ships at 640px and
+320px, as AVIF and WebP; `DishPhoto` picks between them. 640 is as far as the
+originals go, so nothing is upscaled beyond a single Lanczos step and a light
+unsharp pass. The brush headings are re-rendered from the PDF's own text at
+600 dpi and keyed against the paper, so they are type, not a traced bitmap.
+
+### PDF → website check
+
+`dishes.ts` is checked back against the printed menu: every number 1–98 is
+printed, no gaps and no duplicates; the price each dish shows is printed on the
+page that prints its number; each name appears verbatim in one of the three
+languages; and the section a dish is filed under is the section whose
+calligraphy heads that page. It currently passes with nothing flagged.
+
 ### Where the two files disagree
 
-Three entries differ between the English/Polish and Korean editions. The site
+Four entries differ between the English/Polish and Korean editions. The site
 follows the newer English/Polish file; each is marked with a `sourceNote`
 comment in `dishes.ts`.
 
@@ -110,8 +128,14 @@ implement it:
 Frontend → BookingApi → (mock | HTTP → your service)
 ```
 
+## Restaurant details
+
+Address, phone, e-mail, opening hours and the outbound links all live in
+`src/data/restaurant.ts`; no component holds a copy. Monday is `null` there,
+which is what closes the day in the calendar and stops any slot being generated
+for it. `reservation.lastSeatingBeforeClose` keeps the last seating 90 minutes
+before closing, so Tuesday runs 13:00–20:30 and Saturday 12:00–21:30.
+
 ## Still to confirm
 
-- Street address, e-mail and opening hours are placeholders in
-  `src/data/restaurant.ts`.
 - The four rows in the table above, where the two menu files disagree.

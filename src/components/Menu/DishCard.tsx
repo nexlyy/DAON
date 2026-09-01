@@ -1,8 +1,7 @@
 import type { CSSProperties } from 'react'
-import { dishFromPrice } from '@/data/menu/dishes'
+import { DishPhoto } from '@/components/Media/DishPhoto'
 import type { Dish } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
-import { asset } from '@/lib/asset'
 import { DishTags } from './DishTags'
 import styles from './DishCard.module.css'
 
@@ -22,7 +21,6 @@ interface Props {
 export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
   const { t, resolve, formatPrice } = useI18n()
   const name = resolve(dish.name)
-  const hasOptions = Boolean(dish.options?.length)
 
   return (
     <article
@@ -38,28 +36,14 @@ export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
 
       <div className={styles.media}>
         {dish.photo ? (
-          <img
-            className={styles.photo}
-            src={asset(`images/dishes/${dish.photo}.webp`)}
-            // The phone layout shows a 100px thumbnail; there is no reason to
-            // pull a 760px photograph for it.
-            srcSet={`${asset(`images/dishes/sm/${dish.photo}.webp`)} 320w, ${asset(
-              `images/dishes/${dish.photo}.webp`,
-            )} 760w`}
-            sizes="(max-width: 640px) 120px, (max-width: 900px) 50vw, 400px"
-            alt={name}
-            width={760}
-            height={760}
-            loading="lazy"
-            decoding="async"
-          />
+          <DishPhoto className={styles.photo} photo={dish.photo} alt={name} />
         ) : (
           <div className={styles.placeholder} aria-hidden="true">
             <span>DAON</span>
           </div>
         )}
 
-        {dish.no !== null && <span className={styles.number}>{String(dish.no).padStart(2, '0')}</span>}
+        <span className={styles.number}>{dish.number}</span>
       </div>
 
       <div className={styles.body}>
@@ -67,10 +51,7 @@ export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
             phones; one element, moved by CSS rather than duplicated. */}
         <div className={styles.titleRow}>
           <h3 className={styles.name}>{name}</h3>
-          <span className={styles.price}>
-            {hasOptions && <span className={styles.priceFrom}>{t('menu.from')}</span>}
-            {formatPrice(dishFromPrice(dish))}
-          </span>
+          <span className={styles.price}>{formatPrice(dish.price)}</span>
         </div>
         {dish.description && <p className={styles.desc}>{resolve(dish.description)}</p>}
 

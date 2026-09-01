@@ -1,0 +1,51 @@
+.hours {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
+
+.hours > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hours dt {
+  letter-spacing: 0.04em;
+}
+
+.hours dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.hours > div[data-closed] dd {
+  font-variant-numeric: normal;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+/* A dot against today's row, so the guest can find it at a glance. */
+.hours > div[data-today] {
+  color: var(--ink);
+}
+
+.hours > div[data-today] dt::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 0.5em;
+  border-radius: 50%;
+  background: var(--seal);
+  vertical-align: middle;
+}
+
+.hours > div[data-today] dd {
+  color: var(--ink);
+}

@@ -55,7 +55,7 @@
       "contact": "연락처",
       "address": "주소",
       "directions": "지도에서 열기",
-      "addressPending": "주소 확인 예정"
+      "delivery": "배달 주문"
     },
     "cta": {
       "title": "테이블 예약",
@@ -72,8 +72,6 @@
     "searchPlaceholder": "이름으로 검색…",
     "empty": "검색 결과가 없습니다.",
     "clear": "지우기",
-    "from": "부터",
-    "options": "선택",
     "portion": "중량",
     "serves": "{count}인분",
     "itemNo": "{no}번",
@@ -205,7 +203,8 @@
     "explore": "바로가기",
     "visit": "오시는 길",
     "rights": "All rights reserved.",
-    "hours": "영업시간"
+    "hours": "영업시간",
+    "delivery": "배달 주문"
   },
   "days": {
     "long": [

@@ -11,3 +11,6 @@ dist
 
 # Local editor/agent config
 .claude/
+
+# Scratch extraction output
+.tmp/

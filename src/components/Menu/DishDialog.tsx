@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react'
+import { Calligraphy } from '@/components/Media/Calligraphy'
+import { DishPhoto } from '@/components/Media/DishPhoto'
 import { categoryById } from '@/data/menu/categories'
 import { dishAllergens } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
-import { asset } from '@/lib/asset'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { DishTags } from './DishTags'
 import styles from './DishDialog.module.css'
@@ -85,12 +86,11 @@ export function DishDialog({ dish, onClose }: Props) {
 
         <div className={styles.media}>
           {dish.photo ? (
-            <img
-              src={asset(`images/dishes/${dish.photo}.webp`)}
+            <DishPhoto
+              photo={dish.photo}
               alt={name}
-              width={760}
-              height={760}
-              decoding="async"
+              sizes="(max-width: 720px) 100vw, 420px"
+              priority
             />
           ) : (
             <div className={styles.placeholder} aria-hidden="true">
@@ -98,13 +98,7 @@ export function DishDialog({ dish, onClose }: Props) {
             </div>
           )}
           {category && (
-            <img
-              className={styles.calligraphy}
-              src={asset(`images/titles/${category.calligraphy}.webp`)}
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-            />
+            <Calligraphy className={styles.calligraphy} name={category.calligraphy} />
           )}
         </div>
 
@@ -119,32 +113,14 @@ export function DishDialog({ dish, onClose }: Props) {
             <h2 className={styles.title} id="dish-dialog-title">
               {name}
             </h2>
-            {dish.no !== null && <p className={styles.no}>{t('menu.itemNo', { no: dish.no })}</p>}
+            <p className={styles.no}>{t('menu.itemNo', { no: dish.number })}</p>
           </div>
 
           <GoldDivider className={styles.divider} />
 
           {dish.description && <p className={styles.desc}>{resolve(dish.description)}</p>}
 
-          {dish.options?.length ? (
-            <div className={styles.options}>
-              <p className={styles.optionsTitle}>{t('menu.options')}</p>
-              <ul className={styles.optionList}>
-                {dish.options.map((option) => (
-                  <li key={option.no} className={styles.option}>
-                    <span className={styles.optionNo}>{String(option.no).padStart(2, '0')}</span>
-                    <span className={styles.optionLabel}>{resolve(option.label)}</span>
-                    <span className={styles.optionDots} aria-hidden="true" />
-                    <span className={styles.optionPrice}>{formatPrice(option.price)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            dish.price !== undefined && (
-              <p className={styles.singlePrice}>{formatPrice(dish.price)}</p>
-            )
-          )}
+          <p className={styles.singlePrice}>{formatPrice(dish.price)}</p>
 
           {allergens.length > 0 && (
             <p className={styles.allergens}>

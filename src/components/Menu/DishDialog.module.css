@@ -143,63 +143,6 @@
   color: var(--text-soft);
 }
 
-.options {
-  display: grid;
-  gap: 0.7rem;
-  padding: 1.15rem 1.25rem;
-  background: var(--paper-warm);
-  border: 1px solid rgba(198, 176, 150, 0.4);
-  border-radius: var(--radius-m);
-}
-
-.optionsTitle {
-  font-size: 0.72rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--gold-text);
-}
-
-.optionList {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.option {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  font-size: 0.92rem;
-}
-
-.optionNo {
-  font-size: 0.72rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.12em;
-  color: var(--text-faint);
-}
-
-.optionLabel {
-  color: var(--text);
-}
-
-.optionDots {
-  flex: 1;
-  height: 1px;
-  margin-bottom: 0.28em;
-  background-image: linear-gradient(90deg, var(--clay) 30%, transparent 0);
-  background-size: 5px 1px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
-}
-
-.optionPrice {
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
 .singlePrice {
   font-family: var(--font-display);
   font-size: var(--step-2);

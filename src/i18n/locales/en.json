@@ -54,8 +54,8 @@
       "hours": "Opening hours",
       "contact": "Contact",
       "address": "Address",
-      "directions": "Open in maps",
-      "addressPending": "Address to be confirmed"
+      "directions": "Open in Maps",
+      "delivery": "Order delivery"
     },
     "cta": {
       "title": "Reserve a table",
@@ -72,8 +72,6 @@
     "searchPlaceholder": "Search by name…",
     "empty": "Nothing matches that search.",
     "clear": "Clear",
-    "from": "from",
-    "options": "Choose",
     "portion": "Portion",
     "serves": "Serves {count}",
     "itemNo": "No. {no}",
@@ -205,7 +203,8 @@
     "explore": "Explore",
     "visit": "Visit us",
     "rights": "All rights reserved.",
-    "hours": "Opening hours"
+    "hours": "Opening hours",
+    "delivery": "Order delivery"
   },
   "days": {
     "long": [

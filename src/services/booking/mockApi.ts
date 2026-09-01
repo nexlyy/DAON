@@ -1,5 +1,5 @@
 import { floorPlan, resolveTableGroup, tableById } from '@/data/tables/floorPlan'
-import { openingHours, reservation as reservationConfig } from '@/data/restaurant'
+import { hoursFor, reservation as reservationConfig } from '@/data/restaurant'
 import { BookingError } from './types'
 import type {
   AvailabilityQuery,
@@ -74,17 +74,14 @@ export function toISODate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
-function hoursFor(date: Date) {
-  return openingHours.find((entry) => entry.day === date.getDay())
-}
-
 /** Every seating time the restaurant offers on a given date. */
 export function slotsForDate(iso: string): string[] {
-  const hours = hoursFor(parseISODate(iso))
+  const hours = hoursFor(parseISODate(iso).getDay())
   if (!hours) return []
 
-  const first = toMinutes(hours.open)
-  const last = toMinutes(hours.close) - reservationConfig.lastSeatingBeforeClose
+  const [open, close] = hours
+  const first = toMinutes(open)
+  const last = toMinutes(close) - reservationConfig.lastSeatingBeforeClose
   const slots: string[] = []
   for (let m = first; m <= last; m += reservationConfig.slotMinutes) {
     slots.push(fromMinutes(m))
@@ -111,7 +108,7 @@ export function createMockBookingApi(): BookingApi {
       const cursor = parseISODate(fromISO)
       const end = parseISODate(toISO)
       while (cursor <= end) {
-        if (!hoursFor(cursor)) closed.push(toISODate(cursor))
+        if (!hoursFor(cursor.getDay())) closed.push(toISODate(cursor))
         cursor.setDate(cursor.getDate() + 1)
       }
       return closed
@@ -172,6 +169,12 @@ export function createMockBookingApi(): BookingApi {
 
     async createBooking(request: BookingRequest) {
       await wait(LATENCY_MS * 2)
+      // The steps only ever offer open days and real seating times, but a tab
+      // left open past midnight can carry a stale one, so the hours are checked
+      // again here rather than trusted from the UI.
+      if (!slotsForDate(request.date).includes(request.time)) {
+        throw new BookingError('The restaurant is closed at that time', 'unavailable')
+      }
       const status = await api.getTableStatus({
         date: request.date,
         time: request.time,

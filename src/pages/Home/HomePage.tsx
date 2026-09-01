@@ -1,23 +1,23 @@
 import { Link } from 'react-router-dom'
+import { Calligraphy } from '@/components/Media/Calligraphy'
+import { DishPhoto } from '@/components/Media/DishPhoto'
 import { categories } from '@/data/menu/categories'
-import { dishes, dishFromPrice, featuredDishes } from '@/data/menu/dishes'
+import { dishes, featuredDishes } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
-import { openingHours, restaurant } from '@/data/restaurant'
+import { restaurant } from '@/data/restaurant'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useReveal } from '@/hooks/useReveal'
-import { asset } from '@/lib/asset'
 import { Hero } from '@/components/Hero/Hero'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
+import { OpeningHours } from '@/components/OpeningHours/OpeningHours'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
 import { useCallback, useState } from 'react'
 import styles from './HomePage.module.css'
 
-const weekOrder = [1, 2, 3, 4, 5, 6, 0]
-
 export function HomePage() {
-  const { t, resolve, list, formatPrice, locale } = useI18n()
+  const { t, resolve, formatPrice, locale } = useI18n()
   const [openDish, setOpenDish] = useState<Dish | null>(null)
   // Stable identity: the dialog's focus effect depends on it, and a new
   // arrow every render would re-run that effect and yank focus.
@@ -32,8 +32,7 @@ export function HomePage() {
   const ctaRef = useReveal<HTMLDivElement>()
 
   const featured = featuredDishes().slice(0, 6)
-  const dayNames = list('days.long')
-  const cheapest = Math.min(...dishes.map(dishFromPrice))
+  const cheapest = Math.min(...dishes.map((dish) => dish.price))
 
   return (
     <>
@@ -66,23 +65,17 @@ export function HomePage() {
 
           <div className={styles.aboutMedia}>
             <figure className={styles.aboutPhoto}>
-              <img
-                src={asset('images/dishes/19.webp')}
+              <DishPhoto
+                photo="19"
                 alt="Basic kimbap sliced into rounds"
-                width={760}
-                height={760}
-                loading="lazy"
-                decoding="async"
+                sizes="(max-width: 900px) 60vw, 420px"
               />
             </figure>
             <figure className={`${styles.aboutPhoto} ${styles.aboutPhotoSmall}`}>
-              <img
-                src={asset('images/dishes/82.webp')}
+              <DishPhoto
+                photo="82"
                 alt="Haemul pajeon, a seafood and spring onion pancake"
-                width={760}
-                height={760}
-                loading="lazy"
-                decoding="async"
+                sizes="(max-width: 900px) 34vw, 240px"
               />
             </figure>
           </div>
@@ -133,13 +126,7 @@ export function HomePage() {
               return (
                 <li key={category.id}>
                   <Link to="/menu" className={styles.categoryCard}>
-                    <img
-                      src={asset(`images/titles/${category.calligraphy}.webp`)}
-                      alt=""
-                      aria-hidden="true"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <Calligraphy name={category.calligraphy} />
                     <span className={styles.categoryName}>{resolve(category.name)}</span>
                     <span className={styles.categoryMeta}>
                       {locale !== 'ko' && <span lang="ko">{category.ko}</span>}
@@ -163,15 +150,15 @@ export function HomePage() {
             <div className={styles.visitBlock}>
               <h3>{t('home.visit.address')}</h3>
               <address>
-                {restaurant.address.street ?? t('home.visit.addressPending')}
+                {restaurant.address.street}
                 <br />
-                {restaurant.address.city}, {restaurant.address.country}
+                {restaurant.address.postalCode} {restaurant.address.city}
               </address>
               <a
                 className={styles.visitLink}
-                href={restaurant.address.mapsUrl}
+                href={restaurant.links.maps}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noopener noreferrer"
               >
                 {t('home.visit.directions')} →
               </a>
@@ -182,32 +169,33 @@ export function HomePage() {
               <a className={styles.visitLink} href={restaurant.phoneHref}>
                 {restaurant.phone}
               </a>
+              <a className={styles.visitLink} href={restaurant.emailHref}>
+                {restaurant.email}
+              </a>
               <a
                 className={styles.visitLink}
-                href={restaurant.instagramUrl}
+                href={restaurant.links.instagram}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noopener noreferrer"
               >
                 @{restaurant.instagram}
               </a>
             </div>
+
+            <a
+              className={`btn btn--delivery ${styles.deliveryButton}`}
+              href={restaurant.links.uberEats}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('home.visit.delivery')}
+            </a>
           </div>
 
           <div className={styles.hoursCard}>
             <h3 className={styles.hoursTitle}>{t('home.visit.hours')}</h3>
             <GoldDivider />
-            <dl className={styles.hours}>
-              {weekOrder.map((day) => {
-                const entry = openingHours.find((item) => item.day === day)
-                const isToday = new Date().getDay() === day
-                return (
-                  <div key={day} data-today={isToday || undefined}>
-                    <dt>{dayNames[day]}</dt>
-                    <dd>{entry ? `${entry.open} – ${entry.close}` : t('common.closed')}</dd>
-                  </div>
-                )
-              })}
-            </dl>
+            <OpeningHours />
           </div>
         </div>
       </section>

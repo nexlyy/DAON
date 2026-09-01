@@ -1,10 +1,10 @@
 import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { Calligraphy } from '@/components/Media/Calligraphy'
 import { categories } from '@/data/menu/categories'
 import { dishes } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
-import { asset } from '@/lib/asset'
 import { CategoryRail } from '@/components/Menu/CategoryRail'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
@@ -33,8 +33,7 @@ export function MenuPage() {
       const haystack = [
         resolve(dish.name),
         resolve(dish.description),
-        dish.no !== null ? String(dish.no) : '',
-        ...(dish.options ?? []).map((option) => resolve(option.label)),
+        dish.number,
       ]
         .join(' ')
         .toLowerCase()
@@ -99,14 +98,7 @@ export function MenuPage() {
           grouped.map(({ category: entry, items }) => (
             <section className={styles.group} key={entry.id} id={`category-${entry.id}`}>
               <header className={styles.groupHead}>
-                <img
-                  className={styles.calligraphy}
-                  src={asset(`images/titles/${entry.calligraphy}.webp`)}
-                  alt=""
-                  aria-hidden="true"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <Calligraphy className={styles.calligraphy} name={entry.calligraphy} />
                 <div className={styles.groupText}>
                   <h2 className={styles.groupTitle}>{resolve(entry.name)}</h2>
                   <p className={styles.groupRoman}>

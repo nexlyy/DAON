@@ -65,31 +65,10 @@
   color: var(--text-soft);
 }
 
-.hours {
-  display: grid;
-  gap: 0.34rem;
-  width: 100%;
-  max-width: 15rem;
-  margin: 0;
-  font-size: var(--step--1);
-  color: var(--text-soft);
-}
-
-.hoursRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.hoursRow dt {
-  letter-spacing: 0.08em;
-}
-
-.hoursRow dd {
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-  color: var(--text);
+.delivery {
+  margin-top: 0.6rem;
+  padding: 0.7em 1.4em;
+  font-size: 0.68rem;
 }
 
 .legal {
@@ -135,12 +114,13 @@
     gap: 0.1rem;
   }
 
-  .hours {
-    max-width: none;
-    font-size: 0.78rem;
-  }
+    .delivery {
+  margin-top: 0.6rem;
+  padding: 0.7em 1.4em;
+  font-size: 0.68rem;
+}
 
-  .legal {
+.legal {
     margin-top: 2rem;
     padding-top: 1.1rem;
   }
