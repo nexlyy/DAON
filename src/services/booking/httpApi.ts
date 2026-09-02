@@ -18,6 +18,7 @@ import type {
  *   GET  {base}/slots?date=…&partySize=…        -> TimeSlot[]
  *   GET  {base}/tables?date=…&time=…&partySize= -> Record<tableId, status>
  *   POST {base}/bookings                        -> Booking
+ *   POST {base}/bookings/cancel                 -> { ok: true }
  */
 export function createHttpBookingApi(baseUrl: string): BookingApi {
   const base = baseUrl.replace(/\/$/, '')
@@ -56,5 +57,12 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
 
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
+
+    cancelBooking: async (reference: string, token: string) => {
+      await request<{ ok: boolean }>('/bookings/cancel', {
+        method: 'POST',
+        body: JSON.stringify({ reference, token }),
+      })
+    },
   }
 }

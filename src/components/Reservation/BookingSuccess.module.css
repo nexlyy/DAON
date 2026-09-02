@@ -150,3 +150,48 @@
     width: 100%;
   }
 }
+
+/* The way out, kept quiet: it should be findable, not inviting. */
+.cancel {
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--gold-line);
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.cancelTitle {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.cancelButton {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.25s var(--ease);
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .cancelButton:hover:not(:disabled) {
+    color: var(--seal);
+  }
+}
+
+.cancelDone {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.cancelError {
+  font-size: 0.8rem;
+  color: #9c2b23;
+}

@@ -48,6 +48,19 @@ function supabaseStore(url, key) {
     return body
   }
 
+  /** One booking, by the code the guest was given. */
+  async function find(reference) {
+    const [row] = await call(
+      `/reservations?select=*&reference=eq.${encodeURIComponent(reference)}&limit=1`,
+    )
+    if (!row) return null
+    const tables = await call(`/reservation_tables?select=table_id&reservation_id=eq.${row.id}`)
+    return fromRow(
+      row,
+      tables.map((table) => table.table_id),
+    )
+  }
+
   return {
     kind: 'supabase',
 
@@ -70,6 +83,48 @@ function supabaseStore(url, key) {
       return byTime
     },
 
+    find,
+
+    /** Everything booked on a date, for the staff's own list. */
+    async onDate(date) {
+      const rows = await call(
+        `/reservations?select=*&booking_date=eq.${date}&status=eq.confirmed&order=booking_time`,
+      )
+      if (rows.length === 0) return []
+      const tables = await call(
+        `/reservation_tables?select=reservation_id,table_id&booking_date=eq.${date}`,
+      )
+      return rows.map((row) =>
+        fromRow(
+          row,
+          tables.filter((t) => t.reservation_id === row.id).map((t) => t.table_id),
+        ),
+      )
+    },
+
+    /** Bookings still to come on this phone number — the spam ceiling. */
+    async upcomingForPhone(phone, fromDate) {
+      const rows = await call(
+        `/reservations?select=reference&phone=eq.${encodeURIComponent(phone)}` +
+          `&booking_date=gte.${fromDate}&status=eq.confirmed`,
+      )
+      return rows.length
+    },
+
+    async cancel(reference) {
+      const found = await find(reference)
+      if (!found || found.status === 'cancelled') return found
+
+      await call(`/reservations?reference=eq.${encodeURIComponent(reference)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'cancelled' }),
+      })
+      // Freeing the tables is what lets someone else book them, and it is the
+      // step that must not be skipped; a stuck row would block a table.
+      await call(`/reservation_tables?reservation_id=eq.${found.id}`, { method: 'DELETE' })
+      return { ...found, status: 'cancelled' }
+    },
+
     async create(booking) {
       const [row] = await call('/rpc/create_reservation', {
         method: 'POST',
@@ -87,6 +142,24 @@ function supabaseStore(url, key) {
       })
       return row ?? booking
     },
+  }
+}
+
+/** The database's column names, back in the shape the site speaks. */
+function fromRow(row, tableIds) {
+  return {
+    id: row.id,
+    reference: row.reference,
+    date: row.booking_date,
+    time: row.booking_time,
+    partySize: row.party_size,
+    tableIds,
+    name: row.guest_name,
+    phone: row.phone,
+    notes: row.notes ?? '',
+    locale: row.locale ?? '',
+    status: row.status,
+    createdAt: row.created_at,
   }
 }
 
@@ -113,6 +186,7 @@ function fileStore() {
     async takenTables(date, time) {
       const taken = new Set()
       for (const row of read()) {
+        if (row.status === 'cancelled') continue
         if (row.date === date && row.time === time) row.tableIds.forEach((id) => taken.add(id))
       }
       return taken
@@ -121,17 +195,43 @@ function fileStore() {
     async bookedOn(date) {
       const byTime = new Map()
       for (const row of read()) {
-        if (row.date !== date) continue
+        if (row.status === 'cancelled' || row.date !== date) continue
         if (!byTime.has(row.time)) byTime.set(row.time, new Set())
         row.tableIds.forEach((id) => byTime.get(row.time).add(id))
       }
       return byTime
     },
 
+    async find(reference) {
+      return read().find((row) => row.reference === reference) ?? null
+    },
+
+    async onDate(date) {
+      return read()
+        .filter((row) => row.date === date && row.status !== 'cancelled')
+        .sort((a, b) => a.time.localeCompare(b.time))
+    },
+
+    async upcomingForPhone(phone, fromDate) {
+      return read().filter(
+        (row) => row.phone === phone && row.date >= fromDate && row.status === 'confirmed',
+      ).length
+    },
+
+    async cancel(reference) {
+      const rows = read()
+      const found = rows.find((row) => row.reference === reference)
+      if (!found || found.status === 'cancelled') return found ?? null
+      found.status = 'cancelled'
+      write(rows)
+      return found
+    },
+
     async create(booking) {
       const rows = read()
       const clash = rows.some(
         (row) =>
+          row.status !== 'cancelled' &&
           row.date === booking.date &&
           row.time === booking.time &&
           row.tableIds.some((id) => booking.tableIds.includes(id)),

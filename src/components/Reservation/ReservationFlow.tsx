@@ -10,6 +10,8 @@ import {
 import type { FloorTable } from '@/data/tables/floorPlan'
 import { restaurant, reservation as reservationConfig } from '@/data/restaurant'
 import { bookingApi, isDemoBooking, toISODate } from '@/services/booking'
+import { forgetBooking, readBooking, rememberBooking } from '@/services/booking/myBooking'
+import type { SavedBooking } from '@/services/booking/myBooking'
 import type { Booking, TableAvailability, TimeSlot } from '@/services/booking'
 import { BookingError } from '@/services/booking/types'
 import { useI18n } from '@/i18n/useI18n'
@@ -39,6 +41,9 @@ export function ReservationFlow() {
   const [partySize, setPartySize] = useState<number | null>(null)
   const [tableIds, setTableIds] = useState<string[]>([])
   const planRef = useRef<FloorPlanHandle>(null)
+  /** A booking this browser already made and has not been to yet. */
+  const [saved, setSaved] = useState<SavedBooking | null>(() => readBooking())
+  const [dropping, setDropping] = useState(false)
 
   const [closedDates, setClosedDates] = useState<string[]>([])
   /** The API could not be reached. Without this an empty list of times reads as
@@ -224,6 +229,7 @@ export function ReservationFlow() {
         locale,
       })
       setBooking(result)
+      rememberBooking(result)
     } catch (error) {
       const code = error instanceof BookingError ? error.code : 'generic'
       setSubmitError(t(`reservation.errors.${code}`))
@@ -274,6 +280,52 @@ export function ReservationFlow() {
           aria-label={t(`reservation.steps.${step}`)}
           key={step}
         >
+          {/* No accounts and nothing sent to the guest, so this is the only
+              place they can find their booking again. */}
+          {saved && step === 'date' && !booking && (
+            <div className={styles.upcoming}>
+              <p className={styles.upcomingTitle}>{t('reservation.upcoming.title')}</p>
+              <p className={styles.upcomingLine}>
+                {t('reservation.upcoming.line', {
+                  date: formatDate(new Date(`${saved.date}T00:00:00`), {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                  }),
+                  time: saved.time,
+                  guests: `${saved.partySize} ${t(
+                    saved.partySize === 1
+                      ? 'reservation.guests.person'
+                      : 'reservation.guests.people',
+                  )}`,
+                  reference: saved.reference,
+                })}
+              </p>
+              <button
+                type="button"
+                className={styles.upcomingCancel}
+                disabled={dropping}
+                onClick={async () => {
+                  if (!window.confirm(t('reservation.success.cancelConfirm'))) return
+                  setDropping(true)
+                  try {
+                    await bookingApi.cancelBooking(saved.reference, saved.token)
+                    forgetBooking()
+                    setSaved(null)
+                  } catch {
+                    setSubmitError(
+                      t('reservation.success.cancelFailed', { phone: restaurant.phone }),
+                    )
+                  } finally {
+                    setDropping(false)
+                  }
+                }}
+              >
+                {dropping ? t('reservation.success.cancelling') : t('reservation.success.cancel')}
+              </button>
+            </div>
+          )}
+
           {step === 'date' && (
             <>
               <h2 className={styles.stepTitle}>{t('reservation.date.title')}</h2>

@@ -193,7 +193,14 @@ export function createMockBookingApi(): BookingApi {
         status: 'confirmed',
       }
       writeStored([...readStored(), booking])
-      return booking
+      return { ...booking, cancelToken: `demo-${id}` }
+    },
+
+    async cancelBooking(reference: string) {
+      await wait(LATENCY_MS)
+      // The demo has nowhere to check a token against, so it just forgets the
+      // booking — which is all a preview build needs to show the flow.
+      writeStored(readStored().filter((booking) => booking.reference !== reference))
     },
   }
 

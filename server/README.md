@@ -63,6 +63,30 @@ Set `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` and restart. Without them the
 bookings go to `server/data/bookings.json`, which is fine for a trial and
 nothing else: it is a single file on one machine.
 
+## What the staff can do from Telegram
+
+Every booking arrives with a cancel button under it. Pressing it frees the table
+and rewrites the message, so it cannot be pressed twice.
+
+```
+/dzisiaj              bookings for today
+/jutro                for tomorrow
+/dzien 24-12-2026     for a given day
+/zamknij 24-12-2026 Wigilia
+/otworz 24-12-2026
+/zamkniete            the days currently closed
+/pomoc                this list
+```
+
+Closing a day takes it out of the calendar on the site and refuses any booking
+for it. If the day already has bookings the bot says so, with the count — it
+does not cancel them, because those guests need a phone call rather than a
+silent disappearance.
+
+Only the chat that registered with `/start` can use these. The closures live in
+`server/data/closures.json`; the nightly backup copies them alongside the
+bookings.
+
 ## Telling it where to send
 
 Open the bot in Telegram and send `/start`. It replies with the chat id and
@@ -130,6 +154,18 @@ Two cron jobs, in `/etc/cron.d/daon-api`:
 
 Both speak only on a change of state, so an outage over a night is two messages
 rather than fifty.
+
+## Cancelling
+
+The guest gets no account and no e-mail, so their way out is a token: an HMAC of
+the booking's id under a server-side key. It goes back once with the booking,
+the browser keeps it, and `POST /bookings/cancel` checks it. Nothing is stored
+for it, and a guessed reference is useless without the key — a wrong token and a
+wrong reference give the same answer, so the codes cannot be probed.
+
+Cancelling marks the reservation and then deletes its table rows, in that order.
+If the second step failed the table would stay blocked, which is the safe way to
+fail; the other order could hand one table to two parties.
 
 ## What it checks
 

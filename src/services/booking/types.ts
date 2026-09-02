@@ -33,6 +33,11 @@ export interface Booking extends BookingRequest {
   id: string
   /** Short human-readable code the guest can quote on the phone. */
   reference: string
+  /**
+   * Proves the booking is theirs when they come back to cancel it. Returned
+   * once, kept in their browser, never stored anywhere we could leak it from.
+   */
+  cancelToken?: string
   createdAt: string
   status: 'confirmed' | 'pending' | 'cancelled'
 }
@@ -59,4 +64,6 @@ export interface BookingApi {
   getTimeSlots(query: AvailabilityQuery): Promise<TimeSlot[]>
   getTableStatus(query: TableStatusQuery): Promise<Record<string, TableAvailability>>
   createBooking(request: BookingRequest): Promise<Booking>
+  /** Gives the table back. Only the real API can do it; the demo pretends. */
+  cancelBooking(reference: string, token: string): Promise<void>
 }

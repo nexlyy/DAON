@@ -11,6 +11,7 @@
  *   GET  /slots?date&partySize           seating times, with what is still free
  *   GET  /tables?date&time&partySize     per-table availability
  *   POST /bookings                       take a booking, then tell the staff
+ *   POST /bookings/cancel                give a table back
  *   GET  /health                         liveness, store, chat
  *
  * It also answers /start in Telegram with the chat id, which is how the
@@ -32,10 +33,12 @@ import {
   toISODate,
   zoneOf,
 } from './availability.js'
+import { cancelToken, tokenMatches } from './cancel.js'
+import { addClosure, isClosed, listClosures, removeClosure } from './closures.js'
 import { loadEnv, root } from './env.js'
-import { buildMessage } from './message.js'
+import { buildMessage, cancelledMessage, dayList, formatDate, helpMessage } from './message.js'
 import { createStore, reference, TablesTaken } from './store.js'
-import { getMe, pollUpdates, sendMessage } from './telegram.js'
+import { answerCallback, editMessage, getMe, pollUpdates, sendMessage } from './telegram.js'
 
 loadEnv()
 
@@ -83,6 +86,8 @@ function rememberChatId(chatId, who) {
 
 // Enough for a restaurant, not enough for a script.
 const RATE = { windowMs: 60 * 60 * 1000, max: 12 }
+/** One phone cannot hold the room: a party books, it does not farm tables. */
+const MAX_PER_PHONE = Number(process.env.MAX_BOOKINGS_PER_PHONE ?? 4)
 const hits = new Map()
 
 function overRate(ip) {
@@ -146,7 +151,7 @@ function readBooking(raw) {
 
   // The steps only ever offer open days and real seating times, but a tab left
   // open overnight can carry a stale one.
-  if (!slotsForDate(date).includes(time)) {
+  if (!slotsForDate(date).includes(time) || isClosed(date)) {
     return { error: 'the restaurant is closed at that time' }
   }
 
@@ -169,6 +174,19 @@ function readBooking(raw) {
     },
   }
 }
+
+/** A booking in the words the staff read. */
+const toStaff = (booking) => ({
+  reference: booking.reference,
+  date: booking.date,
+  time: booking.time,
+  partySize: booking.partySize,
+  tables: labelsOf(booking.tableIds),
+  zone: zoneOf(booking.tableIds),
+  name: booking.name,
+  phone: booking.phone,
+  notes: booking.notes,
+})
 
 /* ------------------------------------------------------------------ server */
 
@@ -217,7 +235,7 @@ async function handle(request, response, url) {
     const end = parseISODate(to)
     while (cursor <= end) {
       const iso = toISODate(cursor)
-      if (slotsForDate(iso).length === 0) closed.push(iso)
+      if (slotsForDate(iso).length === 0 || isClosed(iso)) closed.push(iso)
       cursor.setDate(cursor.getDate() + 1)
     }
     return send(request, response, 200, closed)
@@ -227,6 +245,8 @@ async function handle(request, response, url) {
     const date = url.searchParams.get('date') ?? ''
     const partySize = Number(url.searchParams.get('partySize') ?? 2)
     if (!ISO_DATE.test(date)) return send(request, response, 400, { error: 'date must be YYYY-MM-DD' })
+
+    if (isClosed(date)) return send(request, response, 200, [])
 
     const booked = await store.bookedOn(date)
     const now = new Date()
@@ -259,6 +279,33 @@ async function handle(request, response, url) {
     return send(request, response, 200, status)
   }
 
+  if (request.method === 'POST' && url.pathname === '/bookings/cancel') {
+    let raw
+    try {
+      raw = JSON.parse(await readBody(request))
+    } catch {
+      return send(request, response, 400, { error: 'invalid JSON' })
+    }
+
+    const ref = text(raw.reference, 24).toUpperCase()
+    const booking = ref ? await store.find(ref) : null
+    // The same answer either way: a wrong code and a wrong token must not be
+    // distinguishable, or the codes become guessable.
+    if (!booking || !tokenMatches(booking.id, raw.token)) {
+      return send(request, response, 404, { error: 'no such booking' })
+    }
+    if (booking.status === 'cancelled') {
+      return send(request, response, 200, { ok: true, alreadyCancelled: true })
+    }
+
+    await store.cancel(ref)
+    const chatId = readChatId()
+    if (chatId) {
+      sendMessage(TOKEN, chatId, cancelledMessage(toStaff(booking), 'gość')).catch(() => {})
+    }
+    return send(request, response, 200, { ok: true })
+  }
+
   if (request.method === 'POST' && url.pathname === '/bookings') {
     const ip = request.headers['x-forwarded-for']?.split(',')[0].trim() ?? request.socket.remoteAddress
     if (overRate(ip ?? 'unknown')) return send(request, response, 429, { error: 'too many requests' })
@@ -272,6 +319,11 @@ async function handle(request, response, url) {
 
     const { booking, error } = readBooking(raw)
     if (error) return send(request, response, 400, { error })
+
+    const held = await store.upcomingForPhone(booking.phone, toISODate(new Date()))
+    if (held >= MAX_PER_PHONE) {
+      return send(request, response, 429, { error: 'too many bookings on that number' })
+    }
 
     // The group has to still make sense against what is booked right now.
     const taken = await store.takenTables(booking.date, booking.time)
@@ -305,30 +357,23 @@ async function handle(request, response, url) {
 
     // The guest already has their table; a silent bot is the restaurant's
     // problem to see in the log, not theirs to see on screen.
+    const id = stored?.id ?? record.id
     const chatId = readChatId()
     if (chatId) {
-      sendMessage(
-        TOKEN,
-        chatId,
-        buildMessage({
-          reference: record.reference,
-          date: record.date,
-          time: record.time,
-          partySize: record.partySize,
-          tables: labelsOf(record.tableIds),
-          zone: zoneOf(record.tableIds),
-          name: record.name,
-          phone: record.phone,
-          notes: record.notes,
-        }),
-      ).catch((failure) => console.error('Telegram refused the message:', failure.message))
+      sendMessage(TOKEN, chatId, buildMessage(toStaff(record)), [
+        [{ text: '❌ Anuluj rezerwację', callback_data: `cancel:${record.reference}` }],
+      ]).catch((failure) => console.error('Telegram refused the message:', failure.message))
     } else {
       console.warn('A booking came in but no chat is configured — send /start to the bot.')
     }
 
-    // `stored` comes back in the database's own column names; the site is
-    // typed against the booking it sent, so that is what goes back.
-    return send(request, response, 200, { ...record, id: stored?.id ?? record.id })
+    // The token is what lets the guest cancel later; it is theirs alone, so it
+    // goes back once and is never stored anywhere we could leak it from.
+    return send(request, response, 200, {
+      ...record,
+      id,
+      cancelToken: cancelToken(id),
+    })
   }
 
   return send(request, response, 404, { error: 'not found' })
@@ -359,29 +404,133 @@ server.listen(PORT, () => {
   )
 })
 
+/* ---------------------------------------------------------------- the bot */
+
+/** "24-12-2026" the way the staff write it, back to an ISO date. */
+function readPolishDate(value) {
+  const match = /^(\d{1,2})[-.\/](\d{1,2})[-.\/](\d{4})$/.exec(String(value ?? '').trim())
+  if (!match) return null
+  const [, day, month, year] = match
+  const iso = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  return ISO_DATE.test(iso) ? iso : null
+}
+
+/** Only the chat the restaurant registered may drive the bot. */
+const isStaff = (chatId) => String(chatId) === String(readChatId() ?? '')
+
+async function handleCommand(chatId, who, body) {
+  const [command, ...rest] = body.split(/\s+/)
+  const argument = rest.join(' ')
+  const say = (text, keyboard) => sendMessage(TOKEN, chatId, text, keyboard).catch(() => {})
+
+  if (command === '/start' || command === '/id') {
+    if (!process.env.TELEGRAM_CHAT_ID?.trim()) rememberChatId(chatId, who)
+    return say(
+      [
+        '<b>DAON — powiadomienia o rezerwacjach</b>',
+        '',
+        `Ten czat: <code>${chatId}</code>`,
+        'Rezerwacje ze strony będą przychodzić tutaj.',
+        '',
+        'Napisz /pomoc, żeby zobaczyć, co jeszcze potrafię.',
+      ].join('\n'),
+    )
+  }
+
+  // Everything below changes what guests can book, so it stays with the chat
+  // the restaurant registered.
+  if (!isStaff(chatId)) return
+
+  if (command === '/pomoc' || command === '/help') {
+    return say(helpMessage(listClosures(toISODate(new Date()))))
+  }
+
+  if (command === '/dzisiaj' || command === '/jutro' || command === '/dzien') {
+    const day = new Date()
+    if (command === '/jutro') day.setDate(day.getDate() + 1)
+    const date = command === '/dzien' ? readPolishDate(argument) : toISODate(day)
+    if (!date) return say('Podaj datę tak: /dzien 24-12-2026')
+    return say(dayList(date, await store.onDate(date)))
+  }
+
+  if (command === '/zamknij' || command === '/otworz') {
+    const [first, ...note] = rest
+    const date = readPolishDate(first)
+    if (!date) return say(`Podaj datę tak: ${command} 24-12-2026`)
+
+    if (command === '/zamknij') {
+      const booked = await store.onDate(date)
+      const added = addClosure(date, note.join(' '))
+      return say(
+        [
+          added
+            ? `Dzień ${formatDate(date)} zamknięty — nowych rezerwacji nie będzie.`
+            : `Dzień ${formatDate(date)} już był zamknięty.`,
+          booked.length > 0
+            ? `\nUwaga: na ten dzień są już rezerwacje (${booked.length}). Zadzwoń do gości — /dzien ${formatDate(date)}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      )
+    }
+
+    return say(
+      removeClosure(date)
+        ? `Dzień ${formatDate(date)} znowu przyjmuje rezerwacje.`
+        : `Dzień ${formatDate(date)} nie był zamknięty.`,
+    )
+  }
+
+  if (command === '/zamkniete') {
+    return say(helpMessage(listClosures(toISODate(new Date()))))
+  }
+}
+
+/** The staff pressed "cancel" under a booking. */
+async function handleCancelButton(query) {
+  const chatId = query.message?.chat?.id
+  const reference = String(query.data ?? '').split(':')[1] ?? ''
+
+  if (!isStaff(chatId)) {
+    return answerCallback(TOKEN, query.id, 'Brak uprawnień.').catch(() => {})
+  }
+
+  const booking = await store.find(reference)
+  if (!booking) {
+    return answerCallback(TOKEN, query.id, 'Nie znaleziono rezerwacji.').catch(() => {})
+  }
+  if (booking.status === 'cancelled') {
+    return answerCallback(TOKEN, query.id, 'Ta rezerwacja jest już anulowana.').catch(() => {})
+  }
+
+  await store.cancel(reference)
+  await answerCallback(TOKEN, query.id, 'Anulowano. Stolik jest znowu wolny.').catch(() => {})
+  // Rewriting the message takes the button away, so it cannot be pressed twice.
+  await editMessage(
+    TOKEN,
+    chatId,
+    query.message.message_id,
+    cancelledMessage(toStaff(booking), 'restaurację'),
+  ).catch(() => {})
+}
+
 if (LISTEN) {
   let offset
   const loop = async () => {
     try {
-      offset = await pollUpdates(TOKEN, offset, async (message) => {
-        const chatId = message.chat?.id
-        if (!chatId) return
-        const who = message.chat.title ?? message.chat.username ?? message.chat.first_name ?? ''
-        const body = (message.text ?? '').trim()
-
-        if (body.startsWith('/start') || body.startsWith('/id')) {
-          if (!process.env.TELEGRAM_CHAT_ID?.trim()) rememberChatId(chatId, who)
-          await sendMessage(
-            TOKEN,
-            chatId,
-            [
-              '<b>DAON — powiadomienia o rezerwacjach</b>',
-              '',
-              `Ten czat: <code>${chatId}</code>`,
-              'Rezerwacje ze strony będą przychodzić tutaj.',
-            ].join('\n'),
-          ).catch(() => {})
-        }
+      offset = await pollUpdates(TOKEN, offset, {
+        async onMessage(message) {
+          const chatId = message.chat?.id
+          if (!chatId) return
+          const who = message.chat.title ?? message.chat.username ?? message.chat.first_name ?? ''
+          const body = (message.text ?? '').trim()
+          if (!body.startsWith('/')) return
+          await handleCommand(chatId, who, body)
+        },
+        async onCallback(query) {
+          if (String(query.data ?? '').startsWith('cancel:')) await handleCancelButton(query)
+        },
       })
     } catch (failure) {
       console.warn('Polling hiccup:', failure.message)

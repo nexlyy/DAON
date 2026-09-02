@@ -171,7 +171,15 @@
       "body": "Rezerwacja jest już u nas — nie musisz nic potwierdzać. Gdyby coś się zmieniło, zadzwoń: {phone}.",
       "reference": "Numer rezerwacji",
       "addAnother": "Zrób kolejną rezerwację",
-      "backHome": "Wróć na stronę główną"
+      "backHome": "Wróć na stronę główną",
+      "calendar": "Dodaj do kalendarza",
+      "cancelTitle": "Plany się zmieniły?",
+      "cancel": "Anuluj rezerwację",
+      "cancelling": "Anulowanie…",
+      "cancelConfirm": "Na pewno anulować tę rezerwację?",
+      "cancelled": "Rezerwacja anulowana. Stolik jest znowu wolny.",
+      "cancelFailed": "Nie udało się anulować. Zadzwoń: {phone}.",
+      "eventTitle": "Rezerwacja stolika"
     },
     "back": "Wstecz",
     "next": "Dalej",
@@ -184,7 +192,11 @@
       "unavailable": "Ten stolik właśnie został zajęty. Wybierz inny.",
       "offline": "Nie udało się sprawdzić dostępności. Odśwież stronę albo zadzwoń: {phone}."
     },
-    "demoNotice": "Rezerwacja demonstracyjna — zapisujemy ją tylko w tej przeglądarce i nie trafia jeszcze do restauracji. Aby zarezerwować naprawdę, zadzwoń pod {phone}."
+    "demoNotice": "Rezerwacja demonstracyjna — zapisujemy ją tylko w tej przeglądarce i nie trafia jeszcze do restauracji. Aby zarezerwować naprawdę, zadzwoń pod {phone}.",
+    "upcoming": {
+      "title": "Masz już rezerwację",
+      "line": "{date} o {time}, {guests} · numer {reference}"
+    }
   },
   "floorPlan": {
     "title": "Plan restauracji",

@@ -171,7 +171,15 @@
       "body": "The restaurant has your booking — there is nothing to confirm. If anything changes, call us on {phone}.",
       "reference": "Reference",
       "addAnother": "Make another reservation",
-      "backHome": "Back to the home page"
+      "backHome": "Back to the home page",
+      "calendar": "Add to calendar",
+      "cancelTitle": "Plans changed?",
+      "cancel": "Cancel this booking",
+      "cancelling": "Cancelling…",
+      "cancelConfirm": "Cancel this booking?",
+      "cancelled": "Cancelled. The table is free again.",
+      "cancelFailed": "We could not cancel it. Call us on {phone}.",
+      "eventTitle": "Table reservation"
     },
     "back": "Back",
     "next": "Continue",
@@ -184,7 +192,11 @@
       "unavailable": "That table was just taken. Please pick another one.",
       "offline": "We could not check availability just now. Reload the page, or call us on {phone}."
     },
-    "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}."
+    "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}.",
+    "upcoming": {
+      "title": "You already have a table",
+      "line": "{date} at {time}, {guests} · reference {reference}"
+    }
   },
   "floorPlan": {
     "title": "Restaurant plan",

@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatTableLabels, tableById, zoneById } from '@/data/tables/floorPlan'
 import { restaurant } from '@/data/restaurant'
+import { bookingApi } from '@/services/booking'
 import type { Booking } from '@/services/booking'
+import { downloadCalendar } from '@/services/booking/calendar'
+import { forgetBooking } from '@/services/booking/myBooking'
 import { useI18n } from '@/i18n/useI18n'
 import { RoofMark } from '@/components/Brand/Logo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
@@ -12,6 +16,27 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
   const primary = tableById.get(booking.tableIds[0])
   const zone = primary ? zoneById.get(primary.zone) : undefined
   const joined = booking.tableIds.length > 1
+
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelled, setCancelled] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
+
+  async function cancel() {
+    if (!booking.cancelToken) return
+    if (!window.confirm(t('reservation.success.cancelConfirm'))) return
+
+    setCancelling(true)
+    setCancelError(null)
+    try {
+      await bookingApi.cancelBooking(booking.reference, booking.cancelToken)
+      forgetBooking()
+      setCancelled(true)
+    } catch {
+      setCancelError(t('reservation.success.cancelFailed', { phone: restaurant.phone }))
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   return (
     <div className={styles.wrap}>
@@ -75,6 +100,13 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
         </p>
 
         <div className={styles.actions}>
+          <button
+            type="button"
+            className="btn btn--delivery"
+            onClick={() => downloadCalendar(booking, t('reservation.success.eventTitle'))}
+          >
+            {t('reservation.success.calendar')}
+          </button>
           <button type="button" className="btn btn--ghost" onClick={onReset}>
             {t('reservation.success.addAnother')}
           </button>
@@ -82,6 +114,31 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
             {t('reservation.success.backHome')}
           </Link>
         </div>
+
+        {/* Nothing is sent to the guest, so the way out has to live on the page
+            they end up on — and in their browser, for when they come back. */}
+        {booking.cancelToken && (
+          <div className={styles.cancel}>
+            {cancelled ? (
+              <p className={styles.cancelDone}>{t('reservation.success.cancelled')}</p>
+            ) : (
+              <>
+                <p className={styles.cancelTitle}>{t('reservation.success.cancelTitle')}</p>
+                <button
+                  type="button"
+                  className={styles.cancelButton}
+                  disabled={cancelling}
+                  onClick={cancel}
+                >
+                  {cancelling
+                    ? t('reservation.success.cancelling')
+                    : t('reservation.success.cancel')}
+                </button>
+                {cancelError && <p className={styles.cancelError}>{cancelError}</p>}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

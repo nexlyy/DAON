@@ -171,7 +171,15 @@
       "body": "예약이 매장에 전달되었습니다. 따로 확인하실 것은 없습니다. 변경이 필요하시면 {phone}으로 연락 주세요.",
       "reference": "예약 번호",
       "addAnother": "다시 예약하기",
-      "backHome": "홈으로 돌아가기"
+      "backHome": "홈으로 돌아가기",
+      "calendar": "캘린더에 추가",
+      "cancelTitle": "일정이 바뀌셨나요?",
+      "cancel": "예약 취소",
+      "cancelling": "취소 중…",
+      "cancelConfirm": "이 예약을 취소할까요?",
+      "cancelled": "예약이 취소되었습니다. 좌석이 다시 열렸습니다.",
+      "cancelFailed": "취소하지 못했습니다. {phone}으로 전화 주세요.",
+      "eventTitle": "좌석 예약"
     },
     "back": "뒤로",
     "next": "다음",
@@ -184,7 +192,11 @@
       "unavailable": "방금 그 자리가 예약되었습니다. 다른 자리를 골라 주세요.",
       "offline": "지금은 예약 가능 여부를 확인할 수 없습니다. 페이지를 새로고침하시거나 {phone}으로 전화 주세요."
     },
-    "demoNotice": "시연용 예약입니다 — 이 브라우저에만 저장되며 아직 매장으로 전달되지 않습니다. 실제 예약은 {phone}으로 전화 주세요."
+    "demoNotice": "시연용 예약입니다 — 이 브라우저에만 저장되며 아직 매장으로 전달되지 않습니다. 실제 예약은 {phone}으로 전화 주세요.",
+    "upcoming": {
+      "title": "이미 예약이 있습니다",
+      "line": "{date} {time}, {guests} · 예약번호 {reference}"
+    }
   },
   "floorPlan": {
     "title": "매장 배치도",

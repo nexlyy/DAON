@@ -493,3 +493,40 @@
     min-height: 3rem;
   }
 }
+
+/* The booking this browser already holds, offered back before a second one. */
+.upcoming {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+  width: 100%;
+  padding: 0.95rem 1.1rem;
+  border: 1px solid var(--gold-line);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-m);
+  background: var(--gold-wash);
+}
+
+.upcomingTitle {
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.upcomingLine {
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.upcomingCancel {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.upcomingCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
