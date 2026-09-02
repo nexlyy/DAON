@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatTableLabels, tableById, zoneById } from '@/data/tables/floorPlan'
+import { restaurant } from '@/data/restaurant'
 import type { Booking } from '@/services/booking'
 import { useI18n } from '@/i18n/useI18n'
 import { RoofMark } from '@/components/Brand/Logo'
@@ -20,7 +21,11 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
         </span>
 
         <h2 className={styles.title}>{t('reservation.success.title')}</h2>
-        <p className={styles.body}>{t('reservation.success.body', { phone: booking.phone })}</p>
+        {/* The restaurant's number, not the guest's: nothing is sent to them,
+            and the only thing they might need is a way to reach the kitchen. */}
+        <p className={styles.body}>
+          {t('reservation.success.body', { phone: restaurant.phone })}
+        </p>
 
         <GoldDivider className={styles.divider} />
 

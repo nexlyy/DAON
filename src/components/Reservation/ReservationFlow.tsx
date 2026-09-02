@@ -41,6 +41,9 @@ export function ReservationFlow() {
   const planRef = useRef<FloorPlanHandle>(null)
 
   const [closedDates, setClosedDates] = useState<string[]>([])
+  /** The API could not be reached. Without this an empty list of times reads as
+   *  a full restaurant, which is the opposite of what has happened. */
+  const [offline, setOffline] = useState(false)
   const [slots, setSlots] = useState<TimeSlot[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
   const [status, setStatus] = useState<Record<string, TableAvailability>>({})
@@ -70,7 +73,10 @@ export function ReservationFlow() {
         if (!cancelled) setClosedDates(dates)
       })
       .catch(() => {
-        if (!cancelled) setClosedDates([])
+        if (!cancelled) {
+          setClosedDates([])
+          setOffline(true)
+        }
       })
 
     return () => {
@@ -90,12 +96,15 @@ export function ReservationFlow() {
       .then((result) => {
         if (cancelled) return
         setSlots(result)
+        setOffline(false)
         setTime((current) =>
           current && result.some((slot) => slot.time === current && slot.available) ? current : null,
         )
       })
       .catch(() => {
-        if (!cancelled) setSlots([])
+        if (cancelled) return
+        setSlots([])
+        setOffline(true)
       })
       .finally(() => {
         if (!cancelled) setSlotsLoading(false)
@@ -276,7 +285,13 @@ export function ReservationFlow() {
             <>
               <h2 className={styles.stepTitle}>{t('reservation.time.title')}</h2>
               <p className={styles.stepNote}>{t('reservation.time.subtitle')}</p>
-              <TimePicker slots={slots} value={time} loading={slotsLoading} onChange={setTime} />
+              {offline ? (
+                <p className={styles.warning}>
+                  {t('reservation.errors.offline', { phone: restaurant.phone })}
+                </p>
+              ) : (
+                <TimePicker slots={slots} value={time} loading={slotsLoading} onChange={setTime} />
+              )}
             </>
           )}
 

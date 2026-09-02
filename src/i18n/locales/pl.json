@@ -168,7 +168,7 @@
     },
     "success": {
       "title": "Stolik zarezerwowany",
-      "body": "Czekamy na Ciebie. Potwierdzenie wyślemy na {phone}.",
+      "body": "Rezerwacja jest już u nas — nie musisz nic potwierdzać. Gdyby coś się zmieniło, zadzwoń: {phone}.",
       "reference": "Numer rezerwacji",
       "addAnother": "Zrób kolejną rezerwację",
       "backHome": "Wróć na stronę główną"
@@ -181,7 +181,8 @@
       "phoneRequired": "Potrzebujemy numeru telefonu, gdyby coś się zmieniło.",
       "phoneInvalid": "To nie wygląda na numer telefonu.",
       "generic": "Nie udało się zapisać rezerwacji. Spróbuj ponownie.",
-      "unavailable": "Ten stolik właśnie został zajęty. Wybierz inny."
+      "unavailable": "Ten stolik właśnie został zajęty. Wybierz inny.",
+      "offline": "Nie udało się sprawdzić dostępności. Odśwież stronę albo zadzwoń: {phone}."
     },
     "demoNotice": "Rezerwacja demonstracyjna — zapisujemy ją tylko w tej przeglądarce i nie trafia jeszcze do restauracji. Aby zarezerwować naprawdę, zadzwoń pod {phone}."
   },

@@ -168,7 +168,7 @@
     },
     "success": {
       "title": "Your table has been reserved",
-      "body": "We are looking forward to seeing you. A confirmation goes out to {phone}.",
+      "body": "The restaurant has your booking — there is nothing to confirm. If anything changes, call us on {phone}.",
       "reference": "Reference",
       "addAnother": "Make another reservation",
       "backHome": "Back to the home page"
@@ -181,7 +181,8 @@
       "phoneRequired": "We need a phone number in case anything changes.",
       "phoneInvalid": "That does not look like a phone number.",
       "generic": "The reservation could not be saved. Please try again.",
-      "unavailable": "That table was just taken. Please pick another one."
+      "unavailable": "That table was just taken. Please pick another one.",
+      "offline": "We could not check availability just now. Reload the page, or call us on {phone}."
     },
     "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}."
   },
