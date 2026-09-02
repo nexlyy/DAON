@@ -26,11 +26,17 @@ fetch() {
     -H "Authorization: Bearer $SUPABASE_SERVICE_KEY"
 }
 
+CLOSURES=/opt/daon-api/data/closures.json
+
 {
   printf '{"takenAt":"%s","reservations":' "$(date -Iseconds)"
   fetch reservations
   printf ',"reservation_tables":'
   fetch reservation_tables
+  # The days the staff closed are settings rather than rows, and they live in a
+  # file — worth the same copy, since losing them reopens Christmas Eve.
+  printf ',"closures":'
+  if [ -f "$CLOSURES" ]; then cat "$CLOSURES"; else printf '[]'; fi
   printf '}\n'
 } > "$FILE.tmp"
 
