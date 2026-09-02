@@ -54,8 +54,7 @@
       "hours": "Opening hours",
       "contact": "Contact",
       "address": "Address",
-      "directions": "Open in Maps",
-      "delivery": "Order delivery"
+      "directions": "Open in Maps"
     },
     "cta": {
       "title": "Reserve a table",
@@ -79,6 +78,12 @@
     "details": "Dish details",
     "categoryJump": "Jump to category",
     "results": "{count} dishes"
+  },
+  "order": {
+    "title": "Order online",
+    "delivery": "Order delivery",
+    "pickup": "Pickup",
+    "note": "Handled by Uber Eats."
   },
   "tags": {
     "vegetarian": "Vegetarian",
@@ -135,7 +140,8 @@
       "selected": "Table {tables} · {zone} · {seats} seats",
       "list": "Table list",
       "noJoin": "no free table next to it for {guests} guests",
-      "selectedJoined": "Tables {tables} pushed together · {zone} · {seats} seats"
+      "selectedJoined": "Tables {tables} pushed together · {zone} · {seats} seats",
+      "freeCount": "{count} free"
     },
     "details": {
       "title": "Who is the table for?",
@@ -196,15 +202,21 @@
       "wcMen": "WC — men",
       "wcWomen": "WC — women"
     },
-    "joinNote": "Every table seats four. Larger parties are seated at tables pushed together."
+    "joinNote": "Every table seats four. Larger parties are seated at tables pushed together.",
+    "zoom": {
+      "label": "Plan zoom",
+      "in": "Zoom in",
+      "out": "Zoom out",
+      "reset": "Whole restaurant",
+      "hint": "Drag or pinch to look closer."
+    }
   },
   "footer": {
     "tagline": "Korean Restaurant",
     "explore": "Explore",
     "visit": "Visit us",
     "rights": "All rights reserved.",
-    "hours": "Opening hours",
-    "delivery": "Order delivery"
+    "hours": "Opening hours"
   },
   "days": {
     "long": [

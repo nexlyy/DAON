@@ -94,6 +94,11 @@ comment in `dishes.ts`.
 
 ## The floor plan
 
+The picker draws the whole restaurant at once and lets the guest pan and zoom
+into it — buttons, a drag, or a pinch. Underneath it, the same tables are listed
+by room, which is the quick way to pick a number and the only way a screen
+reader gets one.
+
 `src/data/tables/floorPlan.ts` holds the real room: Sala 1, Środek, Sala 2 and
 the Ogródek, plus the kitchen, bar and entrance. Nineteen tables, numbered the
 way the restaurant numbers them. The picker draws entirely from that file, so
@@ -112,6 +117,14 @@ to.
 Every table seats four. `joinsWith` lists the tables staff can push against this
 one, and `resolveTableGroup` uses it: pick a table for a party of six and the
 picker pulls in a free neighbour, selects both, and the booking records both.
+
+## Telling the restaurant
+
+`server/` holds a small Node service that forwards each confirmed booking to the
+restaurant's Telegram in Polish. The site is static, so it cannot hold a bot
+token; the service does, and the site only posts the booking to it. Set
+`VITE_BOOKING_NOTIFY_URL` to switch it on — without it the site stays quiet
+rather than failing. See `server/README.md`.
 
 ## Reservations
 

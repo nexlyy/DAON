@@ -37,9 +37,11 @@
     border-color 0.3s var(--ease);
 }
 
-.chip:hover {
-  border-color: var(--gold-line);
-  color: var(--ink);
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--gold-line);
+    color: var(--ink);
+  }
 }
 
 .chip[aria-pressed='true'] {

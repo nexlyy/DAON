@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Logo } from '@/components/Brand/Logo'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
-import { restaurant } from '@/data/restaurant'
+import { OrderLink } from '@/components/Order/OrderLink'
 import { useI18n } from '@/i18n/useI18n'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import styles from './Navbar.module.css'
@@ -75,55 +75,55 @@ export function Navbar() {
   }, [drawerOpen])
 
   return (
-    <header
-      ref={headerRef}
-      className={styles.header}
-      data-scrolled={scrolled || undefined}
-      data-hidden={(hidden && !drawerOpen) || undefined}
-    >
-      <div className={styles.bar}>
-        <Link to="/" className={styles.brand} aria-label="DAON">
-          <Logo />
-        </Link>
-
-        <nav className={styles.desktopNav} aria-label={t('nav.home')}>
-          {links.map((link) => (
-            <NavItem key={link.to} to={link.to} end={link.end}>
-              {t(link.key)}
-            </NavItem>
-          ))}
-        </nav>
-
-        <div className={styles.actions}>
-          <LanguageSwitcher />
-          <a
-            className={`btn btn--delivery ${styles.cta}`}
-            href={restaurant.links.uberEats}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('home.visit.delivery')}
-          </a>
-          <Link to="/reservation" className={`btn ${styles.cta}`}>
-            {t('nav.reservation')}
+    <>
+      <header
+        ref={headerRef}
+        className={styles.header}
+        data-scrolled={scrolled || undefined}
+        data-hidden={(hidden && !drawerOpen) || undefined}
+      >
+        <div className={styles.bar}>
+          <Link to="/" className={styles.brand} aria-label="DAON">
+            <Logo />
           </Link>
-          <button
-            type="button"
-            className={styles.burger}
-            aria-expanded={drawerOpen}
-            aria-controls="daon-mobile-nav"
-            aria-label={drawerOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-            onClick={() => setDrawerOpen((open) => !open)}
-          >
-            <span className={styles.burgerBox} data-open={drawerOpen || undefined}>
-              <span />
-              <span />
-              <span />
-            </span>
-          </button>
-        </div>
-      </div>
 
+          <nav className={styles.desktopNav} aria-label={t('nav.home')}>
+            {links.map((link) => (
+              <NavItem key={link.to} to={link.to} end={link.end}>
+                {t(link.key)}
+              </NavItem>
+            ))}
+          </nav>
+
+          <div className={styles.actions}>
+            <LanguageSwitcher />
+            <OrderLink kind="pickup" className={`${styles.cta} ${styles.pickup}`} />
+            <OrderLink kind="delivery" className={styles.cta} />
+            <Link to="/reservation" className={`btn ${styles.cta}`}>
+              {t('nav.reservation')}
+            </Link>
+            <button
+              type="button"
+              className={styles.burger}
+              aria-expanded={drawerOpen}
+              aria-controls="daon-mobile-nav"
+              aria-label={drawerOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+              onClick={() => setDrawerOpen((open) => !open)}
+            >
+              <span className={styles.burgerBox} data-open={drawerOpen || undefined}>
+                <span />
+                <span />
+                <span />
+              </span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* The drawer is a sibling of the header, not a child: once the page
+          scrolls the header carries a backdrop-filter, and that makes it the
+          containing block for anything fixed inside it — the drawer was being
+          clipped to the height of the bar. */}
       <div
         className={styles.scrim}
         data-open={drawerOpen || undefined}
@@ -147,18 +147,14 @@ export function Navbar() {
           ))}
         </nav>
         <div className={styles.drawerFooter}>
-          <a
-            className="btn btn--delivery"
-            href={restaurant.links.uberEats}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('home.visit.delivery')}
-          </a>
+          <div className={styles.drawerOrder}>
+            <OrderLink kind="delivery" />
+            <OrderLink kind="pickup" />
+          </div>
           <LanguageSwitcher variant="inline" />
         </div>
       </div>
-    </header>
+    </>
   )
 }
 

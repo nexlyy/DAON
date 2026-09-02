@@ -314,67 +314,35 @@
   }
 }
 
-/* Room tabs -------------------------------------------------------------- */
+/* Table list — the map is the picture of the room, this is the quick way to
+   pick a number, and the only way a screen reader gets one. */
 
-.zoneTabs {
-  display: none;
-  gap: 0.4rem;
-  width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
+.tableRoom {
+  display: grid;
+  gap: 0.5rem;
 }
 
-.zoneTabs::-webkit-scrollbar {
-  display: none;
-}
-
-.zoneTab {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45em;
-  flex: 1 1 auto;
-  justify-content: center;
-  min-height: 2.6rem;
-  padding: 0.5em 0.85em;
-  border: 1px solid rgba(198, 176, 150, 0.55);
-  border-radius: var(--radius-pill);
-  background: var(--white);
-  font-size: 0.76rem;
-  letter-spacing: 0.04em;
-  color: var(--text-soft);
-  white-space: nowrap;
-  transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease), color 0.25s var(--ease);
-}
-
-.zoneTab[aria-pressed='true'] {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--paper);
-}
-
-.zoneTabCount {
-  min-width: 1.35em;
-  padding: 0.05em 0.35em;
-  border-radius: var(--radius-pill);
-  background: var(--gold-wash);
-  font-size: 0.68em;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
+.tableRoomName {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--gold-text);
 }
 
-.zoneTab[aria-pressed='true'] .zoneTabCount {
-  background: rgba(255, 255, 255, 0.16);
-  color: var(--gold-line);
+.tableRoomCount {
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--text-faint);
 }
 
-/* Compact table list — the plan is the primary picker on wide screens, this is
-   the one that works with a thumb. */
-
 .tableList {
-  display: none;
+  display: grid;
   width: 100%;
-  gap: 0.6rem;
+  gap: 1rem;
 }
 
 .tableListTitle {
@@ -441,14 +409,6 @@
 }
 
 @media (max-width: 720px) {
-  .tableList {
-    display: grid;
-  }
-
-  .zoneTabs {
-    display: flex;
-  }
-
   /* The summary stops being a card and becomes a line of what is chosen so
      far — on step one that is nothing, so it stays out of the way entirely. */
   .summary {

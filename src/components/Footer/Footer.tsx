@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { OrderLink } from '@/components/Order/OrderLink'
 import { Logo } from '@/components/Brand/Logo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { OpeningHours } from '@/components/OpeningHours/OpeningHours'
@@ -67,14 +68,10 @@ export function Footer() {
             >
               @{restaurant.instagram}
             </a>
-            <a
-              className={`btn btn--delivery ${styles.delivery}`}
-              href={restaurant.links.uberEats}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('footer.delivery')}
-            </a>
+            <div className={styles.order}>
+              <OrderLink kind="delivery" className={styles.orderButton} />
+              <OrderLink kind="pickup" className={styles.orderButton} />
+            </div>
           </div>
 
           <div className={styles.col}>

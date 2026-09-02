@@ -1,8 +1,16 @@
-import { floorPlan, resolveTableGroup, zoneById } from '@/data/tables/floorPlan'
+import { useEffect, useImperativeHandle } from 'react'
+import type { Ref } from 'react'
+import { floorPlan, resolveTableGroup, tableById } from '@/data/tables/floorPlan'
 import type { FloorTable } from '@/data/tables/floorPlan'
 import type { TableAvailability } from '@/services/booking'
 import { useI18n } from '@/i18n/useI18n'
+import { useMapView } from './useMapView'
 import styles from './RestaurantFloorPlan.module.css'
+
+/** Lets the step around the plan bring a table into view. */
+export interface FloorPlanHandle {
+  focusTable: (id: string) => void
+}
 
 /** What the picker draws for one table, once party size is taken into account. */
 export type TableState = TableAvailability | 'selected' | 'noJoin'
@@ -13,12 +21,7 @@ interface Props {
   partySize: number
   onSelect: (table: FloorTable) => void
   loading?: boolean
-  /**
-   * Crops the drawing to one room. The whole plan is 1220 units wide; on a
-   * phone that means either unreadable tables or sideways scrolling, so the
-   * picker shows one room at a time instead.
-   */
-  focusZone?: string | null
+  handleRef?: Ref<FloorPlanHandle>
 }
 
 const isFreeIn = (status: Record<string, TableAvailability>) => (id: string) =>
@@ -46,26 +49,55 @@ export function RestaurantFloorPlan({
   partySize,
   onSelect,
   loading = false,
-  focusZone = null,
+  handleRef,
 }: Props) {
   const { t } = useI18n()
   const { size, tables, fixtures, zones } = floorPlan
+  const map = useMapView({ width: size.width, height: size.height })
 
-  const focus = focusZone ? zoneById.get(focusZone) : undefined
-  const pad = 26
-  const viewBox = focus
-    ? `${focus.x - pad} ${focus.y - pad} ${focus.w + pad * 2} ${focus.h + pad * 2}`
-    : `0 0 ${size.width} ${size.height}`
+  useImperativeHandle(handleRef, () => ({
+    focusTable: (id: string) => {
+      const table = tableById.get(id)
+      if (!table) return
+      map.focusOn({
+        x: table.x - table.w / 2,
+        y: table.y - table.h / 2,
+        w: table.w,
+        h: table.h,
+      })
+    },
+  }))
+
+  // Choosing a table from the list moves the map to it, so the guest can see
+  // where in the room they have just been put.
+  const selectedKey = selectedIds.join(',')
+  useEffect(() => {
+    if (!map.zoomed || selectedIds.length === 0) return
+    const seats = selectedIds
+      .map((id) => tableById.get(id))
+      .filter((table): table is FloorTable => Boolean(table))
+    if (seats.length === 0) return
+    const x0 = Math.min(...seats.map((seat) => seat.x - seat.w / 2))
+    const y0 = Math.min(...seats.map((seat) => seat.y - seat.h / 2))
+    const x1 = Math.max(...seats.map((seat) => seat.x + seat.w / 2))
+    const y1 = Math.max(...seats.map((seat) => seat.y + seat.h / 2))
+    map.focusOn({ x: x0, y: y0, w: x1 - x0, h: y1 - y0 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedKey])
+
+  const { view } = map
 
   return (
     <div className={styles.wrap} data-loading={loading || undefined}>
-      <div className={styles.scroller}>
+      <div className={styles.stage}>
         <svg
+          ref={map.svgRef}
           className={styles.plan}
-          data-focused={focus ? '' : undefined}
-          viewBox={viewBox}
+          data-zoomed={map.zoomed || undefined}
+          viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
           role="group"
           aria-label={t('floorPlan.title')}
+          {...map.handlers}
         >
           <defs>
             <pattern id="daon-hatch" width="7" height="7" patternTransform="rotate(45)">
@@ -83,39 +115,25 @@ export function RestaurantFloorPlan({
                 className={styles.room}
                 data-outdoor={zone.outdoor || undefined}
               />
-              {/* Neighbouring rooms keep their walls for context but lose their
-                  names, which would otherwise be sliced in half at the edge. */}
-              {(!focus || focus.id === zone.id) && (
-                <text x={zone.x + 18} y={zone.y + 34} className={styles.roomLabel}>
-                  {t(`floorPlan.zones.${zone.labelKey}`)}
-                </text>
-              )}
+              <text x={zone.x + 18} y={zone.y + 34} className={styles.roomLabel}>
+                {t(`floorPlan.zones.${zone.labelKey}`)}
+              </text>
             </g>
           ))}
 
-          {fixtures.map((fixture) => {
-            const inside =
-              !focus ||
-              (fixture.x > focus.x - pad &&
-                fixture.x + fixture.w < focus.x + focus.w + pad &&
-                fixture.y > focus.y - pad &&
-                fixture.y + fixture.h < focus.y + focus.h + pad)
-            return (
-              <g
-                key={fixture.id}
-                className={styles.fixture}
-                data-kind={fixture.kind}
-                data-small={fixture.small || undefined}
-              >
-                <rect x={fixture.x} y={fixture.y} width={fixture.w} height={fixture.h} />
-                {inside && (
-                  <text x={fixture.x + fixture.w / 2} y={fixture.y + fixture.h / 2 + 6}>
-                    {t(`floorPlan.fixtures.${fixture.labelKey}`)}
-                  </text>
-                )}
-              </g>
-            )
-          })}
+          {fixtures.map((fixture) => (
+            <g
+              key={fixture.id}
+              className={styles.fixture}
+              data-kind={fixture.kind}
+              data-small={fixture.small || undefined}
+            >
+              <rect x={fixture.x} y={fixture.y} width={fixture.w} height={fixture.h} />
+              <text x={fixture.x + fixture.w / 2} y={fixture.y + fixture.h / 2 + 6}>
+                {t(`floorPlan.fixtures.${fixture.labelKey}`)}
+              </text>
+            </g>
+          ))}
 
           {tables.map((table) => (
             <TableNode
@@ -123,14 +141,53 @@ export function RestaurantFloorPlan({
               table={table}
               state={tableState(table, status, selectedIds, partySize)}
               partySize={partySize}
-              onSelect={onSelect}
+              onSelect={(picked) => {
+                // A drag across the map ends on a table as often as not; that
+                // should move the view, not book a seat.
+                if (map.wasDragged()) return
+                onSelect(picked)
+              }}
             />
           ))}
         </svg>
+
+        <div className={styles.zoom} role="group" aria-label={t('floorPlan.zoom.label')}>
+          <button type="button" onClick={map.zoomIn} aria-label={t('floorPlan.zoom.in')}>
+            +
+          </button>
+          <button type="button" onClick={map.zoomOut} aria-label={t('floorPlan.zoom.out')}>
+            −
+          </button>
+          <button
+            type="button"
+            onClick={map.reset}
+            disabled={!map.zoomed}
+            aria-label={t('floorPlan.zoom.reset')}
+          >
+            <FitIcon />
+          </button>
+        </div>
       </div>
 
-      <p className={styles.note}>{t('floorPlan.joinNote')}</p>
+      <p className={styles.note}>
+        {t('floorPlan.joinNote')} {t('floorPlan.zoom.hint')}
+      </p>
     </div>
+  )
+}
+
+function FitIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" focusable="false">
+      <path
+        d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }
 

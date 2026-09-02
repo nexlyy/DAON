@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { OrderLink } from '@/components/Order/OrderLink'
 import { Calligraphy } from '@/components/Media/Calligraphy'
 import { DishPhoto } from '@/components/Media/DishPhoto'
 import { categories } from '@/data/menu/categories'
@@ -182,14 +183,14 @@ export function HomePage() {
               </a>
             </div>
 
-            <a
-              className={`btn btn--delivery ${styles.deliveryButton}`}
-              href={restaurant.links.uberEats}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('home.visit.delivery')}
-            </a>
+            <div className={styles.order}>
+              <p className={styles.orderTitle}>{t('order.title')}</p>
+              <div className={styles.orderButtons}>
+                <OrderLink kind="delivery" />
+                <OrderLink kind="pickup" />
+              </div>
+              <p className={styles.orderNote}>{t('order.note')}</p>
+            </div>
           </div>
 
           <div className={styles.hoursCard}>

@@ -12,34 +12,68 @@
   pointer-events: none;
 }
 
-.scroller {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
+.stage {
+  position: relative;
   border-radius: var(--radius-l);
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 .plan {
   display: block;
   width: 100%;
   height: auto;
-  min-width: 30rem;
+  /* At rest a vertical swipe still scrolls the page — the map is tall, and a
+     dead zone in the middle of the step would be worse than no map. Once the
+     guest has zoomed in, the drag belongs to the plan. */
+  touch-action: pan-y;
 }
 
-/* Cropped to one room, the drawing fits any width — no sideways scrolling.
-   A wide room like the Ogródek then scales down a long way, so the type is
-   sized up in user units to stay readable at whatever scale it lands on. */
-.plan[data-focused] {
-  min-width: 0;
+.plan[data-zoomed] {
+  touch-action: none;
+  cursor: grab;
 }
 
-.plan[data-focused] .tableLabel {
-  font-size: 32px;
+.plan[data-zoomed]:active {
+  cursor: grabbing;
 }
 
-.plan[data-focused] .roomLabel,
-.plan[data-focused] .fixture text {
-  font-size: 26px;
+/* Zoom controls sit on the drawing rather than beside it, so the map keeps the
+   full width it needs. */
+.zoom {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.3rem;
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius-m);
+  background: rgba(251, 248, 243, 0.9);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-soft);
+}
+
+.zoom button {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--radius-s);
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--ink);
+  transition: background-color 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+.zoom button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .zoom button:hover:not(:disabled) {
+    background: var(--paper-deep);
+  }
 }
 
 .hitArea {

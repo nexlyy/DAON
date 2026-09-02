@@ -45,8 +45,11 @@ export const restaurant = {
     maps: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       `DAON Korean Restaurant, ${addressLine}`,
     )}`,
-    uberEats:
-      'https://www.ubereats.com/pl/store/daon-korean-restaurant/jlFDD3NOTNCqWPgfFwU3tg?diningMode=PICKUP&rwg_token=AE37R_heF8nLkGU43WvRuwLFHbjnCkh-OLj6Lk3uCTr9emS8caRt8Cgizka2tYApWzlHmxJiKw2JQHwXNppZXNihktrQmwpAng%3D%3D',
+    /** Uber Eats, one link per fulfilment mode. */
+    delivery:
+      'https://www.ubereats.com/pl/store/daon-korean-restaurant/jlFDD3NOTNCqWPgfFwU3tg?rwg_token=AE37R_gRWMtqC00Da1og1yQG6oYZVQzwVjZPCPUHC1d_T3pnJKt8Dk8L0tXZseuKYVS22152LKPF3xbXOe3zqj0z6XjFVQnHgg%3D%3D',
+    pickup:
+      'https://www.ubereats.com/pl/store/daon-korean-restaurant/jlFDD3NOTNCqWPgfFwU3tg?diningMode=PICKUP&rwg_token=AE37R_j9KOOzYERTYNF96Quhhr98X90DyTFQmoCqnPO5G9ufWSKT4PRrSSbYh5rC74oF7bg-kxYGkoAe11aGqHbkeFPMw3r2BA%3D%3D',
   },
 } as const
 

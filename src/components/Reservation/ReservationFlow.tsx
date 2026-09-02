@@ -10,11 +10,12 @@ import {
 import type { FloorTable } from '@/data/tables/floorPlan'
 import { restaurant, reservation as reservationConfig } from '@/data/restaurant'
 import { bookingApi, isDemoBooking, toISODate } from '@/services/booking'
+import { notifyRestaurant } from '@/services/booking/notify'
 import type { Booking, TableAvailability, TimeSlot } from '@/services/booking'
 import { BookingError } from '@/services/booking/types'
 import { useI18n } from '@/i18n/useI18n'
-import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { RestaurantFloorPlan, tableState } from '@/components/RestaurantFloorPlan/RestaurantFloorPlan'
+import type { FloorPlanHandle } from '@/components/RestaurantFloorPlan/RestaurantFloorPlan'
 import { DatePicker } from './DatePicker'
 import { TimePicker } from './TimePicker'
 import { GuestSelector } from './GuestSelector'
@@ -25,21 +26,20 @@ import styles from './ReservationFlow.module.css'
 const STEPS = ['date', 'time', 'guests', 'table', 'confirm'] as const
 type Step = (typeof STEPS)[number]
 
-/** Środek has no tables, so it never becomes a room tab. */
+/** Środek is a passage between the two rooms; nothing is seated there. */
 const zonesWithTables = floorPlan.zones.filter((zone) =>
   floorPlan.tables.some((table) => table.zone === zone.id),
 )
 
 export function ReservationFlow() {
   const { t, formatDate, locale } = useI18n()
-  const isPhone = useMediaQuery('(max-width: 720px)')
 
   const [step, setStep] = useState<Step>('date')
   const [date, setDate] = useState<string | null>(null)
   const [time, setTime] = useState<string | null>(null)
   const [partySize, setPartySize] = useState<number | null>(null)
   const [tableIds, setTableIds] = useState<string[]>([])
-  const [focusZone, setFocusZone] = useState(zonesWithTables[0].id)
+  const planRef = useRef<FloorPlanHandle>(null)
 
   const [closedDates, setClosedDates] = useState<string[]>([])
   const [slots, setSlots] = useState<TimeSlot[]>([])
@@ -163,19 +163,9 @@ export function ReservationFlow() {
     (primaryId: string) => {
       const isFree = (id: string) => (status[id] ?? 'available') === 'available'
       setTableIds(resolveTableGroup(primaryId, partySize ?? 1, isFree) ?? [])
-      const zone = tableById.get(primaryId)?.zone
-      if (zone) setFocusZone(zone)
+      planRef.current?.focusTable(primaryId)
     },
     [partySize, status],
-  )
-
-  /**
-   * The list under the plan mirrors the room the guest is looking at — every
-   * table in it, taken ones included, so the numbers match what they can see.
-   */
-  const listedTables = useMemo(
-    () => floorPlan.tables.filter((table) => table.zone === focusZone),
-    [focusZone],
   )
 
   const canContinue = useMemo(() => {
@@ -226,6 +216,7 @@ export function ReservationFlow() {
         locale,
       })
       setBooking(result)
+      notifyRestaurant(result)
     } catch (error) {
       const code = error instanceof BookingError ? error.code : 'generic'
       setSubmitError(t(`reservation.errors.${code}`))
@@ -305,74 +296,66 @@ export function ReservationFlow() {
 
               <Legend />
 
-              {/* Room tabs replace sideways scrolling on a phone. */}
-              <div className={styles.zoneTabs} role="group" aria-label={t('floorPlan.title')}>
-                {zonesWithTables.map((zone) => {
-                  const free = floorPlan.tables.filter(
-                    (table) =>
-                      table.zone === zone.id &&
-                      ['available', 'selected'].includes(
-                        tableState(table, status, tableIds, partySize ?? 1),
-                      ),
-                  ).length
-                  return (
-                    <button
-                      key={zone.id}
-                      type="button"
-                      className={styles.zoneTab}
-                      aria-pressed={focusZone === zone.id}
-                      onClick={() => setFocusZone(zone.id)}
-                    >
-                      {t(`floorPlan.zones.${zone.labelKey}`)}
-                      <span className={styles.zoneTabCount}>{free}</span>
-                    </button>
-                  )
-                })}
-              </div>
-
               <RestaurantFloorPlan
                 status={status}
                 selectedIds={tableIds}
                 partySize={partySize ?? 1}
                 loading={statusLoading}
-                focusZone={isPhone ? focusZone : null}
+                handleRef={planRef}
                 onSelect={(table: FloorTable) => chooseTable(table.id)}
               />
 
-              {/* Phones get a plain list as well: tapping a 40px table inside a
-                  scrolled plan is fiddly, and this is what screen readers read. */}
-              {listedTables.length > 0 && (
-                <div className={styles.tableList}>
-                  <p className={styles.tableListTitle}>{t('reservation.table.list')}</p>
-                  <div className={styles.tableListItems}>
-                    {listedTables.map((table) => {
-                      const state = tableState(table, status, tableIds, partySize ?? 1)
-                      const free = state === 'available' || state === 'selected'
-                      return (
-                        <button
-                          key={table.id}
-                          type="button"
-                          className={styles.tableListItem}
-                          data-state={state}
-                          disabled={!free}
-                          aria-pressed={state === 'selected'}
-                          onClick={() => chooseTable(table.id)}
-                        >
-                          <span className={styles.tableListLabel}>
-                            {t('reservation.table.tableLabel', { label: table.label })}
-                          </span>
-                          <span className={styles.tableListMeta}>
-                            {t('reservation.table.seats', { count: table.seats })} ·{' '}
-                            {state === 'noJoin'
-                              ? t('reservation.table.legend.noJoin')
-                              : t(`reservation.table.legend.${state}`)}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* The list carries the whole restaurant too: tapping a small
+                  table on the map is fiddly, and this is what a screen reader
+                  reads out. */}
+              <div className={styles.tableList}>
+                <p className={styles.tableListTitle}>{t('reservation.table.list')}</p>
+                {zonesWithTables.map((zone) => {
+                  const roomTables = floorPlan.tables.filter((table) => table.zone === zone.id)
+                  const free = roomTables.filter((table) =>
+                    ['available', 'selected'].includes(
+                      tableState(table, status, tableIds, partySize ?? 1),
+                    ),
+                  ).length
+                  return (
+                    <div className={styles.tableRoom} key={zone.id}>
+                      <p className={styles.tableRoomName}>
+                        {t(`floorPlan.zones.${zone.labelKey}`)}
+                        <span className={styles.tableRoomCount}>
+                          {t('reservation.table.freeCount', { count: free })}
+                        </span>
+                      </p>
+                      <div className={styles.tableListItems}>
+                        {roomTables.map((table) => {
+                          const state = tableState(table, status, tableIds, partySize ?? 1)
+                          const selectable = state === 'available' || state === 'selected'
+                          return (
+                            <button
+                              key={table.id}
+                              type="button"
+                              className={styles.tableListItem}
+                              data-state={state}
+                              disabled={!selectable}
+                              aria-pressed={state === 'selected'}
+                              onClick={() => chooseTable(table.id)}
+                            >
+                              <span className={styles.tableListLabel}>
+                                {t('reservation.table.tableLabel', { label: table.label })}
+                              </span>
+                              <span className={styles.tableListMeta}>
+                                {t('reservation.table.seats', { count: table.seats })} ·{' '}
+                                {state === 'noJoin'
+                                  ? t('reservation.table.legend.noJoin')
+                                  : t(`reservation.table.legend.${state}`)}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
 
               {!statusLoading && fittingTables.length === 0 && tableIds.length === 0 && (
                 <p className={styles.warning}>

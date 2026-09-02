@@ -40,9 +40,11 @@
     transform 0.25s var(--ease);
 }
 
-.slot:hover:not(:disabled) {
-  border-color: var(--ink);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .slot:hover:not(:disabled) {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
 }
 
 .slot:disabled {

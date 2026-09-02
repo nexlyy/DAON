@@ -54,8 +54,7 @@
       "hours": "Godziny otwarcia",
       "contact": "Kontakt",
       "address": "Adres",
-      "directions": "Otwórz w mapach",
-      "delivery": "Zamów dostawę"
+      "directions": "Otwórz w mapach"
     },
     "cta": {
       "title": "Zarezerwuj stolik",
@@ -79,6 +78,12 @@
     "details": "Szczegóły dania",
     "categoryJump": "Przejdź do kategorii",
     "results": "{count} dań"
+  },
+  "order": {
+    "title": "Zamów online",
+    "delivery": "Zamów dostawę",
+    "pickup": "Odbiór osobisty",
+    "note": "Realizowane przez Uber Eats."
   },
   "tags": {
     "vegetarian": "Wegetariańskie",
@@ -135,7 +140,8 @@
       "selected": "Stolik {tables} · {zone} · {seats} miejsc",
       "list": "Lista stolików",
       "noJoin": "brak wolnego stolika obok dla {guests} osób",
-      "selectedJoined": "Stoliki {tables} zestawione razem · {zone} · {seats} miejsc"
+      "selectedJoined": "Stoliki {tables} zestawione razem · {zone} · {seats} miejsc",
+      "freeCount": "{count} wolnych"
     },
     "details": {
       "title": "Na kogo rezerwacja?",
@@ -196,15 +202,21 @@
       "wcMen": "WC — męski",
       "wcWomen": "WC — damski"
     },
-    "joinNote": "Każdy stolik jest na cztery osoby. Dla większych grup zestawiamy stoliki razem."
+    "joinNote": "Każdy stolik jest na cztery osoby. Dla większych grup zestawiamy stoliki razem.",
+    "zoom": {
+      "label": "Powiększenie planu",
+      "in": "Powiększ",
+      "out": "Pomniejsz",
+      "reset": "Cała restauracja",
+      "hint": "Przeciągnij lub uszczypnij, aby przyjrzeć się bliżej."
+    }
   },
   "footer": {
     "tagline": "Restauracja koreańska",
     "explore": "Nawigacja",
     "visit": "Odwiedź nas",
     "rights": "Wszelkie prawa zastrzeżone.",
-    "hours": "Godziny otwarcia",
-    "delivery": "Zamów dostawę"
+    "hours": "Godziny otwarcia"
   },
   "days": {
     "long": [

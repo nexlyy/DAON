@@ -27,9 +27,11 @@
     transform 0.28s var(--ease);
 }
 
-.option:hover {
-  border-color: var(--ink);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .option:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
 }
 
 .option[aria-pressed='true'] {

@@ -65,10 +65,16 @@
   color: var(--text-soft);
 }
 
-.delivery {
-  margin-top: 0.6rem;
-  padding: 0.7em 1.4em;
-  font-size: 0.68rem;
+.order {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.orderButton {
+  padding: 0.7em 1.3em;
+  font-size: 0.66rem;
 }
 
 .legal {
@@ -114,10 +120,16 @@
     gap: 0.1rem;
   }
 
-    .delivery {
-  margin-top: 0.6rem;
-  padding: 0.7em 1.4em;
-  font-size: 0.68rem;
+    .order {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.orderButton {
+  padding: 0.7em 1.3em;
+  font-size: 0.66rem;
 }
 
 .legal {

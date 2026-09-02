@@ -1,0 +1,11 @@
+{
+  "name": "daon-notifier",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Sends each reservation from the DAON site to the restaurant's Telegram.",
+  "scripts": {
+    "start": "node src/index.js",
+    "chat-id": "node src/whoami.js"
+  }
+}

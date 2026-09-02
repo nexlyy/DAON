@@ -206,9 +206,17 @@ p {
   --btn-border: var(--gold);
 }
 
-.btn--delivery:hover:not(:disabled) {
+.btn--pickup {
+  --btn-bg: transparent;
+  --btn-fg: var(--gold-text);
+  --btn-border: var(--gold-line);
+}
+
+.btn--delivery:hover:not(:disabled),
+.btn--pickup:hover:not(:disabled) {
   --btn-bg: var(--gold);
   --btn-fg: var(--paper);
+  --btn-border: var(--gold);
 }
 
 .btn--quiet {

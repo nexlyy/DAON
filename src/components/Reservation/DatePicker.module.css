@@ -38,9 +38,20 @@
   transition: border-color 0.25s var(--ease), background-color 0.25s var(--ease);
 }
 
-.nav:hover:not(:disabled) {
-  border-color: var(--ink);
-  background: var(--paper-warm);
+/* A tap leaves :hover stuck on a phone. On the calendar that repainted the
+   chosen day back to paper while its text stayed paper-coloured, so the date
+   disappeared; elsewhere it just left a tile lifted. Hover belongs to devices
+   that actually have a pointer. */
+@media (hover: hover) {
+  .nav:hover:not(:disabled) {
+    border-color: var(--ink);
+    background: var(--paper-warm);
+  }
+
+  .day:hover:not(:disabled):not([aria-pressed='true']) {
+    border-color: var(--gold-line);
+    background: var(--paper-warm);
+  }
 }
 
 .nav:disabled {
@@ -86,11 +97,6 @@
     background-color 0.24s var(--ease),
     color 0.24s var(--ease),
     border-color 0.24s var(--ease);
-}
-
-.day:hover:not(:disabled) {
-  border-color: var(--gold-line);
-  background: var(--paper-warm);
 }
 
 .day:disabled {
