@@ -83,4 +83,15 @@ begin
 end;
 $$;
 
-revoke all on function public.create_reservation from anon, authenticated;
+-- Postgres grants EXECUTE on a new function to PUBLIC, and every Supabase role
+-- inherits that. Revoking from anon by name leaves the PUBLIC grant standing —
+-- which, on a security definer function, hands the publishable key a way to
+-- write rows that row level security would otherwise refuse. Revoke from PUBLIC
+-- and grant it back to the one role that should have it.
+revoke all on function public.create_reservation(
+  text, date, text, integer, text[], text, text, text, text
+) from public, anon, authenticated;
+
+grant execute on function public.create_reservation(
+  text, date, text, integer, text[], text, text, text, text
+) to service_role;

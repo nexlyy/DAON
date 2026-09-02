@@ -326,7 +326,9 @@ async function handle(request, response, url) {
       console.warn('A booking came in but no chat is configured — send /start to the bot.')
     }
 
-    return send(request, response, 200, { ...record, ...stored })
+    // `stored` comes back in the database's own column names; the site is
+    // typed against the booking it sent, so that is what goes back.
+    return send(request, response, 200, { ...record, id: stored?.id ?? record.id })
   }
 
   return send(request, response, 404, { error: 'not found' })

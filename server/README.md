@@ -49,9 +49,15 @@ unique index on (date, time, table) means two parties cannot be given the same
 table, whatever the service believes, and `create_reservation` books all of a
 party's tables or none of them.
 
-Row level security is on and nothing is granted to the anon key, so the tables
-are reachable only with the service key — which stays in `server/.env` and never
-goes near the browser.
+Row level security is on and nothing is granted to the publishable key, so the
+tables are reachable only with the secret key — which stays in `server/.env` and
+never goes near the browser.
+
+One thing worth knowing if you write another function like this: Postgres grants
+EXECUTE to PUBLIC on every new function, and revoking from `anon` by name leaves
+that standing. On a `security definer` function that is a hole straight through
+row level security. The schema revokes from PUBLIC and grants back to
+`service_role` alone.
 
 Set `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` and restart. Without them the
 bookings go to `server/data/bookings.json`, which is fine for a trial and
