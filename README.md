@@ -118,28 +118,24 @@ Every table seats four. `joinsWith` lists the tables staff can push against this
 one, and `resolveTableGroup` uses it: pick a table for a party of six and the
 picker pulls in a free neighbour, selects both, and the booking records both.
 
-## Telling the restaurant
-
-`server/` holds a small Node service that forwards each confirmed booking to the
-restaurant's Telegram in Polish. The site is static, so it cannot hold a bot
-token; the service does, and the site only posts the booking to it. Set
-`VITE_BOOKING_NOTIFY_URL` to switch it on — without it the site stays quiet
-rather than failing. See `server/README.md`.
-
 ## Reservations
 
 `src/services/booking/types.ts` defines a four-call `BookingApi`. Two adapters
-implement it:
+implement it, and the UI never learns which one it is talking to:
 
-- **mockApi** — the default. Availability is derived from a hash of
-  date + time + table, so it looks plausible and stays stable across reloads.
-  Confirmed bookings are kept in `localStorage`.
-- **httpApi** — activated by setting `VITE_BOOKING_API_URL`. Same four calls
-  against a real backend; the UI never learns which adapter it is talking to.
+- **httpApi** — the real one, switched on by `VITE_BOOKING_API_URL`. It talks to
+  `server/`, which keeps the reservations in Supabase and tells the restaurant
+  about each one over Telegram. See `server/README.md`.
+- **mockApi** — the fallback when no API is configured. Availability comes from
+  a hash of date + time + table, so a preview build looks plausible; bookings go
+  to `localStorage` and are forgotten.
 
 ```
-Frontend → BookingApi → (mock | HTTP → your service)
+Frontend → BookingApi → (mock | HTTP → server/ → Supabase + Telegram)
 ```
+
+The published site is built with `BOOKING_API_URL` as a repository variable, so
+Pages gets the real adapter.
 
 ## Restaurant details
 

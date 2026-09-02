@@ -10,7 +10,6 @@ import {
 import type { FloorTable } from '@/data/tables/floorPlan'
 import { restaurant, reservation as reservationConfig } from '@/data/restaurant'
 import { bookingApi, isDemoBooking, toISODate } from '@/services/booking'
-import { notifyRestaurant } from '@/services/booking/notify'
 import type { Booking, TableAvailability, TimeSlot } from '@/services/booking'
 import { BookingError } from '@/services/booking/types'
 import { useI18n } from '@/i18n/useI18n'
@@ -216,7 +215,6 @@ export function ReservationFlow() {
         locale,
       })
       setBooking(result)
-      notifyRestaurant(result)
     } catch (error) {
       const code = error instanceof BookingError ? error.code : 'generic'
       setSubmitError(t(`reservation.errors.${code}`))

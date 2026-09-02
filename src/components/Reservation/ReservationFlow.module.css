@@ -123,7 +123,10 @@
 
 .fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  /* `min()` keeps the track from insisting on 13rem in a narrower card — that
+     is what pushed the notes field out past the panel on a small phone, and on
+     any phone where the reader has turned the system font up. */
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
   gap: 1rem;
   width: 100%;
 }
@@ -131,6 +134,9 @@
 .field {
   display: grid;
   gap: 0.4rem;
+  /* A grid item will not shrink below its content without this, and a text
+     control's content is its `cols`. */
+  min-width: 0;
 }
 
 .fieldWide {
@@ -156,6 +162,9 @@
 
 .field input,
 .field textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 0.8em 1em;
   border: 1px solid rgba(198, 176, 150, 0.6);
   border-radius: var(--radius-m);
@@ -164,6 +173,14 @@
   outline: none;
   resize: vertical;
   transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.field textarea {
+  /* Grows with what is typed where the browser supports it, so it starts as a
+     line rather than an empty box taking a third of the screen. */
+  field-sizing: content;
+  min-height: 4.5rem;
+  max-height: 40vh;
 }
 
 .field input:focus,
