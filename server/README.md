@@ -116,6 +116,21 @@ ssh mcr journalctl -u daon-api -n 20
 `server/.env` and `server/data/` live only on the machine — neither is in the
 repository.
 
+## On the machine
+
+Two cron jobs, in `/etc/cron.d/daon-api`:
+
+- `scripts/backup.sh` — nightly, copies both tables into
+  `/var/backups/daon/reservations-YYYYMMDD.json` and keeps a month. A free
+  Supabase project is not backed up, and the bookings are the one thing here
+  that cannot be rebuilt from the repository.
+- `scripts/watchdog.sh` — every ten minutes, asks `/health` the same question
+  the site asks and messages the restaurant when the answer changes. systemd
+  restarts a crashed process; it cannot see one that is running and broken.
+
+Both speak only on a change of state, so an outage over a night is two messages
+rather than fifty.
+
 ## What it checks
 
 A booking is refused unless the date is in the future, the time is one the
