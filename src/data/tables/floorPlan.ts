@@ -127,14 +127,17 @@ export const floorPlan: FloorPlan = {
     { ...TABLE, id: 'T8', label: '8', zone: 'sala2', x: 1130, y: 452, seating: SIDES, joinsWith: ['T9', 'T10'] },
     { ...TABLE, id: 'T9', label: '9', zone: 'sala2', x: 1130, y: 578, seating: SIDES, joinsWith: ['T8', 'T10'] },
 
-    // Ogródek — four along the back, three in front, chairs either side
-    { ...TABLE, id: 'T21', label: '21', zone: 'ogrodek', x: 400, y: 910, seating: SIDES, joinsWith: ['T22', 'T25'] },
-    { ...TABLE, id: 'T22', label: '22', zone: 'ogrodek', x: 550, y: 910, seating: SIDES, joinsWith: ['T21', 'T23', 'T25', 'T26'] },
-    { ...TABLE, id: 'T23', label: '23', zone: 'ogrodek', x: 700, y: 910, seating: SIDES, joinsWith: ['T22', 'T24', 'T26', 'T27'] },
-    { ...TABLE, id: 'T24', label: '24', zone: 'ogrodek', x: 850, y: 910, seating: SIDES, joinsWith: ['T23', 'T27'] },
-    { ...TABLE, id: 'T25', label: '25', zone: 'ogrodek', x: 460, y: 1070, seating: SIDES, joinsWith: ['T21', 'T22', 'T26'] },
-    { ...TABLE, id: 'T26', label: '26', zone: 'ogrodek', x: 620, y: 1070, seating: SIDES, joinsWith: ['T25', 'T27', 'T22', 'T23'] },
-    { ...TABLE, id: 'T27', label: '27', zone: 'ogrodek', x: 780, y: 1070, seating: SIDES, joinsWith: ['T26', 'T23', 'T24'] },
+    // Ogródek — four along the back, three in front, chairs either side.
+    //
+    // The back row can be pushed together; the front three cannot be joined to
+    // anything, so a party of more than four is never seated at 25, 26 or 27.
+    { ...TABLE, id: 'T21', label: '21', zone: 'ogrodek', x: 400, y: 910, seating: SIDES, joinsWith: ['T22'] },
+    { ...TABLE, id: 'T22', label: '22', zone: 'ogrodek', x: 550, y: 910, seating: SIDES, joinsWith: ['T21', 'T23'] },
+    { ...TABLE, id: 'T23', label: '23', zone: 'ogrodek', x: 700, y: 910, seating: SIDES, joinsWith: ['T22', 'T24'] },
+    { ...TABLE, id: 'T24', label: '24', zone: 'ogrodek', x: 850, y: 910, seating: SIDES, joinsWith: ['T23'] },
+    { ...TABLE, id: 'T25', label: '25', zone: 'ogrodek', x: 460, y: 1070, seating: SIDES },
+    { ...TABLE, id: 'T26', label: '26', zone: 'ogrodek', x: 620, y: 1070, seating: SIDES },
+    { ...TABLE, id: 'T27', label: '27', zone: 'ogrodek', x: 780, y: 1070, seating: SIDES },
   ],
 }
 

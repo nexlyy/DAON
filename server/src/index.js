@@ -426,7 +426,9 @@ const me = await getMe(TOKEN).catch((failure) => {
   process.exit(1)
 })
 
-server.listen(PORT, () => {
+// Bound to loopback: nginx is the only thing that should reach it. The firewall
+// says the same, but a service should not depend on a firewall rule staying put.
+server.listen(PORT, '127.0.0.1', () => {
   console.log(`DAON API on :${PORT} — store: ${store.kind}, bot @${me.username}`)
   const chatId = readChatId()
   console.log(

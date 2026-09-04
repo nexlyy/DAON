@@ -186,8 +186,7 @@
       "seats": 4,
       "zone": "ogrodek",
       "joinsWith": [
-        "T22",
-        "T25"
+        "T22"
       ],
       "disabled": false
     },
@@ -198,9 +197,7 @@
       "zone": "ogrodek",
       "joinsWith": [
         "T21",
-        "T23",
-        "T25",
-        "T26"
+        "T23"
       ],
       "disabled": false
     },
@@ -211,9 +208,7 @@
       "zone": "ogrodek",
       "joinsWith": [
         "T22",
-        "T24",
-        "T26",
-        "T27"
+        "T24"
       ],
       "disabled": false
     },
@@ -223,8 +218,7 @@
       "seats": 4,
       "zone": "ogrodek",
       "joinsWith": [
-        "T23",
-        "T27"
+        "T23"
       ],
       "disabled": false
     },
@@ -233,11 +227,7 @@
       "label": "25",
       "seats": 4,
       "zone": "ogrodek",
-      "joinsWith": [
-        "T21",
-        "T22",
-        "T26"
-      ],
+      "joinsWith": [],
       "disabled": false
     },
     {
@@ -245,12 +235,7 @@
       "label": "26",
       "seats": 4,
       "zone": "ogrodek",
-      "joinsWith": [
-        "T25",
-        "T27",
-        "T22",
-        "T23"
-      ],
+      "joinsWith": [],
       "disabled": false
     },
     {
@@ -258,11 +243,7 @@
       "label": "27",
       "seats": 4,
       "zone": "ogrodek",
-      "joinsWith": [
-        "T26",
-        "T23",
-        "T24"
-      ],
+      "joinsWith": [],
       "disabled": false
     }
   ],

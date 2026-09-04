@@ -112,7 +112,7 @@
     },
     "time": {
       "title": "Pick a time",
-      "subtitle": "Choose when you would like to sit down.",
+      "subtitle": "Tables are held for 15 minutes after the booked time.",
       "lunch": "Lunch",
       "dinner": "Dinner",
       "none": "No times left on this date."

@@ -112,7 +112,7 @@
     },
     "time": {
       "title": "Wybierz godzinę",
-      "subtitle": "Wybierz godzinę, o której chcesz usiąść.",
+      "subtitle": "Stolik trzymamy 15 minut po zarezerwowanej godzinie.",
       "lunch": "Obiad",
       "dinner": "Kolacja",
       "none": "Brak wolnych godzin tego dnia."
