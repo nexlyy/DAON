@@ -1,6 +1,6 @@
 # Table codes
 
-All four files point at the same address: https://nexlyy.github.io/DAON/
+All four files point at the same address: https://daon.pl/
 
 | File | What it is for |
 | --- | --- |
@@ -23,5 +23,4 @@ Regenerate after a change of address:
 python scripts/make-qr.py
 ```
 
-**The address will change.** These point at a GitHub Pages URL under a personal
-account. Reprint once the restaurant has its own domain.
+These point at the restaurant's own domain, so they are the ones to print.

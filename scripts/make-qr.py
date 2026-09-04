@@ -10,7 +10,7 @@ import os
 import segno
 from PIL import Image, ImageDraw, ImageFont
 
-URL = 'https://nexlyy.github.io/DAON/'
+URL = 'https://daon.pl/'
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'qr')
 os.makedirs(OUT, exist_ok=True)
 

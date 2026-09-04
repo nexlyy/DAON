@@ -73,7 +73,7 @@ function structuredData() {
         closes: hours![1],
       })),
     sameAs: [restaurant.links.instagram],
-    hasMenu: 'https://nexlyy.github.io/DAON/menu',
+    hasMenu: 'https://daon.pl/menu/',
     acceptsReservations: 'True',
   }
 

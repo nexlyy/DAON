@@ -1,4 +1,7 @@
-# Putting the site on daon.pl
+# daon.pl
+
+Live since 4 September 2026. This is how it is put together, and how to publish
+a change.
 
 The site and the reservation API both live on the VPS, under one domain. Same
 origin for both means the browser makes ordinary calls to `/api/` — no CORS, one
@@ -10,10 +13,10 @@ daon.pl/api/       → 127.0.0.1:8787       the reservation service
 mcrplanet.com      → untouched            a second name on the same nginx
 ```
 
-## 1. DNS, at the registrar
+## DNS
 
-One record has to change and one has to be added. Everything else in the zone
-can stay as it is.
+Done. `daon.pl` and `www.daon.pl` both answer `204.168.243.140`, and the AAAA
+record points at the machine's IPv6 address.
 
 | Type | Name | Value | TTL |
 | --- | --- | --- | --- |
@@ -50,34 +53,36 @@ before DNS moves:
 curl --resolve daon.pl:80:204.168.243.140 http://daon.pl/
 ```
 
-What is left is the certificate, and it cannot be issued until the name resolves
-to this machine. Certbot writes the HTTPS blocks and reloads nginx itself:
+The certificate covers both names and expires on 3 December 2026; `certbot.timer`
+renews it twice a day along with mcrplanet's. It was issued with the webroot
+plugin, which needs `/.well-known/acme-challenge/` to keep answering over plain
+HTTP — that location sits above the redirect in the config for exactly that
+reason.
+
+One thing to know if you edit the config: this nginx is 1.24, where `http2` is a
+parameter of `listen`, not a directive of its own. `http2 on;` is 1.25 and
+newer, and 1.24 refuses to start with it.
+
+## Publishing a change
 
 ```bash
-ssh mcr certbot --nginx -d daon.pl -d www.daon.pl --agree-tos -m daonpolska@gmail.com --redirect
+deploy/publish.sh
 ```
 
-Renewal is already automatic: `certbot.timer` runs twice a day and covers every
-certificate on the machine.
+It builds for a domain root rather than a repository subfolder, ships the result
+as a tarball, unpacks it beside the live directory and swaps the two in one
+move. The previous build stays as `/var/www/daon.old`, so a bad deploy is one
+`mv` away from undone.
 
-## 3. The site
+It does not use rsync. The rsync on the machine this is built from is a
+zero-byte stub that exits successfully having copied nothing.
 
-Built for a domain root rather than a repository subfolder:
+## The old address
 
-```bash
-BASE_PATH=/ npm run build
-rsync -az --delete dist/ mcr:/var/www/daon/
-```
-
-`deploy/publish.sh` does both, and is what the GitHub Action runs on a push to
-`main`.
-
-## 4. What changes in the project
-
-- `VITE_BOOKING_API_URL` becomes `https://daon.pl/api`
-- `ALLOWED_ORIGIN` in `/opt/daon-api/.env` becomes `https://daon.pl`
-- the canonical URL, the OG tags, `sitemap.xml` and `robots.txt`
-- the QR codes — regenerate with `python scripts/make-qr.py` and reprint
+The GitHub Pages copy still builds and still works; every page on it declares
+`https://daon.pl/` as its canonical address, so search engines are pointed at
+the domain. Turning it off is a one-line change to the workflow whenever you
+want to — nothing depends on it any more.
 
 ## Why not GitHub Pages with a custom domain
 
