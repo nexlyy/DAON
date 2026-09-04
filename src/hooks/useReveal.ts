@@ -1,10 +1,5 @@
 import { useEffect, useRef } from 'react'
 
-/**
- * Adds `is-visible` the first time an element scrolls into view, which is what
- * the `.reveal` animation in global.css hangs off. Elements are unobserved once
- * revealed so nothing keeps running behind the page.
- */
 export function useReveal<T extends HTMLElement = HTMLDivElement>(delayMs = 0) {
   const ref = useRef<T>(null)
 

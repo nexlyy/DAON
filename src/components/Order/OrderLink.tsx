@@ -8,10 +8,6 @@ interface Props {
   className?: string
 }
 
-/**
- * One of the two Uber Eats links. Delivery is the filled one and pickup the
- * outline, so the pair reads as a choice rather than two competing calls.
- */
 export function OrderLink({ kind, className }: Props) {
   const { t } = useI18n()
 

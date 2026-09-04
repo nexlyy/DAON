@@ -22,7 +22,6 @@
   box-shadow: var(--shadow-lift);
 }
 
-/* One big hit target so the whole card is clickable while staying a button */
 .hit {
   position: absolute;
   inset: 0;
@@ -83,9 +82,6 @@
   gap: 0.7rem;
 }
 
-/* The menu prints prices on small white slips, slightly off-square. On wide
-   screens the slip hangs over the bottom of the photo — `bottom: 100%` puts it
-   just above the text block, which is exactly where the photo ends. */
 .price {
   position: absolute;
   right: 0.5rem;
@@ -152,11 +148,6 @@
   color: var(--text-soft);
   white-space: nowrap;
 }
-
-/* ── Phones ──────────────────────────────────────────────────────────────
-   A photo-led card per dish means 70 of them scroll for the length of a
-   novel. Below 640px each dish becomes a row you can scan: thumbnail, name,
-   price, one line of description. Tapping still opens the full card. */
 
 @media (max-width: 640px) {
   .card[data-variant='auto'] {

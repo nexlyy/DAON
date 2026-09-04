@@ -1,10 +1,5 @@
-/*
- * Design tokens lifted from the printed DAON menu: warm paper stock, gold
- * hairline frames, the navy of the roof-tile logo, and the muted blue-rose of
- * the watercolour florals on the cover.
- */
 :root {
-  /* Surfaces — from milky paper to the deeper sand of the menu's cover border */
+  
   --paper: #fbf8f3;
   --paper-warm: #f6efe4;
   --paper-deep: #f0e6d7;
@@ -12,27 +7,22 @@
   --beige: #ddcdb3;
   --clay: #c6b096;
 
-  /* Ink — the navy of the logo, used for headings and primary actions */
   --ink: #2f4256;
   --ink-soft: #56697f;
   --ink-faint: #93a3b4;
 
-  /* Warm neutrals for body copy */
   --text: #33302b;
   --text-soft: #6b6357;
   --text-faint: #97907f;
 
-  /* Gold — hairlines and small caps, never large fills */
   --gold: #b8974f;
   --gold-text: #96792f;
   --gold-line: #d9c395;
   --gold-wash: #f2e7cf;
 
-  /* Muted rose-beige, from the cover's watercolour roses */
   --rose: #d9bfb2;
   --rose-deep: #b9917f;
 
-  /* The red chip on the 다온 seal — used once, as a live accent */
   --seal: #d8362c;
 
   --white: #ffffff;
@@ -40,7 +30,6 @@
   --shadow-card: 0 12px 34px -18px rgba(78, 62, 41, 0.32);
   --shadow-lift: 0 22px 50px -24px rgba(60, 47, 30, 0.42);
 
-  /* Type */
   --font-display: 'Fraunces', 'Gowun Batang', Georgia, 'Times New Roman', serif;
   --font-body: 'Karla', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
@@ -52,7 +41,6 @@
   --step-4: clamp(2.1rem, 1.6rem + 2.4vw, 3.6rem);
   --step-5: clamp(2.8rem, 1.7rem + 5vw, 6rem);
 
-  /* Rhythm */
   --gutter: clamp(1.15rem, 4vw, 2.5rem);
   --section-y: clamp(4rem, 9vw, 8.5rem);
   --max-w: 1240px;

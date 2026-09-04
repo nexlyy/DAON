@@ -16,20 +16,13 @@ const LATENCY_MS = 260
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-/**
- * FNV-1a. Occupancy has to look plausible and, more importantly, stay the same
- * between renders and reloads — so it is derived from the query rather than
- * from Math.random().
- */
 function hash(input: string): number {
   let h = 0x811c9dc5
   for (let i = 0; i < input.length; i += 1) {
     h ^= input.charCodeAt(i)
     h = Math.imul(h, 0x01000193)
   }
-  // Keys here differ only in their last characters ("…|T01" vs "…|T02"), and
-  // plain FNV leaves those neighbours clustered — every table in a slot would
-  // end up on the same side of the threshold. The murmur3 finaliser spreads them.
+  
   h ^= h >>> 16
   h = Math.imul(h, 0x85ebca6b)
   h ^= h >>> 13
@@ -51,7 +44,7 @@ function writeStored(bookings: Booking[]): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings))
   } catch {
-    // Storage unavailable — the booking still returns, it just is not remembered.
+    
   }
 }
 
@@ -64,7 +57,6 @@ const toMinutes = (time: string) => {
 
 const fromMinutes = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`
 
-/** Parses "YYYY-MM-DD" as a local date, avoiding the UTC shift of `new Date(iso)`. */
 export function parseISODate(iso: string): Date {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d)
@@ -74,7 +66,6 @@ export function toISODate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
-/** Every seating time the restaurant offers on a given date. */
 export function slotsForDate(iso: string): string[] {
   const hours = hoursFor(parseISODate(iso).getDay())
   if (!hours) return []
@@ -89,7 +80,6 @@ export function slotsForDate(iso: string): string[] {
   return slots
 }
 
-/** Evenings fill up; a Tuesday lunch does not. */
 function occupancyPressure(iso: string, time: string): number {
   const day = parseISODate(iso).getDay()
   const minutes = toMinutes(time)
@@ -125,10 +115,7 @@ export function createMockBookingApi(): BookingApi {
         if (isToday && toMinutes(time) <= nowMinutes + 60) {
           return { time, available: false }
         }
-        // A slot stays on offer while the party can still be seated somewhere —
-        // for more than four that means enough free tables side by side. This
-        // has to agree with getTableStatus, bookings included, or a slot can be
-        // offered that leaves the guest at a table step with nothing to pick.
+        
         const pressure = occupancyPressure(date, time)
         const booked = new Set(
           stored
@@ -169,9 +156,7 @@ export function createMockBookingApi(): BookingApi {
 
     async createBooking(request: BookingRequest) {
       await wait(LATENCY_MS * 2)
-      // The steps only ever offer open days and real seating times, but a tab
-      // left open past midnight can carry a stale one, so the hours are checked
-      // again here rather than trusted from the UI.
+      
       if (!slotsForDate(request.date).includes(request.time)) {
         throw new BookingError('The restaurant is closed at that time', 'unavailable')
       }
@@ -204,8 +189,7 @@ export function createMockBookingApi(): BookingApi {
 
     async cancelBooking(reference: string) {
       await wait(LATENCY_MS)
-      // The demo has nowhere to check a token against, so it just forgets the
-      // booking — which is all a preview build needs to show the flow.
+      
       writeStored(readStored().filter((booking) => booking.reference !== reference))
     },
   }

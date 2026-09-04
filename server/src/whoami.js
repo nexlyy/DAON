@@ -1,7 +1,3 @@
-/**
- * Prints the bot's name and the chat ids that have written to it — the quick
- * way to find the number for TELEGRAM_CHAT_ID without running the service.
- */
 import { loadEnv } from './env.js'
 import { getMe } from './telegram.js'
 

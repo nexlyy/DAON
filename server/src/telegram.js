@@ -27,8 +27,6 @@ export const sendMessage = (token, chatId, text, keyboard) =>
     ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
   })
 
-/** Rewrites a message that has been acted on, so the buttons cannot be used
- *  twice and the staff can see what happened. */
 export const editMessage = (token, chatId, messageId, text) =>
   call(token, 'editMessageText', {
     chat_id: chatId,
@@ -38,15 +36,9 @@ export const editMessage = (token, chatId, messageId, text) =>
     disable_web_page_preview: true,
   })
 
-/** Telegram spins the button until this is answered. */
 export const answerCallback = (token, id, text) =>
   call(token, 'answerCallbackQuery', { callback_query_id: id, text, show_alert: false })
 
-/**
- * Long polling, only so the restaurant can find its own chat id: whoever sends
- * /start gets the number back, and the first one to do so is remembered when
- * no chat is configured yet.
- */
 export async function pollUpdates(token, offset, handlers, timeout = 50) {
   const updates = await call(token, 'getUpdates', {
     offset,

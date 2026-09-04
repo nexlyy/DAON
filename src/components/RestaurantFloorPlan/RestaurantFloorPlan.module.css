@@ -1,8 +1,7 @@
 .wrap {
   display: grid;
   gap: 0.75rem;
-  /* The step panel lays its children out with `justify-items: start`, so the
-     plan has to claim the full column itself. */
+  
   width: 100%;
   transition: opacity 0.3s var(--ease);
 }
@@ -22,9 +21,7 @@
   display: block;
   width: 100%;
   height: auto;
-  /* At rest a vertical swipe still scrolls the page — the map is tall, and a
-     dead zone in the middle of the step would be worse than no map. Once the
-     guest has zoomed in, the drag belongs to the plan. */
+  
   touch-action: pan-y;
 }
 
@@ -37,8 +34,6 @@
   cursor: grabbing;
 }
 
-/* Zoom controls sit on the drawing rather than beside it, so the map keeps the
-   full width it needs. */
 .zoom {
   position: absolute;
   right: 0.6rem;
@@ -86,7 +81,6 @@
   stroke-width: 3;
 }
 
-/* The Ogródek is a terrace, not a room. */
 .room[data-outdoor] {
   fill: #f2f0e4;
 }
@@ -133,8 +127,6 @@
   fill: none;
   stroke-dasharray: 14 9;
 }
-
-/* Tables ----------------------------------------------------------------- */
 
 .table {
   transition: transform 0.35s var(--ease-out);

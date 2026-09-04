@@ -4,16 +4,10 @@ import { copyFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { hoursFor, restaurant, weekOrder } from './src/data/restaurant'
 
-/** Routes that get their own index.html so Pages answers 200 instead of 404. */
-const ROUTES = ['menu', 'reservation']
+const ROUTES = ['menu', 'reservation', 'about', 'contact']
 
-// GitHub Pages serves the site from /<repo>/, so the base path is configurable
-// through BASE_PATH and defaults to the repository name.
 const base = process.env.BASE_PATH ?? '/DAON/'
 
-// GitHub Pages has no SPA rewrite rule. Known routes get a copy of the shell so
-// they answer 200, and 404.html catches everything else — a typo in the URL then
-// still loads the app, which renders its own not-found page.
 function spaFallback() {
   return {
     name: 'spa-fallback',
@@ -29,11 +23,6 @@ function spaFallback() {
   }
 }
 
-/**
- * What Google is told about the restaurant. Built from `data/restaurant.ts` so
- * the address and the hours cannot drift from the ones on the page — an earlier
- * hand-written copy of this had the restaurant in the wrong city.
- */
 function structuredData() {
   const DAY_NAMES = [
     'Sunday',
@@ -73,7 +62,7 @@ function structuredData() {
         closes: hours![1],
       })),
     sameAs: [restaurant.links.instagram],
-    hasMenu: 'https://daon.pl/menu/',
+    hasMenu: 'https://daon.pl/menu',
     acceptsReservations: 'True',
   }
 

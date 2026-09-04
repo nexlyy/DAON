@@ -27,7 +27,6 @@ import styles from './ReservationFlow.module.css'
 const STEPS = ['date', 'time', 'guests', 'table', 'confirm'] as const
 type Step = (typeof STEPS)[number]
 
-/** Środek is a passage between the two rooms; nothing is seated there. */
 const zonesWithTables = floorPlan.zones.filter((zone) =>
   floorPlan.tables.some((table) => table.zone === zone.id),
 )
@@ -41,12 +40,10 @@ export function ReservationFlow() {
   const [partySize, setPartySize] = useState<number | null>(null)
   const [tableIds, setTableIds] = useState<string[]>([])
   const planRef = useRef<FloorPlanHandle>(null)
-  /** A booking this browser already made and has not been to yet. */
+  
   const [saved, setSaved] = useState<SavedBooking | null>(() => readBooking())
   const [dropping, setDropping] = useState(false)
 
-  // The staff can cancel from Telegram, and the browser would go on showing a
-  // table that no longer exists — so the remembered booking checks itself.
   useEffect(() => {
     if (!saved) return
     let cancelled = false
@@ -54,25 +51,23 @@ export function ReservationFlow() {
       .lookupBooking(saved.reference, saved.token)
       .then((found) => {
         if (cancelled) return
-        // `null` is the server saying it has no such booking; anything other
-        // than confirmed means the table has been given back.
+        
         if (found === null || found.status !== 'confirmed') {
           forgetBooking()
           setSaved(null)
         }
       })
       .catch(() => {
-        // Could not ask. Leave what the browser remembers alone.
+        
       })
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [saved?.reference])
 
   const [closedDates, setClosedDates] = useState<string[]>([])
-  /** The API could not be reached. Without this an empty list of times reads as
-   *  a full restaurant, which is the opposite of what has happened. */
+  
   const [offline, setOffline] = useState(false)
   const [slots, setSlots] = useState<TimeSlot[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
@@ -90,7 +85,6 @@ export function ReservationFlow() {
   const panelRef = useRef<HTMLDivElement>(null)
   const firstRender = useRef(true)
 
-  // Closed dates only depend on the opening hours, so they load once.
   useEffect(() => {
     const from = new Date()
     const to = new Date()
@@ -114,8 +108,6 @@ export function ReservationFlow() {
     }
   }, [])
 
-  // Party size is not known while the guest is still on the time step, so the
-  // slot query asks for "any table at all" and the table step narrows it later.
   useEffect(() => {
     if (!date) return
     let cancelled = false
@@ -167,8 +159,6 @@ export function ReservationFlow() {
     }
   }, [date, time, partySize])
 
-  // A change of party size or a table going in the meantime can invalidate the
-  // group; rebuild it around the same first table, and drop it if that fails.
   useEffect(() => {
     if (tableIds.length === 0) return
     const stillFree = (id: string) => (status[id] ?? 'available') === 'available'
@@ -177,7 +167,6 @@ export function ReservationFlow() {
     if (!unchanged) setTableIds(rebuilt ?? [])
   }, [partySize, status, tableIds])
 
-  // Move focus to the new step so keyboard and screen-reader users follow along.
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false
@@ -305,8 +294,7 @@ export function ReservationFlow() {
           aria-label={t(`reservation.steps.${step}`)}
           key={step}
         >
-          {/* No accounts and nothing sent to the guest, so this is the only
-              place they can find their booking again. */}
+          
           {saved && step === 'date' && !booking && (
             <div className={styles.upcoming}>
               <p className={styles.upcomingTitle}>{t('reservation.upcoming.title')}</p>
@@ -395,9 +383,6 @@ export function ReservationFlow() {
                 onSelect={(table: FloorTable) => chooseTable(table.id)}
               />
 
-              {/* The list carries the whole restaurant too: tapping a small
-                  table on the map is fiddly, and this is what a screen reader
-                  reads out. */}
               <div className={styles.tableList}>
                 <p className={styles.tableListTitle}>{t('reservation.table.list')}</p>
                 {zonesWithTables.map((zone) => {
@@ -589,7 +574,6 @@ export function ReservationFlow() {
         </aside>
       </div>
 
-      {/* Repeated below the panel so the actions stay reachable on phones */}
       <div className={styles.mobileBar}>
         {stepIndex > 0 && (
           <button type="button" className="btn btn--ghost" onClick={back}>
@@ -642,8 +626,7 @@ function SummaryRow({
 
 function Legend() {
   const { t } = useI18n()
-  // `disabled` is for tables out of service, of which there are none; the
-  // hatched tables a guest sees are the ones with no free neighbour to join.
+  
   const states = ['available', 'selected', 'occupied', 'noJoin'] as const
 
   return (

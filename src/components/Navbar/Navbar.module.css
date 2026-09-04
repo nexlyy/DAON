@@ -134,8 +134,7 @@
 .scrim {
   position: fixed;
   inset: 0;
-  /* Under the bar, so the burger stays tappable, but over everything else on
-     the page — the menu's sticky filter sits at 40. */
+  
   z-index: 90;
   background: rgba(41, 33, 24, 0.34);
   opacity: 0;
@@ -214,8 +213,6 @@
   width: 100%;
 }
 
-/* Two order buttons plus the reservation is a lot of bar; the quieter one goes
-   first when the width runs out. */
 @media (max-width: 1180px) {
   .actions .pickup {
     display: none;

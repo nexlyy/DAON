@@ -4,7 +4,6 @@ import { useI18n } from '@/i18n/useI18n'
 import styles from './LanguageSwitcher.module.css'
 
 interface Props {
-  /** `menu` is the compact popover in the navbar; `inline` lists all three. */
   variant?: 'menu' | 'inline'
 }
 

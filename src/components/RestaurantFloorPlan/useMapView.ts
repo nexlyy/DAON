@@ -10,20 +10,12 @@ export interface ViewBox {
 interface Options {
   width: number
   height: number
-  /** How far in the guest may zoom, as a multiple of the fitted view. */
+
   maxZoom?: number
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-/**
- * Pan and zoom for the floor plan, driven by the SVG's own viewBox rather than
- * a CSS transform — strokes and type stay crisp at every scale, and the tables
- * keep their real hit areas.
- *
- * The whole restaurant is on screen at rest; a guest who wants a closer look at
- * one corner pinches, drags, or uses the buttons.
- */
 export function useMapView({ width, height, maxZoom = 4 }: Options) {
   const fitted: ViewBox = { x: 0, y: 0, w: width, h: height }
   const [view, setView] = useState<ViewBox>(fitted)
@@ -33,13 +25,11 @@ export function useMapView({ width, height, maxZoom = 4 }: Options) {
     null,
   )
   const drag = useRef<{ x: number; y: number; view: ViewBox } | null>(null)
-  /** Set once a gesture has moved far enough to be a drag, so the pointerup
-   *  that ends it does not also select whatever table it landed on. */
+
   const moved = useRef(false)
 
   const zoomed = view.w < width - 1
 
-  /** Keeps the view inside the plan, with a little slack at the edges. */
   const settle = useCallback(
     (next: ViewBox): ViewBox => {
       const w = clamp(next.w, width / maxZoom, width)
@@ -57,7 +47,6 @@ export function useMapView({ width, height, maxZoom = 4 }: Options) {
 
   const reset = useCallback(() => setView(fitted), [width, height])
 
-  /** Zooms by `factor` around a point in the plan's own coordinates. */
   const zoomAt = useCallback(
     (factor: number, focus?: { x: number; y: number }) =>
       setView((current) => {
@@ -75,7 +64,6 @@ export function useMapView({ width, height, maxZoom = 4 }: Options) {
     [width, height, maxZoom, settle],
   )
 
-  /** Brings a rectangle of the plan into view, padded, without over-zooming. */
   const focusOn = useCallback(
     (box: { x: number; y: number; w: number; h: number }, pad = 120) => {
       setView((current) => {
@@ -93,7 +81,6 @@ export function useMapView({ width, height, maxZoom = 4 }: Options) {
     [width, height, maxZoom, settle],
   )
 
-  /** Screen pixels to plan units. */
   const toPlan = useCallback(
     (clientX: number, clientY: number) => {
       const svg = svgRef.current
@@ -170,8 +157,6 @@ export function useMapView({ width, height, maxZoom = 4 }: Options) {
     if (pointers.current.size === 0) drag.current = null
   }
 
-  // Wheel zoom has to be a non-passive native listener: React's synthetic wheel
-  // handler cannot call preventDefault, so the page would scroll underneath.
   useEffect(() => {
     const svg = svgRef.current
     if (!svg) return
@@ -191,7 +176,7 @@ export function useMapView({ width, height, maxZoom = 4 }: Options) {
     svgRef,
     view,
     zoomed,
-    /** True while the last gesture was a drag rather than a tap. */
+
     wasDragged: () => moved.current,
     handlers: {
       onPointerDown,

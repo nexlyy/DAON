@@ -30,7 +30,6 @@
   color: var(--text-faint);
 }
 
-/* A dot against today's row, so the guest can find it at a glance. */
 .hours > div[data-today] {
   color: var(--ink);
 }

@@ -27,7 +27,7 @@ export function DatePicker({ value, closedDates, onChange }: Props) {
 
   const months = list('months')
   const dayNames = list('days.narrow')
-  // Monday-first grid, which is what Polish and Korean calendars use.
+  
   const weekdays = [1, 2, 3, 4, 5, 6, 0]
 
   const cells = useMemo(() => {

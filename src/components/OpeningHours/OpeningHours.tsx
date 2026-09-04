@@ -3,16 +3,10 @@ import { useI18n } from '@/i18n/useI18n'
 import styles from './OpeningHours.module.css'
 
 interface Props {
-  /** `long` spells the weekday out, `short` abbreviates it for the footer. */
   labels?: 'long' | 'short'
   className?: string
 }
 
-/**
- * The week's hours, read from `data/restaurant.ts` and rendered wherever they
- * are needed — home page, contact block, footer — so there is only one list to
- * change when the kitchen changes.
- */
 export function OpeningHours({ labels = 'long', className }: Props) {
   const { t, list } = useI18n()
   const dayNames = list(`days.${labels}`)

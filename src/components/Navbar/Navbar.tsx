@@ -11,9 +11,9 @@ import styles from './Navbar.module.css'
 const links = [
   { to: '/', key: 'nav.home', end: true },
   { to: '/menu', key: 'nav.menu' },
-  { to: '/#about', key: 'nav.about' },
+  { to: '/about', key: 'nav.about' },
   { to: '/reservation', key: 'nav.reservation' },
-  { to: '/#contact', key: 'nav.contact' },
+  { to: '/contact', key: 'nav.contact' },
 ]
 
 export function Navbar() {
@@ -26,8 +26,6 @@ export function Navbar() {
 
   useLockBodyScroll(drawerOpen)
 
-  // The bar condenses once the hero is behind it, and slides away while the
-  // guest scrolls down so the menu photographs get the full screen.
   useEffect(() => {
     let previous = window.scrollY
 
@@ -43,9 +41,6 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Anything else that sticks to the top of the page (the menu filter bar) reads
-  // `--nav-offset` so it tucks under the bar and rides up with it when it hides.
-  // The bar is a different height on a phone, so a rotation has to re-measure.
   useEffect(() => {
     const header = headerRef.current
     if (!header) return
@@ -120,10 +115,6 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* The drawer is a sibling of the header, not a child: once the page
-          scrolls the header carries a backdrop-filter, and that makes it the
-          containing block for anything fixed inside it — the drawer was being
-          clipped to the height of the bar. */}
       <div
         className={styles.scrim}
         data-open={drawerOpen || undefined}
@@ -159,20 +150,6 @@ export function Navbar() {
 }
 
 function NavItem({ to, end, children }: { to: string; end?: boolean; children: ReactNode }) {
-  const location = useLocation()
-
-  // Hash links point at sections of the home page, so their active state has to
-  // follow the hash rather than the router match.
-  if (to.includes('#')) {
-    const hash = `#${to.split('#')[1]}`
-    const active = location.pathname === '/' && location.hash === hash
-    return (
-      <Link to={to} className={styles.navLink} data-active={active || undefined}>
-        {children}
-      </Link>
-    )
-  }
-
   return (
     <NavLink
       to={to}

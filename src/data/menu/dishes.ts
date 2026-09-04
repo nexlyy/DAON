@@ -2,22 +2,6 @@ import { allergensFor } from './allergens'
 import type { Allergen } from './allergens'
 import type { Dish, LocalizedText } from './types'
 
-/**
- * One entry per number printed in the menu — 01 to 98, no gaps and nothing
- * merged. Where the menu offers a choice under one heading ("Pork / 7.Łagodny
- * / 8.Ostry") each choice keeps its own number, price and card, because that
- * is what a guest reads out when ordering.
- *
- * Transcribed from the two files the restaurant supplied: "Eng and PL
- * (2026.01.09)" and "Kor (2025.01.09)". Numbers, prices and badges follow the
- * English/Polish edition, the newer of the two. The Korean edition is not a
- * translation — it tells where each dish comes from — so `ko` carries its own
- * text. Four entries disagree between the files; they are listed in the README.
- *
- * `number` is the number as printed, zero-padded, and it is the only thing the
- * interface ever shows. Sorting or regrouping the list cannot renumber a dish.
- */
-
 const ramenPorkDesc: LocalizedText = {
   en: 'Ramen with pork, vegetables and rich broth.',
   ko: '메인요리와 함께 샐러드, 과일등 데일리 반찬이 함꼐 서비스합니다.',
@@ -1647,8 +1631,6 @@ export const dishes: Dish[] = [
   },
 ]
 
-
-/** Allergens the menu lists against this dish, from the notice on page 23. */
 export function dishAllergens(dish: Dish): Allergen[] {
   return allergensFor([Number(dish.number)])
 }

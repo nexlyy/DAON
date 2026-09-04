@@ -31,7 +31,7 @@ export function Footer() {
             <Link to="/menu" className={styles.link}>
               {t('nav.menu')}
             </Link>
-            <Link to="/#about" className={styles.link}>
+            <Link to="/about" className={styles.link}>
               {t('nav.about')}
             </Link>
             <Link to="/reservation" className={styles.link}>

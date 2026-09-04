@@ -12,9 +12,7 @@
 .panel {
   display: grid;
   gap: 1.15rem;
-  /* `justify-items: start` made every child shrink-to-fit, which let the guest
-     grid size itself to six columns of max-content and pushed the page wider
-     than the screen. Children that want to be narrow say so themselves. */
+  
   justify-items: stretch;
   padding: clamp(1.3rem, 3vw, 2.4rem);
   background: var(--paper-warm);
@@ -71,8 +69,6 @@
   color: var(--ink);
 }
 
-/* Legend ----------------------------------------------------------------- */
-
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -119,13 +115,9 @@
   border-style: dashed;
 }
 
-/* Contact fields --------------------------------------------------------- */
-
 .fields {
   display: grid;
-  /* `min()` keeps the track from insisting on 13rem in a narrower card — that
-     is what pushed the notes field out past the panel on a small phone, and on
-     any phone where the reader has turned the system font up. */
+  
   grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
   gap: 1rem;
   width: 100%;
@@ -134,8 +126,7 @@
 .field {
   display: grid;
   gap: 0.4rem;
-  /* A grid item will not shrink below its content without this, and a text
-     control's content is its `cols`. */
+  
   min-width: 0;
 }
 
@@ -176,8 +167,7 @@
 }
 
 .field textarea {
-  /* Grows with what is typed where the browser supports it, so it starts as a
-     line rather than an empty box taking a third of the screen. */
+  
   field-sizing: content;
   min-height: 4.5rem;
   max-height: 40vh;
@@ -207,8 +197,6 @@
   line-height: 1.7;
   color: var(--text-soft);
 }
-
-/* Summary ---------------------------------------------------------------- */
 
 .summary {
   position: sticky;
@@ -304,8 +292,6 @@
     order: -1;
   }
 
-  /* Stacked above the panel, an empty summary is four dashes between the
-     guest and the calendar. */
   .summary[data-empty] {
     display: none;
   }
@@ -330,9 +316,6 @@
     flex: 1;
   }
 }
-
-/* Table list — the map is the picture of the room, this is the quick way to
-   pick a number, and the only way a screen reader gets one. */
 
 .tableRoom {
   display: grid;
@@ -426,8 +409,7 @@
 }
 
 @media (max-width: 720px) {
-  /* The summary stops being a card and becomes a line of what is chosen so
-     far — on step one that is nothing, so it stays out of the way entirely. */
+  
   .summary {
     gap: 0.5rem;
     padding: 0.75rem 0.9rem;
@@ -494,7 +476,6 @@
   }
 }
 
-/* The booking this browser already holds, offered back before a second one. */
 .upcoming {
   display: grid;
   gap: 0.4rem;

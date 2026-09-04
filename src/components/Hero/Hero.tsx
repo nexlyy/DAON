@@ -6,11 +6,6 @@ import { Vine } from '@/components/Ornament/Vine'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './Hero.module.css'
 
-/**
- * The cover of the printed menu is a gold hairline frame around a cream field
- * with the roof mark centred; the hero repeats that frame and hangs three
- * photographs off it the way the inside pages do.
- */
 export function Hero() {
   const { t } = useI18n()
 

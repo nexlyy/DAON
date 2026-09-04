@@ -22,6 +22,9 @@ export function App() {
       <main id="main" className={styles.main} data-switching={switching || undefined}>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          
+          <Route path="/about" element={<HomePage />} />
+          <Route path="/contact" element={<HomePage />} />
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="*" element={<NotFoundPage />} />
@@ -32,13 +35,18 @@ export function App() {
   )
 }
 
-/** Jumps to the top on navigation, or to the anchor when the URL carries one. */
+const SECTIONS: Record<string, string> = {
+  '/about': 'about',
+  '/contact': 'contact',
+}
+
 function ScrollBehaviour() {
   const { pathname, hash } = useLocation()
 
   useEffect(() => {
-    if (hash) {
-      const target = document.querySelector(hash)
+    const id = SECTIONS[pathname] ?? (hash ? hash.slice(1) : '')
+    if (id) {
+      const target = document.getElementById(id)
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' })
         return

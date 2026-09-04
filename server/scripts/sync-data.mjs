@@ -1,13 +1,3 @@
-/**
- * Copies the facts the API needs out of the site's own data files.
- *
- * The opening hours, the reservation rules and the floor plan live in
- * `src/data/*.ts` and are the single source for both halves of the project.
- * The API runs on a server with an older Node that cannot import TypeScript,
- * so this writes them out as JSON — run it after changing either file:
- *
- *   npm run sync:data
- */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -20,7 +10,7 @@ const load = (relative) => import(pathToFileURL(resolve(root, relative)).href)
 
 const { openingHours, reservation, restaurant } = await load('src/data/restaurant.ts')
 const { floorPlan } = await load('src/data/tables/floorPlan.ts')
-// The staff read their alerts in English, so the room names travel in English.
+
 const strings = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/en.json'), 'utf8'))
 
 const data = {
@@ -36,7 +26,7 @@ const data = {
     joinsWith: table.joinsWith ?? [],
     disabled: table.disabled ?? false,
   })),
-  // One name per room, whatever language the guest booked in.
+  
   zones: Object.fromEntries(
     floorPlan.zones.map((zone) => [zone.id, strings.floorPlan.zones[zone.labelKey] ?? zone.id]),
   ),

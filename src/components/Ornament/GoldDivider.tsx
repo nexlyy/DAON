@@ -1,9 +1,5 @@
 import styles from './GoldDivider.module.css'
 
-/**
- * The hairline-and-blossom rule that separates dishes on every page of the
- * printed menu.
- */
 export function GoldDivider({ className }: { className?: string }) {
   return (
     <div className={[styles.divider, className].filter(Boolean).join(' ')} aria-hidden="true">

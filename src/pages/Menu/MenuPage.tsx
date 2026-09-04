@@ -17,12 +17,11 @@ export function MenuPage() {
   const [category, setCategory] = useState('all')
   const [query, setQuery] = useState('')
   const [openDish, setOpenDish] = useState<Dish | null>(null)
-  // Stable identity: the dialog's focus effect depends on it, and a new
-  // arrow every render would re-run that effect and yank focus.
+  
   const closeDish = useCallback(() => setOpenDish(null), [])
   const deferredQuery = useDeferredValue(query)
 
-  useDocumentMeta({ title: t('meta.menuTitle'), description: t('meta.description') })
+  useDocumentMeta({ title: t('meta.menuTitle'), description: t('meta.description'), path: '/menu' })
 
   const visible = useMemo(() => {
     const needle = deferredQuery.trim().toLowerCase()
@@ -124,7 +123,6 @@ export function MenuPage() {
         )}
       </div>
 
-      {/* The notice printed at the back of the menu. */}
       <section className={`shell ${styles.allergy}`} aria-labelledby="allergy-title">
         <GoldDivider />
         <h2 className={styles.allergyTitle} id="allergy-title">

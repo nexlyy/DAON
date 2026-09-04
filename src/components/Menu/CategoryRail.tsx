@@ -12,7 +12,6 @@ export function CategoryRail({ active, onChange }: Props) {
   const { t, resolve, locale } = useI18n()
   const railRef = useRef<HTMLDivElement>(null)
 
-  // Keep the selected chip in view when the filter changes from elsewhere.
   useEffect(() => {
     const chip = railRef.current?.querySelector<HTMLElement>('[aria-pressed="true"]')
     chip?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' })

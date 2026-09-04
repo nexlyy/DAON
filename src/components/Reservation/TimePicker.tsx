@@ -10,7 +10,6 @@ interface Props {
   onChange: (time: string) => void
 }
 
-/** Anything before 16:00 is lunch service; the rest is dinner. */
 const DINNER_FROM = 16
 
 export function TimePicker({ slots, value, loading, onChange }: Props) {

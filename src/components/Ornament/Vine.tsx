@@ -1,10 +1,5 @@
 import styles from './Vine.module.css'
 
-/**
- * The gold line-art branch that runs down the left column of every menu page.
- * Purely decorative, so it is hidden from assistive tech and from narrow
- * screens where it would crowd the text.
- */
 export function Vine({ className, flip = false }: { className?: string; flip?: boolean }) {
   return (
     <svg

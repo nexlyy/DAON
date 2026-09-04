@@ -9,18 +9,6 @@ import type {
   TimeSlot,
 } from './types'
 
-/**
- * Ready for a real backend. Set VITE_BOOKING_API_URL and this adapter replaces
- * the mock — the UI never learns which one it is talking to.
- *
- * Expected endpoints:
- *   GET  {base}/closed-dates?from=…&to=…        -> string[]
- *   GET  {base}/slots?date=…&partySize=…        -> TimeSlot[]
- *   GET  {base}/tables?date=…&time=…&partySize= -> Record<tableId, status>
- *   POST {base}/bookings                        -> Booking
- *   POST {base}/bookings/cancel                 -> { ok: true }
- *   POST {base}/bookings/lookup                 -> { status }
- */
 export function createHttpBookingApi(baseUrl: string): BookingApi {
   const base = baseUrl.replace(/\/$/, '')
 
@@ -59,12 +47,6 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
 
-    /**
-     * Answers three ways on purpose. A record means the booking stands; `null`
-     * means the server says it does not exist; a thrown error means we could
-     * not ask — and a browser must not forget a real booking over one blip of
-     * bad signal.
-     */
     lookupBooking: async (reference: string, token: string) => {
       let response: Response
       try {

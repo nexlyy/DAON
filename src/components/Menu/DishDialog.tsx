@@ -25,8 +25,6 @@ export function DishDialog({ dish, onClose }: Props) {
   useEffect(() => {
     if (!dish) return
 
-    // Focus goes into the dialog and back to the card that opened it, so a
-    // keyboard user does not land at the top of the page on close.
     const opener = document.activeElement as HTMLElement | null
     closeRef.current?.focus()
 
@@ -37,7 +35,6 @@ export function DishDialog({ dish, onClose }: Props) {
       }
       if (event.key !== 'Tab') return
 
-      // Keep focus inside the dialog while it is open.
       const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
         'button, a[href], input, [tabindex]:not([tabindex="-1"])',
       )

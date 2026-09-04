@@ -7,8 +7,6 @@ import styles from './NotFoundPage.module.css'
 export function NotFoundPage() {
   const { t } = useI18n()
 
-  // Without this the tab keeps whatever title the last page set — usually the
-  // home page's, which reads as though the page loaded fine.
   useDocumentMeta({ title: t('meta.notFoundTitle'), description: t('meta.description') })
 
   return (

@@ -46,8 +46,7 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
         </span>
 
         <h2 className={styles.title}>{t('reservation.success.title')}</h2>
-        {/* The restaurant's number, not the guest's: nothing is sent to them,
-            and the only thing they might need is a way to reach the kitchen. */}
+        
         <p className={styles.body}>
           {t('reservation.success.body', { phone: restaurant.phone })}
         </p>
@@ -115,8 +114,6 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
           </Link>
         </div>
 
-        {/* Nothing is sent to the guest, so the way out has to live on the page
-            they end up on — and in their browser, for when they come back. */}
         {booking.cancelToken && (
           <div className={styles.cancel}>
             {cancelled ? (

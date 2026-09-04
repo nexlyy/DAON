@@ -1,11 +1,3 @@
-/**
- * Where reservations live.
- *
- * Supabase when it is configured, a JSON file next door when it is not — the
- * service runs either way, so a fresh checkout works before anyone has set up a
- * database. Both stores answer the same three questions: what is booked for a
- * given service, whether a set of tables is still free, and take this booking.
- */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -18,14 +10,10 @@ export class TablesTaken extends Error {
   }
 }
 
-/* ------------------------------------------------------------------ shared */
-
 const reference = () => {
   const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
   return `DAON-${id.slice(-5).toUpperCase()}`
 }
-
-/* ---------------------------------------------------------------- supabase */
 
 function supabaseStore(url, key) {
   const base = `${url.replace(/\/$/, '')}/rest/v1`
@@ -41,14 +29,13 @@ function supabaseStore(url, key) {
     const body = text ? JSON.parse(text) : null
 
     if (!response.ok) {
-      // The stored procedure raises this when a table went in the meantime.
+      
       if (body?.message?.includes('tables_taken')) throw new TablesTaken()
       throw new Error(body?.message ?? `Supabase said ${response.status}`)
     }
     return body
   }
 
-  /** One booking, by the code the guest was given. */
   async function find(reference) {
     const [row] = await call(
       `/reservations?select=*&reference=eq.${encodeURIComponent(reference)}&limit=1`,
@@ -85,7 +72,6 @@ function supabaseStore(url, key) {
 
     find,
 
-    /** Everything booked on a date, for the staff's own list. */
     async onDate(date) {
       const rows = await call(
         `/reservations?select=*&booking_date=eq.${date}&status=eq.confirmed&order=booking_time`,
@@ -102,7 +88,6 @@ function supabaseStore(url, key) {
       )
     },
 
-    /** Bookings still to come on this phone number — the spam ceiling. */
     async upcomingForPhone(phone, fromDate) {
       const rows = await call(
         `/reservations?select=reference&phone=eq.${encodeURIComponent(phone)}` +
@@ -119,8 +104,7 @@ function supabaseStore(url, key) {
         method: 'PATCH',
         body: JSON.stringify({ status: 'cancelled' }),
       })
-      // Freeing the tables is what lets someone else book them, and it is the
-      // step that must not be skipped; a stuck row would block a table.
+      
       await call(`/reservation_tables?reservation_id=eq.${found.id}`, { method: 'DELETE' })
       return { ...found, status: 'cancelled' }
     },
@@ -145,7 +129,6 @@ function supabaseStore(url, key) {
   }
 }
 
-/** The database's column names, back in the shape the site speaks. */
 function fromRow(row, tableIds) {
   return {
     id: row.id,
@@ -162,8 +145,6 @@ function fromRow(row, tableIds) {
     createdAt: row.created_at,
   }
 }
-
-/* -------------------------------------------------------------------- file */
 
 function fileStore() {
   const dir = resolve(root, 'data')

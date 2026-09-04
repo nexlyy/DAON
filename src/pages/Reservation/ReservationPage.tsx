@@ -5,7 +5,7 @@ import styles from './ReservationPage.module.css'
 
 export function ReservationPage() {
   const { t } = useI18n()
-  useDocumentMeta({ title: t('meta.reservationTitle'), description: t('meta.description') })
+  useDocumentMeta({ title: t('meta.reservationTitle'), description: t('meta.description'), path: '/reservation' })
 
   return (
     <div className={styles.page}>

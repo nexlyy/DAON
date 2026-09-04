@@ -7,12 +7,10 @@ import { useI18n } from '@/i18n/useI18n'
 import { useMapView } from './useMapView'
 import styles from './RestaurantFloorPlan.module.css'
 
-/** Lets the step around the plan bring a table into view. */
 export interface FloorPlanHandle {
   focusTable: (id: string) => void
 }
 
-/** What the picker draws for one table, once party size is taken into account. */
 export type TableState = TableAvailability | 'selected' | 'noJoin'
 
 interface Props {
@@ -38,8 +36,6 @@ export function tableState(
   const raw = status[table.id] ?? 'available'
   if (raw !== 'available') return raw
 
-  // A free table is only offerable when the party actually fits there — for
-  // more than four that means enough free neighbours to push against it.
   return resolveTableGroup(table.id, partySize, isFreeIn(status)) ? 'available' : 'noJoin'
 }
 
@@ -68,8 +64,6 @@ export function RestaurantFloorPlan({
     },
   }))
 
-  // Choosing a table from the list moves the map to it, so the guest can see
-  // where in the room they have just been put.
   const selectedKey = selectedIds.join(',')
   useEffect(() => {
     if (!map.zoomed || selectedIds.length === 0) return
@@ -82,7 +76,7 @@ export function RestaurantFloorPlan({
     const x1 = Math.max(...seats.map((seat) => seat.x + seat.w / 2))
     const y1 = Math.max(...seats.map((seat) => seat.y + seat.h / 2))
     map.focusOn({ x: x0, y: y0, w: x1 - x0, h: y1 - y0 })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [selectedKey])
 
   const { view } = map
@@ -142,8 +136,7 @@ export function RestaurantFloorPlan({
               state={tableState(table, status, selectedIds, partySize)}
               partySize={partySize}
               onSelect={(picked) => {
-                // A drag across the map ends on a table as often as not; that
-                // should move the view, not book a seat.
+                
                 if (map.wasDragged()) return
                 onSelect(picked)
               }}
@@ -264,7 +257,6 @@ function TableNode({
   )
 }
 
-/** Chairs on the sides the restaurant's plan puts them on. */
 function Seats({ table }: { table: FloorTable }) {
   const seats: { x: number; y: number }[] = []
   const gap = 13

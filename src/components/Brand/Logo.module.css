@@ -6,7 +6,6 @@
   line-height: 1;
 }
 
-/* The mark is a 600x182 alpha mask painted with the inherited colour. */
 .mark {
   display: block;
   flex: none;

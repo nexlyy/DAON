@@ -1,12 +1,9 @@
-/** The messages the restaurant reads. */
-
 const EMPTY = '—'
 const NL = '\n'
 
 const escapeHtml = (value) =>
   String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-/** "2026-09-11" -> "11-09-2026". Anything else is passed through untouched. */
 export function formatDate(iso) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso ?? ''))
   if (!match) return String(iso ?? EMPTY)
@@ -14,7 +11,6 @@ export function formatDate(iso) {
   return `${day}-${month}-${year}`
 }
 
-/** "19:30", or whatever came in if it is not a time. */
 export function formatTime(value) {
   const match = /^(\d{1,2}):(\d{2})$/.exec(String(value ?? ''))
   if (!match) return String(value ?? EMPTY)
@@ -26,12 +22,6 @@ const filled = (value) => {
   return text.length > 0 ? text : EMPTY
 }
 
-/**
- * The lines a booking is described by, shared by every message about it: when,
- * how many, where, who, and anything the guest wanted us to know. A blank note
- * becomes an em dash rather than an empty line, so nothing looks like it went
- * missing.
- */
 const describe = (booking) => [
   `Date: <b>${escapeHtml(formatDate(booking.date))}</b>`,
   `Time: <b>${escapeHtml(formatTime(booking.time))}</b>`,
@@ -51,7 +41,6 @@ export function buildMessage(booking) {
   return [heading('New reservation', booking.reference), '', ...describe(booking)].join(NL)
 }
 
-/** Who let the table go, once it has been let go. */
 export function cancelledMessage(booking, by) {
   return [
     heading('Reservation cancelled', booking.reference),
@@ -61,7 +50,6 @@ export function cancelledMessage(booking, by) {
   ].join(NL)
 }
 
-/** A day's bookings, for the staff's own list. */
 export function dayList(date, bookings) {
   const title = `<b>${escapeHtml(formatDate(date))}</b>`
   if (bookings.length === 0) return [title, '', 'No reservations.'].join(NL)
@@ -80,7 +68,6 @@ export function dayList(date, bookings) {
   return [`${title} — ${bookings.length} reservation(s)`, '', rows.join(NL + NL)].join(NL)
 }
 
-/** What the bot answers when someone asks it what it can do. */
 export function helpMessage(closures) {
   const list =
     closures.length === 0
@@ -104,7 +91,6 @@ export function helpMessage(closures) {
   ].join(NL)
 }
 
-/** The reply to /start, which is also how a chat registers itself. */
 export function welcomeMessage(chatId) {
   return [
     '<b>DAON — reservation alerts</b>',

@@ -12,13 +12,6 @@ export interface SavedBooking {
   name: string
 }
 
-/**
- * The guest's own copy of their booking, kept in this browser.
- *
- * There are no accounts and nothing is sent to them, so this is how the site
- * can still show "you have a table on Friday" and offer to cancel it. It holds
- * the cancel token, which is why it stays on the device and goes nowhere else.
- */
 export function rememberBooking(booking: Booking & { cancelToken?: string }): void {
   if (!booking.cancelToken) return
   const saved: SavedBooking = {
@@ -33,11 +26,9 @@ export function rememberBooking(booking: Booking & { cancelToken?: string }): vo
   try {
     window.localStorage.setItem(KEY, JSON.stringify(saved))
   } catch {
-    // A browser with storage turned off simply does not get the reminder.
   }
 }
 
-/** The saved booking, unless it is in the past — then it is cleared. */
 export function readBooking(): SavedBooking | null {
   try {
     const raw = window.localStorage.getItem(KEY)
@@ -64,6 +55,5 @@ export function forgetBooking(): void {
   try {
     window.localStorage.removeItem(KEY)
   } catch {
-    // Nothing to do; the entry expires by date anyway.
   }
 }

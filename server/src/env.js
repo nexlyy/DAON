@@ -5,11 +5,6 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 export const root = resolve(here, '..')
 
-/**
- * Reads server/.env into process.env without pulling in a dependency for it.
- * Values already in the environment win, so a host's own settings are not
- * overwritten by a file left behind on disk.
- */
 export function loadEnv(file = resolve(root, '.env')) {
   let text
   try {

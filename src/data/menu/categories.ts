@@ -1,10 +1,5 @@
 import type { MenuCategory } from './types'
 
-/**
- * Categories follow the printed DAON menu. `ko` is the brush heading that
- * appears on each page; the English and Polish names translate that heading —
- * the printed menu only carries the Korean one.
- */
 export const categories: MenuCategory[] = [
   {
     id: 'hansang',

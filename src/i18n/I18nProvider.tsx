@@ -15,18 +15,17 @@ const dictionaries: Record<Locale, Dictionary> = {
   ko: ko as Dictionary,
 }
 
-/** Text carried by the menu data, which may not have every language yet. */
 export type Translatable = { en: string } & Partial<Record<Locale, string>>
 
 export interface I18nValue {
   locale: Locale
   setLocale: (locale: Locale) => void
-  /** True for the few hundred ms after a manual language change. */
+  
   switching: boolean
   t: (key: string, params?: Params) => string
-  /** Reads an array out of the dictionary, e.g. weekday names. */
+  
   list: (key: string) => string[]
-  /** Picks the right language out of menu data, falling back to English. */
+  
   resolve: (text: Translatable | undefined) => string
   formatPrice: (amount: number) => string
   formatDate: (date: Date, options?: Intl.DateTimeFormatOptions) => string
@@ -63,8 +62,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
-  // A state updater has to be pure — React may call it more than once — so the
-  // "did it actually change" check reads a ref instead of the previous state.
   const setLocale = useCallback((next: Locale) => {
     if (current.current === next) return
     current.current = next
@@ -95,8 +92,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
 
     const formatPrice = (amount: number) =>
-      // The menu prints prices as "60PLN"; the site keeps the unit but adds
-      // a thin space so it reads as typography rather than as a code.
+      
       `${new Intl.NumberFormat(LOCALE_META[locale].htmlLang).format(amount)} PLN`
 
     const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions) =>

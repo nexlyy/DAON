@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 
-/** Freezes the page behind an open dialog or drawer without shifting layout. */
 export function useLockBodyScroll(locked: boolean): void {
   useEffect(() => {
     if (!locked) return

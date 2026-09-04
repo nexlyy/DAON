@@ -107,14 +107,11 @@
     font-size: 0.66rem;
   }
 
-  /* "Potwierdzenie" is wider than a fifth of a phone screen; let it wrap
-     rather than run under the edge of the rail and get cut. */
   .label {
     font-size: 0.55rem;
     letter-spacing: 0.03em;
     white-space: normal;
-    /* Hyphenate where the browser has a dictionary for the language, break
-       anywhere where it does not — either beats a word cut off at the edge. */
+    
     overflow-wrap: anywhere;
     hyphens: auto;
     line-height: 1.25;

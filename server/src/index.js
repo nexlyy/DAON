@@ -1,22 +1,3 @@
-/**
- * DAON reservation API.
- *
- * The site is a static build: it cannot hold a bot token, and it cannot be
- * trusted to know what is already booked. This service does both. It answers
- * the four calls the site's `BookingApi` makes, keeps the reservations in
- * Supabase (or a local file when none is configured), and tells the restaurant
- * about each one over Telegram.
- *
- *   GET  /closed-dates?from&to           dates the kitchen is shut
- *   GET  /slots?date&partySize           seating times, with what is still free
- *   GET  /tables?date&time&partySize     per-table availability
- *   POST /bookings                       take a booking, then tell the staff
- *   POST /bookings/cancel                give a table back
- *   GET  /health                         liveness, store, chat
- *
- * It also answers /start in Telegram with the chat id, which is how the
- * restaurant tells the service where to send.
- */
 import { createServer } from 'node:http'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -51,7 +32,7 @@ loadEnv()
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN?.trim()
 const PORT = Number(process.env.PORT ?? 8787)
-/** Comma-separated: the published site, plus a dev server while working. */
+
 const ORIGINS = (process.env.ALLOWED_ORIGIN ?? '*')
   .split(',')
   .map((origin) => origin.trim())
@@ -68,8 +49,6 @@ if (!TOKEN) {
 
 mkdirSync(STORE, { recursive: true })
 const store = createStore()
-
-/* -------------------------------------------------------------------- chat */
 
 function readChatId() {
   const configured = process.env.TELEGRAM_CHAT_ID?.trim()
@@ -89,11 +68,8 @@ function rememberChatId(chatId, who) {
   console.log(`Notifications will go to chat ${chatId} (${who}).`)
 }
 
-/* ------------------------------------------------------------------ limits */
-
-// Enough for a restaurant, not enough for a script.
 const RATE = { windowMs: 60 * 60 * 1000, max: 12 }
-/** One phone cannot hold the room: a party books, it does not farm tables. */
+
 const MAX_PER_PHONE = Number(process.env.MAX_BOOKINGS_PER_PHONE ?? 4)
 const hits = new Map()
 
@@ -104,8 +80,6 @@ function overRate(ip) {
   hits.set(ip, seen)
   return seen.length > RATE.max
 }
-
-/* ---------------------------------------------------------------- requests */
 
 const MAX_BODY = 8 * 1024
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
@@ -134,7 +108,6 @@ function readBody(request) {
   })
 }
 
-/** Everything a booking has to satisfy before it reaches the store. */
 function readBooking(raw) {
   if (!raw || typeof raw !== 'object') return { error: 'body must be an object' }
 
@@ -156,8 +129,6 @@ function readBooking(raw) {
     return { error: 'unknown table' }
   }
 
-  // The steps only ever offer open days and real seating times, but a tab left
-  // open overnight can carry a stale one.
   if (!slotsForDate(date).includes(time) || isClosed(date)) {
     return { error: 'the restaurant is closed at that time' }
   }
@@ -182,7 +153,6 @@ function readBooking(raw) {
   }
 }
 
-/** A booking in the words the staff read. */
 const toStaff = (booking) => ({
   reference: booking.reference,
   date: booking.date,
@@ -195,9 +165,6 @@ const toStaff = (booking) => ({
   notes: booking.notes,
 })
 
-/* ------------------------------------------------------------------ server */
-
-/** Echoes the caller's origin when it is one of ours — a list cannot be sent. */
 function allowOrigin(request) {
   const origin = request.headers.origin
   if (ORIGINS.includes('*')) return '*'
@@ -262,7 +229,7 @@ async function handle(request, response, url) {
 
     const slots = slotsForDate(date).map((time) => {
       const [h, m] = time.split(':').map(Number)
-      // An hour's notice: the kitchen cannot take a table booked for right now.
+      
       if (isToday && h * 60 + m <= nowMinutes + 60) return { time, available: false }
       return { time, available: seatsAnyone(partySize, booked.get(time) ?? new Set()) }
     })
@@ -286,8 +253,6 @@ async function handle(request, response, url) {
     return send(request, response, 200, status)
   }
 
-  // Is the booking this browser remembers still a booking? The staff can
-  // cancel from Telegram, and the guest has no other way to find that out.
   if (request.method === 'POST' && url.pathname === '/bookings/lookup') {
     let raw
     try {
@@ -321,8 +286,7 @@ async function handle(request, response, url) {
 
     const ref = text(raw.reference, 24).toUpperCase()
     const booking = ref ? await store.find(ref) : null
-    // The same answer either way: a wrong code and a wrong token must not be
-    // distinguishable, or the codes become guessable.
+    
     if (!booking || !tokenMatches(booking.id, raw.token)) {
       return send(request, response, 404, { error: 'no such booking' })
     }
@@ -357,7 +321,6 @@ async function handle(request, response, url) {
       return send(request, response, 429, { error: 'too many bookings on that number' })
     }
 
-    // The group has to still make sense against what is booked right now.
     const taken = await store.takenTables(booking.date, booking.time)
     if (booking.tableIds.some((id) => taken.has(id))) {
       return send(request, response, 409, { error: 'table is no longer available' })
@@ -387,8 +350,6 @@ async function handle(request, response, url) {
       return send(request, response, 500, { error: 'could not store the booking' })
     }
 
-    // The guest already has their table; a silent bot is the restaurant's
-    // problem to see in the log, not theirs to see on screen.
     const id = stored?.id ?? record.id
     const chatId = readChatId()
     if (chatId) {
@@ -399,8 +360,6 @@ async function handle(request, response, url) {
       console.warn('A booking came in but no chat is configured — send /start to the bot.')
     }
 
-    // The token is what lets the guest cancel later; it is theirs alone, so it
-    // goes back once and is never stored anywhere we could leak it from.
     return send(request, response, 200, {
       ...record,
       id,
@@ -419,15 +378,11 @@ const server = createServer((request, response) => {
   })
 })
 
-/* ------------------------------------------------------------------- start */
-
 const me = await getMe(TOKEN).catch((failure) => {
   console.error('The bot token was refused:', failure.message)
   process.exit(1)
 })
 
-// Bound to loopback: nginx is the only thing that should reach it. The firewall
-// says the same, but a service should not depend on a firewall rule staying put.
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`DAON API on :${PORT} — store: ${store.kind}, bot @${me.username}`)
   const chatId = readChatId()
@@ -438,9 +393,6 @@ server.listen(PORT, '127.0.0.1', () => {
   )
 })
 
-/* ---------------------------------------------------------------- the bot */
-
-/** "24-12-2026", the way it is written on the day, back to an ISO date. */
 function readDayFirstDate(value) {
   const match = /^(\d{1,2})[-.\/](\d{1,2})[-.\/](\d{4})$/.exec(String(value ?? '').trim())
   if (!match) return null
@@ -449,10 +401,6 @@ function readDayFirstDate(value) {
   return ISO_DATE.test(iso) ? iso : null
 }
 
-/**
- * The commands, with the Polish names they shipped with kept as aliases so a
- * staff member who learned those is not left tapping a dead command.
- */
 const COMMANDS = {
   '/help': 'help',
   '/pomoc': 'help',
@@ -470,11 +418,10 @@ const COMMANDS = {
   '/zamkniete': 'help',
 }
 
-/** Only the chat the restaurant registered may drive the bot. */
 const isStaff = (chatId) => String(chatId) === String(readChatId() ?? '')
 
 async function handleCommand(chatId, who, body) {
-  // Telegram appends @botname when a command is used in a group.
+  
   const [raw, ...rest] = body.split(/\s+/)
   const command = raw.split('@')[0].toLowerCase()
   const say = (text, keyboard) => sendMessage(TOKEN, chatId, text, keyboard).catch(() => {})
@@ -484,8 +431,6 @@ async function handleCommand(chatId, who, body) {
     return say(welcomeMessage(chatId))
   }
 
-  // Everything below changes what guests can book, so it stays with the chat
-  // the restaurant registered.
   if (!isStaff(chatId)) return
 
   const action = COMMANDS[command]
@@ -529,7 +474,6 @@ async function handleCommand(chatId, who, body) {
   )
 }
 
-/** The staff pressed "cancel" under a booking. */
 async function handleCancelButton(query) {
   const chatId = query.message?.chat?.id
   const reference = String(query.data ?? '').split(':')[1] ?? ''
@@ -548,7 +492,7 @@ async function handleCancelButton(query) {
 
   await store.cancel(reference)
   await answerCallback(TOKEN, query.id, 'Cancelled. The table is free again.').catch(() => {})
-  // Rewriting the message takes the button away, so it cannot be pressed twice.
+  
   await editMessage(
     TOKEN,
     chatId,

@@ -28,8 +28,6 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 
-  /* The menu is printed on flecked paper stock; two faint speckle layers get
-     close enough without shipping a texture image. */
   background-image:
     radial-gradient(circle at 18% 12%, rgba(216, 197, 166, 0.16), transparent 42%),
     radial-gradient(circle at 84% 68%, rgba(200, 176, 158, 0.13), transparent 46%);
@@ -42,9 +40,6 @@ svg {
   max-width: 100%;
 }
 
-/* Photographs are wrapped in <picture> to offer AVIF; the wrapper must not
-   become a layout box of its own, or the rules that size the img would be
-   addressing the wrong element. */
 picture {
   display: contents;
 }
@@ -73,9 +68,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  /* Fraunces carries an optical-size axis plus SOFT and WONK: a little
-     softening on the terminals and the tilted italic-ish `g` give headings the
-     warmth of letterpress rather than the flatness of a default serif. */
+  
   font-variation-settings: 'SOFT' 40, 'WONK' 1;
   font-weight: 500;
   line-height: 1.14;
@@ -98,8 +91,6 @@ p {
   background: var(--gold-wash);
   color: var(--ink);
 }
-
-/* ── Shared primitives ─────────────────────────────────────────────────── */
 
 .shell {
   width: min(100% - var(--gutter) * 2, var(--max-w));
@@ -144,8 +135,6 @@ p {
   line-height: 1.62;
   color: var(--text-soft);
 }
-
-/* Buttons ---------------------------------------------------------------- */
 
 .btn {
   --btn-bg: var(--ink);
@@ -233,18 +222,12 @@ p {
   transform: none;
 }
 
-/* Cards ------------------------------------------------------------------ */
-
 .paper-card {
   position: relative;
   background: var(--white);
   border: 1px solid rgba(198, 176, 150, 0.42);
   box-shadow: var(--shadow-soft);
 }
-
-/* Shelf ------------------------------------------------------------------
-   A grid of cards on a phone scrolls for the length of a novel. Below 640px
-   these sections turn into a swipeable shelf that bleeds to both edges. */
 
 @media (max-width: 640px) {
   .shelf {
@@ -271,12 +254,6 @@ p {
   }
 }
 
-/* Short viewports ---------------------------------------------------------
-   A phone in landscape is 375px tall but 800px wide, so the width-based rules
-   leave it with the desktop's vertical chrome — on the menu page that was a
-   71px bar over a 150px filter strip, better than half the screen. Section
-   padding and display type shrink by height here, whatever the width. */
-
 @media (max-height: 560px) {
   :root {
     --section-y: 2.5rem;
@@ -287,8 +264,6 @@ p {
     padding-block: 0.7em;
   }
 }
-
-/* Motion ----------------------------------------------------------------- */
 
 @keyframes daon-rise {
   from {

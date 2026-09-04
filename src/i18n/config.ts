@@ -4,7 +4,6 @@ export type Locale = (typeof LOCALES)[number]
 
 export const DEFAULT_LOCALE: Locale = 'en'
 
-/** Key used to remember a language the guest picked by hand. */
 export const LOCALE_STORAGE_KEY = 'daon.locale'
 
 export const LOCALE_META: Record<Locale, { label: string; english: string; htmlLang: string }> = {

@@ -20,8 +20,7 @@ import styles from './HomePage.module.css'
 export function HomePage() {
   const { t, resolve, formatPrice, locale } = useI18n()
   const [openDish, setOpenDish] = useState<Dish | null>(null)
-  // Stable identity: the dialog's focus effect depends on it, and a new
-  // arrow every render would re-run that effect and yank focus.
+  
   const closeDish = useCallback(() => setOpenDish(null), [])
 
   useDocumentMeta({ title: t('meta.title'), description: t('meta.description') })
@@ -39,7 +38,6 @@ export function HomePage() {
     <>
       <Hero />
 
-      {/* About ------------------------------------------------------------ */}
       <section className={`section ${styles.about}`} id="about">
         <div className={`shell ${styles.aboutInner}`}>
           <div className={`reveal ${styles.aboutCopy}`} ref={aboutRef}>
@@ -83,7 +81,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Signature dishes ------------------------------------------------- */}
       <section className={`section ${styles.signature}`}>
         <div className="shell">
           <header className={`reveal ${styles.sectionHead}`} ref={signatureRef}>
@@ -112,7 +109,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Categories ------------------------------------------------------- */}
       <section className={`section ${styles.categories}`}>
         <div className="shell">
           <header className={`reveal ${styles.sectionHead}`} ref={categoriesRef}>
@@ -141,8 +137,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Visit ------------------------------------------------------------ */}
-      <section className={`section ${styles.visit}`} id="visit">
+      <section className={`section ${styles.visit}`} id="contact">
         <div className={`shell ${styles.visitInner}`}>
           <div className={`reveal ${styles.visitCopy}`} ref={visitRef}>
             <p className="eyebrow">{t('home.visit.eyebrow')}</p>
@@ -201,7 +196,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Reservation CTA -------------------------------------------------- */}
       <section className={styles.cta}>
         <div className={`shell ${styles.ctaInner}`}>
           <div className={`reveal ${styles.ctaCopy}`} ref={ctaRef}>
