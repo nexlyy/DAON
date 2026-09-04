@@ -1,0 +1,14 @@
+{
+  "name": "DAON — Korean Restaurant",
+  "short_name": "DAON",
+  "description": "Menu and table reservations for DAON, Dworcowa 8, Katowice.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbf8f3",
+  "theme_color": "#fbf8f3",
+  "icons": [
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
