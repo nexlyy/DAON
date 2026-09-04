@@ -6,7 +6,13 @@ import { hoursFor, restaurant, weekOrder } from './src/data/restaurant'
 
 const ROUTES = ['menu', 'reservation', 'about', 'contact']
 
-const base = process.env.BASE_PATH ?? '/DAON/'
+const requested = process.env.BASE_PATH ?? '/DAON/'
+
+const base = /^\/[\w./-]*$/.test(requested) ? requested : '/'
+
+if (base !== requested) {
+  console.warn(`BASE_PATH was "${requested}"; building for "/" instead.`)
+}
 
 function spaFallback() {
   return {

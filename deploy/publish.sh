@@ -10,6 +10,12 @@
 
 set -eu
 
+# Git Bash rewrites a lone "/" in an argument or an environment value into the
+# path of its own installation, which produced a build whose every asset URL
+# began with /Program Files/Git. The build refuses such a value now as well.
+export MSYS_NO_PATHCONV=1
+export MSYS2_ARG_CONV_EXCL='*'
+
 HOST="${DAON_HOST:-mcr}"
 ROOT="${DAON_ROOT:-/var/www/daon}"
 
