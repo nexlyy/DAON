@@ -59,16 +59,27 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
 
+    /**
+     * Answers three ways on purpose. A record means the booking stands; `null`
+     * means the server says it does not exist; a thrown error means we could
+     * not ask — and a browser must not forget a real booking over one blip of
+     * bad signal.
+     */
     lookupBooking: async (reference: string, token: string) => {
+      let response: Response
       try {
-        return await request<{ status: string }>('/bookings/lookup', {
+        response = await fetch(`${base}/bookings/lookup`, {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ reference, token }),
         })
       } catch {
-        // Gone, or unreachable. Either way there is nothing to show.
-        return null
+        throw new BookingError('Network request failed')
       }
+
+      if (response.status === 404) return null
+      if (!response.ok) throw new BookingError(`Lookup failed with ${response.status}`)
+      return (await response.json()) as { status: string }
     },
 
     cancelBooking: async (reference: string, token: string) => {

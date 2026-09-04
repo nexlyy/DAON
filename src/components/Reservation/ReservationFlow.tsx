@@ -50,13 +50,20 @@ export function ReservationFlow() {
   useEffect(() => {
     if (!saved) return
     let cancelled = false
-    bookingApi.lookupBooking(saved.reference, saved.token).then((found) => {
-      if (cancelled || !found) return
-      if (found.status !== 'confirmed') {
-        forgetBooking()
-        setSaved(null)
-      }
-    })
+    bookingApi
+      .lookupBooking(saved.reference, saved.token)
+      .then((found) => {
+        if (cancelled) return
+        // `null` is the server saying it has no such booking; anything other
+        // than confirmed means the table has been given back.
+        if (found === null || found.status !== 'confirmed') {
+          forgetBooking()
+          setSaved(null)
+        }
+      })
+      .catch(() => {
+        // Could not ask. Leave what the browser remembers alone.
+      })
     return () => {
       cancelled = true
     }
