@@ -267,9 +267,9 @@
     }
   ],
   "zones": {
-    "sala1": "Sala 1",
-    "srodek": "Środek",
-    "sala2": "Sala 2",
-    "ogrodek": "Ogródek"
+    "sala1": "Room 1",
+    "srodek": "Middle",
+    "sala2": "Room 2",
+    "ogrodek": "Garden"
   }
 }

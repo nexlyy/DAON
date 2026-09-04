@@ -19,6 +19,7 @@ import type {
  *   GET  {base}/tables?date=…&time=…&partySize= -> Record<tableId, status>
  *   POST {base}/bookings                        -> Booking
  *   POST {base}/bookings/cancel                 -> { ok: true }
+ *   POST {base}/bookings/lookup                 -> { status }
  */
 export function createHttpBookingApi(baseUrl: string): BookingApi {
   const base = baseUrl.replace(/\/$/, '')
@@ -57,6 +58,18 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
 
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
+
+    lookupBooking: async (reference: string, token: string) => {
+      try {
+        return await request<{ status: string }>('/bookings/lookup', {
+          method: 'POST',
+          body: JSON.stringify({ reference, token }),
+        })
+      } catch {
+        // Gone, or unreachable. Either way there is nothing to show.
+        return null
+      }
+    },
 
     cancelBooking: async (reference: string, token: string) => {
       await request<{ ok: boolean }>('/bookings/cancel', {

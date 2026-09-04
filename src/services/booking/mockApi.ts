@@ -196,6 +196,12 @@ export function createMockBookingApi(): BookingApi {
       return { ...booking, cancelToken: `demo-${id}` }
     },
 
+    async lookupBooking(reference: string) {
+      await wait(LATENCY_MS / 2)
+      const found = readStored().find((booking) => booking.reference === reference)
+      return found ? { status: found.status } : null
+    },
+
     async cancelBooking(reference: string) {
       await wait(LATENCY_MS)
       // The demo has nowhere to check a token against, so it just forgets the

@@ -3,7 +3,8 @@
     "title": "DAON — Restauracja koreańska",
     "description": "DAON to koreańska restauracja: ramen domowej roboty, grill koreański, kociołki i kimbap. Zobacz menu i zarezerwuj stolik.",
     "menuTitle": "Menu — DAON Restauracja koreańska",
-    "reservationTitle": "Rezerwacja stolika — DAON Restauracja koreańska"
+    "reservationTitle": "Rezerwacja stolika — DAON Restauracja koreańska",
+    "notFoundTitle": "Nie znaleziono strony — DAON"
   },
   "nav": {
     "home": "Strona główna",
@@ -111,7 +112,7 @@
     },
     "time": {
       "title": "Wybierz godzinę",
-      "subtitle": "Stolik trzymamy 15 minut po zarezerwowanej godzinie.",
+      "subtitle": "Wybierz godzinę, o której chcesz usiąść.",
       "lunch": "Obiad",
       "dinner": "Kolacja",
       "none": "Brak wolnych godzin tego dnia."

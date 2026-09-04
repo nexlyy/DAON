@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '@/i18n/useI18n'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { RoofMark } from '@/components/Brand/Logo'
 import styles from './NotFoundPage.module.css'
 
 export function NotFoundPage() {
   const { t } = useI18n()
+
+  // Without this the tab keeps whatever title the last page set — usually the
+  // home page's, which reads as though the page loaded fine.
+  useDocumentMeta({ title: t('meta.notFoundTitle'), description: t('meta.description') })
 
   return (
     <div className={styles.page}>

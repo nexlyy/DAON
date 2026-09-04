@@ -66,4 +66,9 @@ export interface BookingApi {
   createBooking(request: BookingRequest): Promise<Booking>
   /** Gives the table back. Only the real API can do it; the demo pretends. */
   cancelBooking(reference: string, token: string): Promise<void>
+  /**
+   * Is that booking still standing? The staff can cancel from their phone, so
+   * a browser holding one has to be able to ask. `null` when it is gone.
+   */
+  lookupBooking(reference: string, token: string): Promise<{ status: string } | null>
 }

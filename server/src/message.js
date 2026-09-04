@@ -1,4 +1,4 @@
-/** The messages the restaurant reads, in Polish. */
+/** The messages the restaurant reads. */
 
 const EMPTY = '—'
 const NL = '\n'
@@ -33,29 +33,29 @@ const filled = (value) => {
  * missing.
  */
 const describe = (booking) => [
-  `Data: <b>${escapeHtml(formatDate(booking.date))}</b>`,
-  `Godzina: <b>${escapeHtml(formatTime(booking.time))}</b>`,
-  `Liczba osób: <b>${escapeHtml(filled(booking.partySize))}</b>`,
-  `Stoliki: <b>${escapeHtml(filled(booking.tables))}</b>${
+  `Date: <b>${escapeHtml(formatDate(booking.date))}</b>`,
+  `Time: <b>${escapeHtml(formatTime(booking.time))}</b>`,
+  `Guests: <b>${escapeHtml(filled(booking.partySize))}</b>`,
+  `Tables: <b>${escapeHtml(filled(booking.tables))}</b>${
     booking.zone ? ` (${escapeHtml(booking.zone)})` : ''
   }`,
-  `Imię: ${escapeHtml(filled(booking.name))}`,
-  `Telefon: ${escapeHtml(filled(booking.phone))}`,
-  `Uwagi: ${escapeHtml(filled(booking.notes))}`,
+  `Name: ${escapeHtml(filled(booking.name))}`,
+  `Phone: ${escapeHtml(filled(booking.phone))}`,
+  `Notes: ${escapeHtml(filled(booking.notes))}`,
 ]
 
 const heading = (title, reference) =>
   `<b>${title}</b>${reference ? ` · ${escapeHtml(reference)}` : ''}`
 
 export function buildMessage(booking) {
-  return [heading('Nowa rezerwacja', booking.reference), '', ...describe(booking)].join(NL)
+  return [heading('New reservation', booking.reference), '', ...describe(booking)].join(NL)
 }
 
 /** Who let the table go, once it has been let go. */
 export function cancelledMessage(booking, by) {
   return [
-    heading('Rezerwacja anulowana', booking.reference),
-    `Anulowana przez: ${escapeHtml(by)}`,
+    heading('Reservation cancelled', booking.reference),
+    `Cancelled by: ${escapeHtml(by)}`,
     '',
     ...describe(booking),
   ].join(NL)
@@ -64,46 +64,54 @@ export function cancelledMessage(booking, by) {
 /** A day's bookings, for the staff's own list. */
 export function dayList(date, bookings) {
   const title = `<b>${escapeHtml(formatDate(date))}</b>`
-  if (bookings.length === 0) return [title, '', 'Brak rezerwacji.'].join(NL)
+  if (bookings.length === 0) return [title, '', 'No reservations.'].join(NL)
 
   const rows = bookings.map((booking) => {
     const note = String(booking.notes ?? '').trim()
     return [
       `<b>${escapeHtml(formatTime(booking.time))}</b> · ${escapeHtml(filled(booking.name))}`,
-      `${escapeHtml(filled(booking.partySize))} os. · stoliki ${escapeHtml(
+      `${escapeHtml(filled(booking.partySize))} guests · tables ${escapeHtml(
         filled(booking.tables),
       )}`,
       `${escapeHtml(filled(booking.phone))}${note ? ` · ${escapeHtml(note)}` : ''}`,
     ].join(NL)
   })
 
-  return [
-    `${title} — rezerwacji: ${bookings.length}`,
-    '',
-    rows.join(NL + NL),
-  ].join(NL)
+  return [`${title} — ${bookings.length} reservation(s)`, '', rows.join(NL + NL)].join(NL)
 }
 
 /** What the bot answers when someone asks it what it can do. */
 export function helpMessage(closures) {
   const list =
     closures.length === 0
-      ? 'Brak dodatkowych dni zamknięcia.'
+      ? 'No extra closed days.'
       : closures
           .map((row) => `• ${formatDate(row.date)}${row.note ? ` — ${escapeHtml(row.note)}` : ''}`)
           .join(NL)
 
   return [
-    '<b>DAON — rezerwacje</b>',
+    '<b>DAON — reservations</b>',
     '',
-    '/dzisiaj — rezerwacje na dziś',
-    '/jutro — rezerwacje na jutro',
-    '/dzien 24-12-2026 — rezerwacje na wybrany dzień',
-    '/zamknij 24-12-2026 Wigilia — zamknij dzień dla rezerwacji',
-    '/otworz 24-12-2026 — otwórz go z powrotem',
-    '/zamkniete — lista zamkniętych dni',
+    '/today — reservations for today',
+    '/tomorrow — reservations for tomorrow',
+    '/day 24-12-2026 — reservations for a given day',
+    '/close 24-12-2026 Christmas Eve — close a day for bookings',
+    '/open 24-12-2026 — open it again',
+    '/closed — the days currently closed',
     '',
-    '<b>Zamknięte dni</b>',
+    '<b>Closed days</b>',
     list,
+  ].join(NL)
+}
+
+/** The reply to /start, which is also how a chat registers itself. */
+export function welcomeMessage(chatId) {
+  return [
+    '<b>DAON — reservation alerts</b>',
+    '',
+    `This chat: <code>${chatId}</code>`,
+    'Reservations from the website will arrive here.',
+    '',
+    'Send /help to see what else I can do.',
   ].join(NL)
 }

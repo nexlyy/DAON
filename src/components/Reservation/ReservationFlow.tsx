@@ -45,6 +45,24 @@ export function ReservationFlow() {
   const [saved, setSaved] = useState<SavedBooking | null>(() => readBooking())
   const [dropping, setDropping] = useState(false)
 
+  // The staff can cancel from Telegram, and the browser would go on showing a
+  // table that no longer exists — so the remembered booking checks itself.
+  useEffect(() => {
+    if (!saved) return
+    let cancelled = false
+    bookingApi.lookupBooking(saved.reference, saved.token).then((found) => {
+      if (cancelled || !found) return
+      if (found.status !== 'confirmed') {
+        forgetBooking()
+        setSaved(null)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saved?.reference])
+
   const [closedDates, setClosedDates] = useState<string[]>([])
   /** The API could not be reached. Without this an empty list of times reads as
    *  a full restaurant, which is the opposite of what has happened. */

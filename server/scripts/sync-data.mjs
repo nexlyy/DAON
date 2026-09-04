@@ -20,7 +20,8 @@ const load = (relative) => import(pathToFileURL(resolve(root, relative)).href)
 
 const { openingHours, reservation, restaurant } = await load('src/data/restaurant.ts')
 const { floorPlan } = await load('src/data/tables/floorPlan.ts')
-const pl = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/pl.json'), 'utf8'))
+// The staff read their alerts in English, so the room names travel in English.
+const strings = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/en.json'), 'utf8'))
 
 const data = {
   generatedFrom: 'src/data/restaurant.ts, src/data/tables/floorPlan.ts',
@@ -35,9 +36,9 @@ const data = {
     joinsWith: table.joinsWith ?? [],
     disabled: table.disabled ?? false,
   })),
-  // The restaurant reads Polish whatever language the guest booked in.
+  // One name per room, whatever language the guest booked in.
   zones: Object.fromEntries(
-    floorPlan.zones.map((zone) => [zone.id, pl.floorPlan.zones[zone.labelKey] ?? zone.id]),
+    floorPlan.zones.map((zone) => [zone.id, strings.floorPlan.zones[zone.labelKey] ?? zone.id]),
   ),
 }
 

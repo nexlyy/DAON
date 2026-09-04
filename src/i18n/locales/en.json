@@ -3,7 +3,8 @@
     "title": "DAON — Korean Restaurant",
     "description": "DAON is a Korean restaurant serving handmade ramen, Korean BBQ, hot pots and kimbap. Browse the menu and reserve your table.",
     "menuTitle": "Menu — DAON Korean Restaurant",
-    "reservationTitle": "Book a Table — DAON Korean Restaurant"
+    "reservationTitle": "Book a Table — DAON Korean Restaurant",
+    "notFoundTitle": "Page not found — DAON"
   },
   "nav": {
     "home": "Home",
@@ -111,7 +112,7 @@
     },
     "time": {
       "title": "Pick a time",
-      "subtitle": "Tables are held for 15 minutes after the booked time.",
+      "subtitle": "Choose when you would like to sit down.",
       "lunch": "Lunch",
       "dinner": "Dinner",
       "none": "No times left on this date."

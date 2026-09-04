@@ -3,7 +3,8 @@
     "title": "DAON — 한국 레스토랑",
     "description": "다온은 수제라면, 바베큐, 전골, 김밥을 내는 한국 레스토랑입니다. 메뉴를 보고 테이블을 예약하세요.",
     "menuTitle": "메뉴 — DAON 한국 레스토랑",
-    "reservationTitle": "예약 — DAON 한국 레스토랑"
+    "reservationTitle": "예약 — DAON 한국 레스토랑",
+    "notFoundTitle": "페이지를 찾을 수 없습니다 — DAON"
   },
   "nav": {
     "home": "홈",
@@ -111,7 +112,7 @@
     },
     "time": {
       "title": "시간을 고르세요",
-      "subtitle": "예약 시간으로부터 15분간 자리를 잡아 둡니다.",
+      "subtitle": "앉으실 시간을 골라 주세요.",
       "lunch": "점심",
       "dinner": "저녁",
       "none": "이 날짜에는 남은 시간이 없습니다."
