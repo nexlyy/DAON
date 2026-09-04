@@ -22,9 +22,11 @@ can stay as it is.
 | CNAME | `www` | `daon.pl.` | 1 hour |
 
 The existing `A @ → WebsiteBuilder Site` points at the registrar's parking page
-and must be edited to the address above — GoDaddy will not let two A records for
-`@` disagree. The `www` CNAME is already right. The AAAA is optional; without it
-the site is simply IPv4-only.
+— today `daon.pl` answers `13.248.243.5` and `76.223.105.230`, which are
+GoDaddy's, not ours. Edit that record rather than adding a second one: two A
+records for `@` would send half the visitors to the parking page. The `www`
+CNAME is already right. The AAAA is optional; without it the site is simply
+IPv4-only.
 
 Leave the NS, SOA, `_domainconnect` and `_dmarc` records alone.
 
@@ -40,14 +42,16 @@ to an hour.
 
 ## 2. The server
 
+Already done: nginx answers to `daon.pl` on port 80, `/var/www/daon` holds a
+build made for a domain root, and the ACME path is open. The site can be seen
+before DNS moves:
+
 ```bash
-scp deploy/nginx-daon.conf mcr:/etc/nginx/sites-available/daon.pl
-ssh mcr ln -s /etc/nginx/sites-available/daon.pl /etc/nginx/sites-enabled/daon.pl
-ssh mcr mkdir -p /var/www/daon
+curl --resolve daon.pl:80:204.168.243.140 http://daon.pl/
 ```
 
-The config refers to a certificate that does not exist yet, so ask certbot for
-one before reloading nginx — it writes the files and reloads by itself:
+What is left is the certificate, and it cannot be issued until the name resolves
+to this machine. Certbot writes the HTTPS blocks and reloads nginx itself:
 
 ```bash
 ssh mcr certbot --nginx -d daon.pl -d www.daon.pl --agree-tos -m daonpolska@gmail.com --redirect
