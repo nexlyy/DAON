@@ -29,7 +29,7 @@ function supabaseStore(url, key) {
     const body = text ? JSON.parse(text) : null
 
     if (!response.ok) {
-      
+
       if (body?.message?.includes('tables_taken')) throw new TablesTaken()
       throw new Error(body?.message ?? `Supabase said ${response.status}`)
     }
@@ -51,23 +51,18 @@ function supabaseStore(url, key) {
   return {
     kind: 'supabase',
 
-    async takenTables(date, time) {
-      const rows = await call(
-        `/reservation_tables?select=table_id&booking_date=eq.${date}&booking_time=eq.${time}`,
-      )
-      return new Set(rows.map((row) => row.table_id))
-    },
-
-    async bookedOn(date) {
+    async holdsOn(date) {
       const rows = await call(
         `/reservation_tables?select=booking_time,table_id&booking_date=eq.${date}`,
       )
-      const byTime = new Map()
-      for (const row of rows) {
-        if (!byTime.has(row.booking_time)) byTime.set(row.booking_time, new Set())
-        byTime.get(row.booking_time).add(row.table_id)
-      }
-      return byTime
+      return rows.map((row) => ({ time: row.booking_time, tableId: row.table_id }))
+    },
+
+    async release(reference) {
+      const found = await find(reference)
+      if (!found) return null
+      await call(`/reservation_tables?reservation_id=eq.${found.id}`, { method: 'DELETE' })
+      return { ...found, tableIds: [] }
     },
 
     find,
@@ -104,7 +99,7 @@ function supabaseStore(url, key) {
         method: 'PATCH',
         body: JSON.stringify({ status: 'cancelled' }),
       })
-      
+
       await call(`/reservation_tables?reservation_id=eq.${found.id}`, { method: 'DELETE' })
       return { ...found, status: 'cancelled' }
     },
@@ -164,23 +159,23 @@ function fileStore() {
   return {
     kind: 'file',
 
-    async takenTables(date, time) {
-      const taken = new Set()
-      for (const row of read()) {
-        if (row.status === 'cancelled') continue
-        if (row.date === date && row.time === time) row.tableIds.forEach((id) => taken.add(id))
-      }
-      return taken
-    },
-
-    async bookedOn(date) {
-      const byTime = new Map()
+    async holdsOn(date) {
+      const holds = []
       for (const row of read()) {
         if (row.status === 'cancelled' || row.date !== date) continue
-        if (!byTime.has(row.time)) byTime.set(row.time, new Set())
-        row.tableIds.forEach((id) => byTime.get(row.time).add(id))
+        for (const tableId of row.tableIds) holds.push({ time: row.time, tableId })
       }
-      return byTime
+      return holds
+    },
+
+    async release(reference) {
+      const rows = read()
+      const found = rows.find((row) => row.reference === reference)
+      if (!found) return null
+      found.tableIds = []
+      found.releasedAt = new Date().toISOString()
+      write(rows)
+      return found
     },
 
     async find(reference) {

@@ -26,7 +26,7 @@ const data = {
     joinsWith: table.joinsWith ?? [],
     disabled: table.disabled ?? false,
   })),
-  
+
   zones: Object.fromEntries(
     floorPlan.zones.map((zone) => [zone.id, strings.floorPlan.zones[zone.labelKey] ?? zone.id]),
   ),

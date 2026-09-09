@@ -50,6 +50,15 @@ export function cancelledMessage(booking, by) {
   ].join(NL)
 }
 
+export function releasedMessage(booking) {
+  return [
+    heading('Table free again', booking.reference),
+    'The guests have left; the table is back in the calendar.',
+    '',
+    ...describe(booking),
+  ].join(NL)
+}
+
 export function dayList(date, bookings) {
   const title = `<b>${escapeHtml(formatDate(date))}</b>`
   if (bookings.length === 0) return [title, '', 'No reservations.'].join(NL)
@@ -82,6 +91,7 @@ export function helpMessage(closures) {
     '/today — reservations for today',
     '/tomorrow — reservations for tomorrow',
     '/day 24-12-2026 — reservations for a given day',
+    '/free DAON-XXXXX — guests left, free the table now',
     '/close 24-12-2026 Christmas Eve — close a day for bookings',
     '/open 24-12-2026 — open it again',
     '/closed — the days currently closed',

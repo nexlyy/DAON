@@ -9,6 +9,7 @@ import {
   rules,
   seatsAnyone,
   slotsForDate,
+  takenAt,
   tableById,
   tables,
   toISODate,
@@ -23,6 +24,7 @@ import {
   dayList,
   formatDate,
   helpMessage,
+  releasedMessage,
   welcomeMessage,
 } from './message.js'
 import { createStore, reference, TablesTaken } from './store.js'
@@ -222,16 +224,16 @@ async function handle(request, response, url) {
 
     if (isClosed(date)) return send(request, response, 200, [])
 
-    const booked = await store.bookedOn(date)
+    const holds = await store.holdsOn(date)
     const now = new Date()
     const isToday = toISODate(now) === date
     const nowMinutes = now.getHours() * 60 + now.getMinutes()
 
     const slots = slotsForDate(date).map((time) => {
       const [h, m] = time.split(':').map(Number)
-      
+
       if (isToday && h * 60 + m <= nowMinutes + 60) return { time, available: false }
-      return { time, available: seatsAnyone(partySize, booked.get(time) ?? new Set()) }
+      return { time, available: seatsAnyone(partySize, takenAt(time, holds)) }
     })
     return send(request, response, 200, slots)
   }
@@ -243,7 +245,7 @@ async function handle(request, response, url) {
       return send(request, response, 400, { error: 'date and time are required' })
     }
 
-    const taken = await store.takenTables(date, time)
+    const taken = takenAt(time, await store.holdsOn(date))
     const status = Object.fromEntries(
       tables.map((table) => [
         table.id,
@@ -286,7 +288,7 @@ async function handle(request, response, url) {
 
     const ref = text(raw.reference, 24).toUpperCase()
     const booking = ref ? await store.find(ref) : null
-    
+
     if (!booking || !tokenMatches(booking.id, raw.token)) {
       return send(request, response, 404, { error: 'no such booking' })
     }
@@ -321,7 +323,7 @@ async function handle(request, response, url) {
       return send(request, response, 429, { error: 'too many bookings on that number' })
     }
 
-    const taken = await store.takenTables(booking.date, booking.time)
+    const taken = takenAt(booking.time, await store.holdsOn(booking.date))
     if (booking.tableIds.some((id) => taken.has(id))) {
       return send(request, response, 409, { error: 'table is no longer available' })
     }
@@ -354,7 +356,10 @@ async function handle(request, response, url) {
     const chatId = readChatId()
     if (chatId) {
       sendMessage(TOKEN, chatId, buildMessage(toStaff(record)), [
-        [{ text: '❌ Cancel this reservation', callback_data: `cancel:${record.reference}` }],
+        [
+          { text: '✅ Guests left', callback_data: `free:${record.reference}` },
+          { text: '❌ Cancel', callback_data: `cancel:${record.reference}` },
+        ],
       ]).catch((failure) => console.error('Telegram refused the message:', failure.message))
     } else {
       console.warn('A booking came in but no chat is configured — send /start to the bot.')
@@ -416,12 +421,13 @@ const COMMANDS = {
   '/otworz': 'open',
   '/closed': 'help',
   '/zamkniete': 'help',
+  '/free': 'free',
 }
 
 const isStaff = (chatId) => String(chatId) === String(readChatId() ?? '')
 
 async function handleCommand(chatId, who, body) {
-  
+
   const [raw, ...rest] = body.split(/\s+/)
   const command = raw.split('@')[0].toLowerCase()
   const say = (text, keyboard) => sendMessage(TOKEN, chatId, text, keyboard).catch(() => {})
@@ -437,6 +443,17 @@ async function handleCommand(chatId, who, body) {
   if (!action) return
 
   if (action === 'help') return say(helpMessage(listClosures(toISODate(new Date()))))
+
+  if (action === 'free') {
+    const ref = (rest[0] ?? '').toUpperCase()
+    if (!ref) return say('Which one? /free DAON-XXXXX')
+    const booking = await store.find(ref)
+    if (!booking) return say(`No reservation ${ref}.`)
+    if (booking.tableIds.length === 0) return say(`${ref} is not holding a table.`)
+    const before = toStaff(booking)
+    await store.release(ref)
+    return say(releasedMessage(before))
+  }
 
   if (action === 'day' || action === 'tomorrow' || action === 'onDate') {
     const day = new Date()
@@ -474,6 +491,30 @@ async function handleCommand(chatId, who, body) {
   )
 }
 
+async function handleFreeButton(query) {
+  const chatId = query.message?.chat?.id
+  const reference = String(query.data ?? '').split(':')[1] ?? ''
+
+  if (!isStaff(chatId)) {
+    return answerCallback(TOKEN, query.id, 'Not allowed.').catch(() => {})
+  }
+
+  const booking = await store.find(reference)
+  if (!booking) {
+    return answerCallback(TOKEN, query.id, 'That reservation is gone.').catch(() => {})
+  }
+  if (booking.status === 'cancelled' || booking.tableIds.length === 0) {
+    return answerCallback(TOKEN, query.id, 'That table is already free.').catch(() => {})
+  }
+
+  const before = toStaff(booking)
+  await store.release(reference)
+  await answerCallback(TOKEN, query.id, 'Table is free again.').catch(() => {})
+  await editMessage(TOKEN, chatId, query.message.message_id, releasedMessage(before)).catch(
+    () => {},
+  )
+}
+
 async function handleCancelButton(query) {
   const chatId = query.message?.chat?.id
   const reference = String(query.data ?? '').split(':')[1] ?? ''
@@ -492,7 +533,7 @@ async function handleCancelButton(query) {
 
   await store.cancel(reference)
   await answerCallback(TOKEN, query.id, 'Cancelled. The table is free again.').catch(() => {})
-  
+
   await editMessage(
     TOKEN,
     chatId,
@@ -515,7 +556,9 @@ if (LISTEN) {
           await handleCommand(chatId, who, body)
         },
         async onCallback(query) {
-          if (String(query.data ?? '').startsWith('cancel:')) await handleCancelButton(query)
+          const data = String(query.data ?? '')
+          if (data.startsWith('cancel:')) await handleCancelButton(query)
+          if (data.startsWith('free:')) await handleFreeButton(query)
         },
       })
     } catch (failure) {

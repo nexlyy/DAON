@@ -61,6 +61,8 @@ export const reservation = {
   slotMinutes: 30,
   
   lastSeatingBeforeClose: 90,
+
+  holdMinutes: 90,
   
   maxDaysAhead: 60,
   

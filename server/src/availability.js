@@ -60,6 +60,16 @@ export function resolveTableGroup(primaryId, partySize, isFree) {
   return group.map((table) => table.id)
 }
 
+export function takenAt(time, holds) {
+  const at = toMinutes(time)
+  const hold = rules.holdMinutes ?? 90
+  const taken = new Set()
+  for (const row of holds) {
+    if (Math.abs(toMinutes(row.time) - at) <= hold) taken.add(row.tableId)
+  }
+  return taken
+}
+
 export function seatsAnyone(partySize, taken) {
   const isFree = (id) => !taken.has(id) && !tableById.get(id)?.disabled
   return tables.some((table) => Boolean(resolveTableGroup(table.id, partySize, isFree)))
