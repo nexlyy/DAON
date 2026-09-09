@@ -1,0 +1,546 @@
+.notice {
+  min-height: 60vh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding-block: clamp(7rem, 14vh, 11rem) var(--section-y);
+}
+
+.noticeTitle {
+  font-size: var(--step-3);
+}
+
+.noticeBody {
+  max-width: 42ch;
+  color: var(--text-soft);
+}
+
+.retry {
+  padding: 0.7em 1.7em;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.back {
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  border-bottom: 1px solid var(--gold-line);
+  padding-bottom: 0.2em;
+}
+
+/* --- cover ---------------------------------------------------------------- */
+
+.cover {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: end;
+  justify-items: center;
+  min-height: min(78vh, 680px);
+  padding: clamp(7rem, 14vh, 11rem) var(--gutter) clamp(1.6rem, 4vw, 2.6rem);
+  overflow: hidden;
+  background: #10161f;
+}
+
+.cover picture,
+.cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+.cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(251, 248, 243, 0.97) 0,
+      rgba(251, 248, 243, 0.93) 3.6rem,
+      rgba(251, 248, 243, 0) 9rem
+    ),
+    linear-gradient(180deg, transparent 45%, rgba(8, 13, 20, 0.85));
+}
+
+.coverText {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  max-width: 46ch;
+  padding: 0.9rem 1.4rem;
+  text-align: center;
+  color: var(--paper);
+  border: 1px solid rgba(217, 195, 149, 0.35);
+  border-radius: var(--radius-m);
+  background: rgba(8, 13, 20, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.coverEyebrow {
+  color: var(--gold-line);
+}
+
+.coverLede {
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: rgba(251, 248, 243, 0.86);
+}
+
+/* --- rail ----------------------------------------------------------------- */
+
+.rail {
+  position: sticky;
+  top: var(--nav-offset, 0px);
+  transition: top 0.5s var(--ease);
+  z-index: 40;
+  background: rgba(251, 248, 243, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(198, 176, 150, 0.35);
+}
+
+.railInner {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-block: 0.75rem;
+  scroll-snap-type: x proximity;
+}
+
+.railInner::-webkit-scrollbar {
+  display: none;
+}
+
+.railLink {
+  flex: none;
+  scroll-snap-align: start;
+  padding: 0.45em 1em;
+  border: 1px solid rgba(198, 176, 150, 0.5);
+  border-radius: var(--radius-pill);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-soft);
+  background: var(--white);
+  transition:
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+@media (hover: hover) {
+  .railLink:hover {
+    color: var(--ink);
+    border-color: var(--gold-line);
+  }
+}
+
+/* --- sections ------------------------------------------------------------- */
+
+.section {
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  scroll-margin-top: 7rem;
+}
+
+.sectionHead {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.sectionTitle {
+  font-size: var(--step-3);
+  letter-spacing: 0.04em;
+}
+
+.sectionAlt {
+  font-size: var(--step--1);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.sectionRule {
+  margin-top: 0.5rem;
+}
+
+/* --- shared bits ---------------------------------------------------------- */
+
+.rowHead {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.itemName {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+
+.itemDesc {
+  margin-top: 0.35rem;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.itemNote {
+  margin-top: 0.3rem;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.price {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  color: var(--gold-text);
+  white-space: nowrap;
+}
+
+.volume {
+  margin-inline: 0.5em 0.7em;
+  white-space: nowrap;
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  color: var(--text-faint);
+}
+
+.dots {
+  flex: 1;
+  min-width: 1.5rem;
+  align-self: center;
+  border-bottom: 1px dotted rgba(198, 176, 150, 0.75);
+}
+
+/* --- cocktail cards ------------------------------------------------------- */
+
+.cards {
+  display: grid;
+  gap: clamp(1rem, 2.2vw, 1.6rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid rgba(198, 176, 150, 0.42);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-soft);
+  animation: daon-rise 0.7s var(--ease-out) both;
+  transition:
+    transform 0.5s var(--ease-out),
+    box-shadow 0.5s var(--ease-out),
+    border-color 0.5s var(--ease);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: var(--gold-line);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+.cardMedia {
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: #10161f;
+}
+
+.cardMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardBody {
+  padding: clamp(0.9rem, 2vw, 1.2rem);
+}
+
+/* --- feature (bowl, Korean alcohols) -------------------------------------- */
+
+.feature,
+.wines,
+.steps {
+  display: grid;
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+  align-items: start;
+}
+
+.feature,
+.wines {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 860px) {
+  .feature,
+  .wines {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  }
+
+  .featureMedia,
+  .winesMedia {
+    order: -1;
+  }
+}
+
+.featureMedia img,
+.winesMedia img,
+.groupsMedia img,
+.groupMedia img,
+.stepsMedia img {
+  width: 100%;
+  height: auto;
+  max-height: 24rem;
+  object-fit: contain;
+  border-radius: var(--radius-l);
+  background: #10161f;
+}
+
+.featureList,
+.rows,
+.stepList {
+  list-style: none;
+  padding: 0;
+}
+
+.featureList {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.featureItem {
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid rgba(198, 176, 150, 0.35);
+}
+
+.featureItem:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.priceGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 2rem;
+  margin-top: 0.9rem;
+}
+
+.priceCell dt {
+  display: flex;
+  gap: 0.5em;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.priceCell dd {
+  margin-top: 0.2rem;
+  font-family: var(--font-display);
+  color: var(--gold-text);
+}
+
+/* --- grouped lists -------------------------------------------------------- */
+
+.groups {
+  display: grid;
+  gap: clamp(1.6rem, 4vw, 2.8rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.groupsMedia,
+.stepsMedia {
+  grid-column: 1 / -1;
+  max-width: 30rem;
+  justify-self: center;
+}
+
+.groupTitle {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.9rem;
+}
+
+.groupMedia {
+  margin-bottom: 1rem;
+}
+
+.rows {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.row .itemName {
+  font-size: var(--step-0);
+}
+
+/* --- wines ---------------------------------------------------------------- */
+
+.wineTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.wineTable th,
+.wineTable td {
+  padding: 0.7rem 0.4rem;
+  border-bottom: 1px solid rgba(198, 176, 150, 0.35);
+  vertical-align: baseline;
+}
+
+.wineTable thead th {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.wineTable thead th:not(:first-child),
+.wineTable td {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wineTable tbody th {
+  font-weight: 400;
+}
+
+.wineTable tbody th .itemName,
+.wineTable tbody th .itemDesc {
+  display: block;
+}
+
+.wineTable td {
+  font-family: var(--font-display);
+  color: var(--gold-text);
+}
+
+@media (max-width: 600px) {
+  .wineTable,
+  .wineTable tbody,
+  .wineTable tr,
+  .wineTable tbody th,
+  .wineTable td {
+    display: block;
+    width: 100%;
+  }
+
+  .wineTable thead {
+    display: none;
+  }
+
+  .wineTable tr {
+    padding-block: 0.9rem;
+    border-bottom: 1px solid rgba(198, 176, 150, 0.35);
+  }
+
+  .wineTable tbody th,
+  .wineTable td {
+    border: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  .wineTable td {
+    display: inline-flex;
+    gap: 0.4em;
+    margin-top: 0.5rem;
+    margin-right: 1.4rem;
+  }
+
+  .wineTable td::before {
+    content: attr(data-label);
+    font-family: var(--font-body);
+    font-size: var(--step--1);
+    color: var(--text-faint);
+  }
+}
+
+/* --- build your own tea --------------------------------------------------- */
+
+.stepsPrice {
+  grid-column: 1 / -1;
+  justify-self: center;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  color: var(--gold-text);
+}
+
+.stepList {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: clamp(1.2rem, 3vw, 2rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  counter-reset: none;
+}
+
+.step {
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+  background: var(--white);
+  border: 1px solid rgba(198, 176, 150, 0.42);
+  border-radius: var(--radius-l);
+}
+
+.stepTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+
+.stepNumber {
+  font-size: var(--step-2);
+  line-height: 1;
+  color: var(--gold-line);
+}
+
+/* --- foot ----------------------------------------------------------------- */
+
+.foot {
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+  text-align: center;
+  padding-block: clamp(2rem, 5vw, 3.5rem) var(--section-y);
+}
+
+.footNote {
+  max-width: 52ch;
+  font-size: var(--step--1);
+  color: var(--text-faint);
+}

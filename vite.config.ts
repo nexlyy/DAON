@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
-import { copyFileSync, mkdirSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { copyFileSync, createReadStream, existsSync, mkdirSync, readFileSync } from 'node:fs'
+import { extname, resolve } from 'node:path'
 import { hoursFor, restaurant, weekOrder } from './src/data/restaurant'
 
 const ROUTES = ['menu', 'reservation', 'about', 'contact']
@@ -25,6 +25,38 @@ function spaFallback() {
         mkdirSync(resolve(out, route), { recursive: true })
         copyFileSync(shell, resolve(out, route, 'index.html'))
       }
+    },
+  }
+}
+
+const TYPES: Record<string, string> = {
+  '.json': 'application/json',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif',
+}
+
+function privateBundle() {
+  const root = resolve(__dirname, 'private/site')
+  const keyFile = resolve(__dirname, 'private/key.txt')
+
+  return {
+    name: 'private-bundle',
+    apply: 'serve' as const,
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use((req, res, next) => {
+        const match = /^\/d\/([^/]+)\/([\w./-]+)$/.exec((req.url ?? '').split('?')[0])
+        if (!match) return next()
+
+        const key = existsSync(keyFile) ? readFileSync(keyFile, 'utf8').trim() : ''
+        if (key && match[1] !== key) return next()
+
+        const file = resolve(root, match[2])
+        if (!file.startsWith(root) || !existsSync(file)) return next()
+
+        res.setHeader('content-type', TYPES[extname(file)] ?? 'application/octet-stream')
+        res.setHeader('x-robots-tag', 'noindex, nofollow')
+        createReadStream(file).pipe(res)
+      })
     },
   }
 }
@@ -85,7 +117,7 @@ function structuredData() {
 
 export default defineConfig({
   base,
-  plugins: [react(), structuredData(), spaFallback()],
+  plugins: [react(), structuredData(), spaFallback(), privateBundle()],
   resolve: {
     alias: { '@': resolve(__dirname, 'src') },
   },

@@ -80,6 +80,21 @@
     "categoryJump": "분류로 이동",
     "results": "{count}개 요리"
   },
+  "drinks": {
+    "eyebrow": "비공개 미리보기",
+    "title": "음료",
+    "subtitle": "바는 아직 열지 않았습니다. 이 페이지는 사이트에 연결되어 있지 않으며 검색에도 노출되지 않습니다.",
+    "metaTitle": "음료 — DAON",
+    "jump": "섹션으로 이동",
+    "loading": "음료 목록을 불러오는 중…",
+    "missingTitle": "유효하지 않은 링크입니다",
+    "missingBody": "음료 목록은 현재 사용 중인 링크로만 열 수 있습니다. 레스토랑에 문의해 주세요.",
+    "errorTitle": "목록을 불러오지 못했습니다",
+    "errorBody": "연결을 확인한 뒤 다시 시도해 주세요.",
+    "retry": "다시 시도",
+    "footer": "가격 단위는 폴란드 즈워티입니다. 이 목록은 아직 공개 페이지에 없습니다.",
+    "back": "daon.pl로 돌아가기"
+  },
   "order": {
     "title": "온라인 주문",
     "delivery": "배달 주문",

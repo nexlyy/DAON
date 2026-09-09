@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /d/
+Disallow: /drinks/
 
 Sitemap: https://daon.pl/sitemap.xml

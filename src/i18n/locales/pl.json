@@ -80,6 +80,21 @@
     "categoryJump": "Przejdź do kategorii",
     "results": "{count} dań"
   },
+  "drinks": {
+    "eyebrow": "Podgląd prywatny",
+    "title": "Napoje",
+    "subtitle": "Bar jeszcze nie działa. Ta strona nie jest podlinkowana na stronie ani indeksowana.",
+    "metaTitle": "Napoje — DAON",
+    "jump": "Przejdź do sekcji",
+    "loading": "Wczytywanie karty napojów…",
+    "missingTitle": "Ten link nie jest aktywny",
+    "missingBody": "Karta napojów jest dostępna tylko przez aktualny link. Poproś o niego restaurację.",
+    "errorTitle": "Nie udało się wczytać karty",
+    "errorBody": "Sprawdź połączenie i spróbuj ponownie.",
+    "retry": "Spróbuj ponownie",
+    "footer": "Ceny w złotych. Karta nie jest jeszcze publikowana na stronie.",
+    "back": "Wróć na daon.pl"
+  },
   "order": {
     "title": "Zamów online",
     "delivery": "Zamów dostawę",

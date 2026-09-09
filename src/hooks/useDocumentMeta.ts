@@ -11,11 +11,14 @@ export function useDocumentMeta({
   title,
   description,
   path = '/',
+  noindex = false,
 }: {
   title: string
   description: string
-  
+
   path?: string
+
+  noindex?: boolean
 }) {
   useEffect(() => {
     document.title = title
@@ -29,4 +32,14 @@ export function useDocumentMeta({
     setMeta('link[rel="canonical"]', 'href', url)
     setMeta('meta[property="og:url"]', 'content', url)
   }, [title, description, path])
+
+  useEffect(() => {
+    if (!noindex) return
+
+    const tag = document.createElement('meta')
+    tag.name = 'robots'
+    tag.content = 'noindex, nofollow'
+    document.head.append(tag)
+    return () => tag.remove()
+  }, [noindex])
 }

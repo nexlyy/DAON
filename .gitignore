@@ -17,3 +17,6 @@ dist
 
 # Notifier state (chat id, booking log)
 server/data/
+
+# Drinks menu: not public until the bar opens
+private/

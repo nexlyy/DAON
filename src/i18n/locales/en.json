@@ -80,6 +80,21 @@
     "categoryJump": "Jump to category",
     "results": "{count} dishes"
   },
+  "drinks": {
+    "eyebrow": "Private preview",
+    "title": "Drinks",
+    "subtitle": "The bar is not open yet. This page is not linked from the site and is not indexed.",
+    "metaTitle": "Drinks — DAON",
+    "jump": "Jump to a section",
+    "loading": "Loading the drinks list…",
+    "missingTitle": "This link is not active",
+    "missingBody": "The drinks list is only reachable through a current link. Ask the restaurant for one.",
+    "errorTitle": "The list could not be loaded",
+    "errorBody": "Check the connection and try again.",
+    "retry": "Try again",
+    "footer": "Prices in Polish złoty. The list is not on the public site yet.",
+    "back": "Back to daon.pl"
+  },
   "order": {
     "title": "Order online",
     "delivery": "Order delivery",

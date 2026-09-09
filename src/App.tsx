@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar/Navbar'
 import { Footer } from '@/components/Footer/Footer'
 import { HomePage } from '@/pages/Home/HomePage'
 import { MenuPage } from '@/pages/Menu/MenuPage'
+import { DrinksPage } from '@/pages/Drinks/DrinksPage'
 import { ReservationPage } from '@/pages/Reservation/ReservationPage'
 import { NotFoundPage } from '@/pages/NotFound/NotFoundPage'
 import { useI18n } from '@/i18n/useI18n'
@@ -27,6 +28,7 @@ export function App() {
           <Route path="/contact" element={<HomePage />} />
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/reservation" element={<ReservationPage />} />
+          <Route path="/drinks/:key" element={<DrinksPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
