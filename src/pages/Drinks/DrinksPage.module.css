@@ -44,7 +44,7 @@
   display: grid;
   align-content: end;
   justify-items: center;
-  min-height: min(78vh, 680px);
+  min-height: max(26rem, min(78vh, 680px));
   padding: clamp(7rem, 14vh, 11rem) var(--gutter) clamp(1.6rem, 4vw, 2.6rem);
   overflow: hidden;
   background: #10161f;
@@ -65,12 +65,15 @@
   position: absolute;
   inset: 0;
   z-index: -1;
+  /* The bar carries dark navy links over a night sky, so it needs paper under
+     it. The veil ends just below the bar: any longer and it washes out the
+     blossom and the moon, which are the reason the cover is there at all. */
   background:
     linear-gradient(
       180deg,
-      rgba(251, 248, 243, 0.97) 0,
-      rgba(251, 248, 243, 0.93) 3.6rem,
-      rgba(251, 248, 243, 0) 9rem
+      rgba(251, 248, 243, 0.96) 0,
+      rgba(251, 248, 243, 0.9) 3.4rem,
+      rgba(251, 248, 243, 0) 6rem
     ),
     linear-gradient(180deg, transparent 45%, rgba(8, 13, 20, 0.85));
 }

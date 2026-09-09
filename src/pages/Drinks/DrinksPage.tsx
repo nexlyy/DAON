@@ -17,8 +17,8 @@ type Status = 'loading' | 'ready' | 'missing' | 'error'
 // The whole menu lives behind the link: nothing about the drinks is in the site
 // bundle, and the key in the address is what fetches it.
 const bundleUrl = (key: string) => `/d/${encodeURIComponent(key)}/drinks.json`
-const imageUrl = (key: string, photo: string, ext: string, small = false) =>
-  `/d/${encodeURIComponent(key)}/images/${small ? 'sm/' : ''}${photo}.${ext}`
+const imageUrl = (key: string, photo: string, ext: string, tier?: 'sm' | 'xl') =>
+  `/d/${encodeURIComponent(key)}/images/${tier ? `${tier}/` : ''}${photo}.${ext}`
 
 export function DrinksPage() {
   const { t, locale } = useI18n()
@@ -37,7 +37,10 @@ export function DrinksPage() {
     let cancelled = false
     setStatus('loading')
 
-    fetch(bundleUrl(key), { headers: { accept: 'application/json' } })
+    // The bundle and the page that reads it are deployed separately, so the
+    // page always revalidates: a cached copy from before a rebuild would be
+    // read with the shape the new code no longer expects.
+    fetch(bundleUrl(key), { headers: { accept: 'application/json' }, cache: 'no-cache' })
       .then((response) => {
         if (response.status === 404 || response.status === 403) return null
         if (!response.ok) throw new Error(String(response.status))
@@ -165,7 +168,14 @@ function Cover({ menu, bundleKey }: { menu: DrinksMenu } & Pick<Shared, 'bundleK
 
   return (
     <section className={styles.cover}>
-      <Photo bundleKey={bundleKey} photo={menu.cover} alt="" ratio={1.417} priority />
+      <Photo
+        bundleKey={bundleKey}
+        photo={menu.cover.photo}
+        alt=""
+        ratio={menu.cover.ratio}
+        full={menu.cover.width}
+        priority
+      />
       <h1 className="visually-hidden">{t('drinks.title')}</h1>
       <div className={styles.coverText}>
         <p className={`eyebrow ${styles.coverEyebrow}`}>{t('drinks.eyebrow')}</p>
@@ -482,27 +492,41 @@ function Photo({
   alt,
   ratio = 1.5,
   priority = false,
+  full,
 }: {
   photo: string
   alt: string
   ratio?: number
   priority?: boolean
+
+  full?: number
 } & Pick<Shared, 'bundleKey'>) {
-  const width = 1000
+  // A photograph inside the page is drawn at a few hundred CSS pixels; the
+  // cover fills the window, so it is told so and offered the whole file.
+  const sizes = full ? '100vw' : '(max-width: 720px) 100vw, 420px'
+  const width = full ?? 1000
   const height = Math.round(width / ratio)
+
   const set = (ext: string) =>
-    `${imageUrl(bundleKey, photo, ext, true)} 360w, ${imageUrl(bundleKey, photo, ext)} 1000w`
+    [
+      `${imageUrl(bundleKey, photo, ext, 'sm')} 360w`,
+      `${imageUrl(bundleKey, photo, ext)} 1000w`,
+      full ? `${imageUrl(bundleKey, photo, ext, 'xl')} ${full}w` : '',
+    ]
+      .filter(Boolean)
+      .join(', ')
 
   return (
     <picture>
-      <source type="image/avif" srcSet={set('avif')} sizes="(max-width: 720px) 100vw, 420px" />
-      <source type="image/webp" srcSet={set('webp')} sizes="(max-width: 720px) 100vw, 420px" />
+      <source type="image/avif" srcSet={set('avif')} sizes={sizes} />
+      <source type="image/webp" srcSet={set('webp')} sizes={sizes} />
       <img
-        src={imageUrl(bundleKey, photo, 'webp')}
+        src={imageUrl(bundleKey, photo, 'webp', full ? 'xl' : undefined)}
         alt={alt}
         width={width}
         height={height}
         loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : undefined}
         decoding="async"
       />
     </picture>

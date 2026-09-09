@@ -48,9 +48,16 @@ export interface DrinkSection {
   groups?: DrinkGroup[]
 }
 
+export interface CoverPhoto {
+  photo: string
+  ratio: number
+
+  width: number
+}
+
 export interface DrinksMenu {
   source: string
-  cover: string
+  cover: CoverPhoto
   note: Bilingual
   sections: DrinkSection[]
 }
