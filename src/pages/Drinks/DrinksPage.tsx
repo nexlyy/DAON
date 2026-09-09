@@ -488,10 +488,10 @@ function Photo({
   ratio?: number
   priority?: boolean
 } & Pick<Shared, 'bundleKey'>) {
-  const width = 720
+  const width = 1000
   const height = Math.round(width / ratio)
   const set = (ext: string) =>
-    `${imageUrl(bundleKey, photo, ext, true)} 360w, ${imageUrl(bundleKey, photo, ext)} 720w`
+    `${imageUrl(bundleKey, photo, ext, true)} 360w, ${imageUrl(bundleKey, photo, ext)} 1000w`
 
   return (
     <picture>
