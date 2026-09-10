@@ -177,10 +177,6 @@ function Cover({ menu, bundleKey }: { menu: DrinksMenu } & Pick<Shared, 'bundleK
         priority
       />
       <h1 className="visually-hidden">{t('drinks.title')}</h1>
-      <div className={styles.coverText}>
-        <p className={`eyebrow ${styles.coverEyebrow}`}>{t('drinks.eyebrow')}</p>
-        <p className={styles.coverLede}>{t('drinks.subtitle')}</p>
-      </div>
     </section>
   )
 }
