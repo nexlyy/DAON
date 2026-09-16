@@ -1,5 +1,6 @@
 .main {
   min-height: 60dvh;
+  padding-top: var(--promo-offset, 0px);
   transition: opacity 0.28s var(--ease);
 }
 

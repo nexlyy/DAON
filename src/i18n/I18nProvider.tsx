@@ -91,9 +91,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       return text[locale] ?? text.en
     }
 
-    const formatPrice = (amount: number) =>
-      
-      `${new Intl.NumberFormat(LOCALE_META[locale].htmlLang).format(amount)} PLN`
+    const formatPrice = (amount: number) => {
+      const number = new Intl.NumberFormat(LOCALE_META[locale].htmlLang, {
+        minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+        maximumFractionDigits: 2,
+      })
+      return `${number.format(amount)} PLN`
+    }
 
     const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions) =>
       new Intl.DateTimeFormat(LOCALE_META[locale].htmlLang, options).format(date)

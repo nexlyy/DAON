@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react'
 import { DishPhoto } from '@/components/Media/DishPhoto'
+import { PromoPrice } from '@/components/Promo/PromoPrice'
+import { usePromo } from '@/promo/usePromo'
 import type { Dish } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
 import { DishTags } from './DishTags'
@@ -15,7 +17,8 @@ interface Props {
 }
 
 export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
-  const { t, resolve, formatPrice } = useI18n()
+  const { t, resolve } = useI18n()
+  const { phase, percent } = usePromo()
   const name = resolve(dish.name)
 
   return (
@@ -40,13 +43,20 @@ export function DishCard({ dish, onOpen, index = 0, variant = 'auto' }: Props) {
         )}
 
         <span className={styles.number}>{dish.number}</span>
+        {phase === 'active' && (
+          <span className={styles.deal} aria-hidden="true">
+            −{percent}%
+          </span>
+        )}
       </div>
 
       <div className={styles.body}>
         
         <div className={styles.titleRow}>
           <h3 className={styles.name}>{name}</h3>
-          <span className={styles.price}>{formatPrice(dish.price)}</span>
+          <span className={styles.price} data-promo={phase ?? undefined}>
+            <PromoPrice amount={dish.price} />
+          </span>
         </div>
         {dish.description && <p className={styles.desc}>{resolve(dish.description)}</p>}
 

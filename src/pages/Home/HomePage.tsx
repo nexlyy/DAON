@@ -10,6 +10,8 @@ import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useReveal } from '@/hooks/useReveal'
 import { Hero } from '@/components/Hero/Hero'
+import { BirthdayBand } from '@/components/Promo/BirthdayBand'
+import { usePromo } from '@/promo/usePromo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { OpeningHours } from '@/components/OpeningHours/OpeningHours'
 import { DishCard } from '@/components/Menu/DishCard'
@@ -19,6 +21,7 @@ import styles from './HomePage.module.css'
 
 export function HomePage() {
   const { t, resolve, formatPrice, locale } = useI18n()
+  const promo = usePromo()
   const [openDish, setOpenDish] = useState<Dish | null>(null)
   
   const closeDish = useCallback(() => setOpenDish(null), [])
@@ -37,6 +40,7 @@ export function HomePage() {
   return (
     <>
       <Hero />
+      <BirthdayBand />
 
       <section className={`section ${styles.about}`} id="about">
         <div className={`shell ${styles.aboutInner}`}>
@@ -56,7 +60,7 @@ export function HomePage() {
                 <dd>{t('home.about.stats.chapters')}</dd>
               </div>
               <div>
-                <dt>{formatPrice(cheapest)}</dt>
+                <dt>{formatPrice(promo.price(cheapest))}</dt>
                 <dd>{t('home.about.stats.from')}</dd>
               </div>
             </dl>

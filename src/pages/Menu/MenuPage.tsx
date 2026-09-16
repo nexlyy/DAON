@@ -10,6 +10,7 @@ import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { widespreadAllergens } from '@/data/menu/allergens'
+import { MenuPromoNotice } from '@/components/Promo/BirthdayBand'
 import styles from './MenuPage.module.css'
 
 export function MenuPage() {
@@ -60,6 +61,7 @@ export function MenuPage() {
           <p className="eyebrow">{t('menu.eyebrow')}</p>
           <h1 className={styles.title}>{t('menu.title')}</h1>
           <p className={`lede ${styles.subtitle}`}>{t('menu.subtitle')}</p>
+          <MenuPromoNotice />
         </div>
       </section>
 

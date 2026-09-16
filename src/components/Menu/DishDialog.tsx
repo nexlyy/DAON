@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Calligraphy } from '@/components/Media/Calligraphy'
 import { DishPhoto } from '@/components/Media/DishPhoto'
+import { PromoPrice } from '@/components/Promo/PromoPrice'
 import { categoryById } from '@/data/menu/categories'
 import { dishAllergens } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export function DishDialog({ dish, onClose }: Props) {
-  const { t, resolve, formatPrice, locale } = useI18n()
+  const { t, resolve, locale } = useI18n()
   const panelRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
 
@@ -117,7 +118,9 @@ export function DishDialog({ dish, onClose }: Props) {
 
           {dish.description && <p className={styles.desc}>{resolve(dish.description)}</p>}
 
-          <p className={styles.singlePrice}>{formatPrice(dish.price)}</p>
+          <p className={styles.singlePrice}>
+            <PromoPrice amount={dish.price} align="start" />
+          </p>
 
           {allergens.length > 0 && (
             <p className={styles.allergens}>

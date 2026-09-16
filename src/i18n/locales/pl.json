@@ -312,5 +312,30 @@
       "fish": "Ryby",
       "sesame": "Sezam"
     }
+  },
+  "promo": {
+    "ribbon": {
+      "upcoming": "Urodziny DAON · {dates} · −{percent}% na wszystkie dania",
+      "active": "Urodzinowy weekend · −{percent}% na wszystkie dania do {end}",
+      "cta": "Zobacz menu",
+      "close": "Ukryj ogłoszenie"
+    },
+    "band": {
+      "title": "DAON ma urodziny",
+      "titleActive": "W ten weekend mamy urodziny",
+      "body": "Piątek, sobota i niedziela: wszystkie dania z menu tańsze o {percent}%. Przyjdźcie świętować razem z nami.",
+      "bodyActive": "Do niedzieli wszystkie dania z menu są tańsze o {percent}%, a ceny na stronie są już obniżone. Przyjdźcie świętować razem z nami.",
+      "everyDish": "na wszystkie dania",
+      "fine": "Rabat obejmuje dania z menu. Napoje nie są objęte promocją.",
+      "menu": "Zobacz menu"
+    },
+    "menu": {
+      "upcoming": "{dates}: −{percent}% na wszystkie dania z okazji naszych urodzin. Napoje nie są objęte promocją.",
+      "active": "Ceny urodzinowe do {end}: wszystkie dania poniżej są już tańsze o {percent}%. Napoje nie są objęte promocją."
+    },
+    "price": {
+      "was": "Cena regularna",
+      "now": "Cena urodzinowa"
+    }
   }
 }

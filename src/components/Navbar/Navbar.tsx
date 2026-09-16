@@ -4,6 +4,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Logo } from '@/components/Brand/Logo'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { OrderLink } from '@/components/Order/OrderLink'
+import { PromoRibbon } from '@/components/Promo/PromoRibbon'
 import { useI18n } from '@/i18n/useI18n'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import styles from './Navbar.module.css'
@@ -77,6 +78,7 @@ export function Navbar() {
         data-scrolled={scrolled || undefined}
         data-hidden={(hidden && !drawerOpen) || undefined}
       >
+        <PromoRibbon />
         <div className={styles.bar}>
           <Link to="/" className={styles.brand} aria-label="DAON">
             <Logo />

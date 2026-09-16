@@ -1,0 +1,223 @@
+.band {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: clamp(3.5rem, 8vw, 6rem);
+  color: var(--paper);
+  background:
+    radial-gradient(ellipse 55% 80% at 18% 50%, rgba(217, 195, 149, 0.16), transparent 70%),
+    radial-gradient(ellipse 40% 60% at 92% 10%, rgba(216, 54, 44, 0.18), transparent 70%),
+    linear-gradient(160deg, #34495f 0%, var(--ink) 55%, #25364a 100%);
+}
+
+.frame {
+  position: absolute;
+  inset: clamp(0.75rem, 2vw, 1.25rem);
+  z-index: -1;
+  border: 1px solid rgba(217, 195, 149, 0.38);
+  border-radius: var(--radius-l);
+  box-shadow: inset 0 0 0 5px rgba(217, 195, 149, 0.06);
+  pointer-events: none;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+}
+
+.figure {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.off {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 13vw, 10rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--gold-line);
+  text-shadow: 0 0.05em 0.3em rgba(0, 0, 0, 0.25);
+}
+
+.minus {
+  display: inline-block;
+  margin-right: 0.02em;
+  font-size: 0.72em;
+  vertical-align: 0.08em;
+}
+
+.every {
+  margin: 0.6rem 0 0;
+  font-size: var(--step--1);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(251, 248, 243, 0.78);
+}
+
+.seal {
+  position: absolute;
+  top: -0.9rem;
+  right: clamp(0rem, 3vw, 1.5rem);
+  font-size: clamp(3.4rem, 6vw, 4.6rem);
+  animation: stamp 0.9s var(--ease-out) 0.2s both;
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.8) rotate(-18deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(-7deg);
+  }
+}
+
+.copy {
+  display: grid;
+  justify-items: start;
+  gap: 0.9rem;
+}
+
+.eyebrow {
+  color: var(--gold-line);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--step-4);
+  line-height: 1.05;
+  color: var(--paper);
+}
+
+.body {
+  margin: 0;
+  max-width: 44ch;
+  font-size: var(--step-1);
+  line-height: 1.6;
+  color: rgba(251, 248, 243, 0.86);
+}
+
+.fine {
+  margin: 0;
+  font-size: var(--step--1);
+  color: rgba(251, 248, 243, 0.62);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+
+.primary {
+  --btn-bg: var(--gold-line);
+  --btn-fg: var(--ink);
+  --btn-border: var(--gold-line);
+}
+
+.secondary {
+  --btn-bg: transparent;
+  --btn-fg: var(--paper);
+  --btn-border: rgba(251, 248, 243, 0.45);
+}
+
+@media (hover: hover) {
+  .secondary:hover {
+    --btn-border: var(--paper);
+    --btn-bg: rgba(251, 248, 243, 0.08);
+  }
+}
+
+@media (max-width: 860px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+
+  .copy {
+    justify-items: center;
+  }
+
+  .body {
+    margin-inline: auto;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+
+  .eyebrow {
+    justify-content: center;
+  }
+
+  .eyebrow::after {
+    content: '';
+    width: 2.2em;
+    height: 1px;
+    background: linear-gradient(270deg, transparent, var(--gold-line));
+  }
+}
+
+@media (max-width: 640px) {
+  .band {
+    padding-block: 3rem 3.25rem;
+  }
+
+  .seal {
+    top: -0.6rem;
+    right: 0;
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .actions :global(.btn) {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seal {
+    animation: none;
+  }
+}
+
+.notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: 42rem;
+  margin: 0.4rem auto 0;
+  padding: 0.7rem 1.2rem 0.7rem 0.8rem;
+  border: 1px solid rgba(216, 54, 44, 0.35);
+  border-radius: var(--radius-m);
+  background: rgba(216, 54, 44, 0.06);
+  font-size: var(--step--1);
+  line-height: 1.5;
+  text-align: left;
+  color: var(--text);
+}
+
+.notice[data-phase='active'] {
+  border-color: var(--seal);
+  background: rgba(216, 54, 44, 0.1);
+}
+
+.noticeSeal {
+  flex: none;
+  font-size: 2.4rem;
+}

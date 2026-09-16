@@ -312,5 +312,30 @@
       "fish": "Fish",
       "sesame": "Sesame"
     }
+  },
+  "promo": {
+    "ribbon": {
+      "upcoming": "DAON's birthday · {dates} · −{percent}% on every dish",
+      "active": "Birthday weekend · −{percent}% on every dish until {end}",
+      "cta": "See the menu",
+      "close": "Hide the announcement"
+    },
+    "band": {
+      "title": "DAON is having a birthday",
+      "titleActive": "It's our birthday this weekend",
+      "body": "Friday, Saturday and Sunday: every dish on the menu is {percent}% cheaper. Come and celebrate with us.",
+      "bodyActive": "Until Sunday every dish on the menu is {percent}% cheaper, and the prices on the site already show it. Come and celebrate with us.",
+      "everyDish": "on every dish",
+      "fine": "The discount applies to dishes from the menu. Drinks are not included.",
+      "menu": "See the menu"
+    },
+    "menu": {
+      "upcoming": "{dates}: −{percent}% on every dish for our birthday. Drinks are not included.",
+      "active": "Birthday prices until {end}: every dish below is already {percent}% off. Drinks are not included."
+    },
+    "price": {
+      "was": "Regular price",
+      "now": "Birthday price"
+    }
   }
 }

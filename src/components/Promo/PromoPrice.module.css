@@ -1,0 +1,29 @@
+.stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.12em;
+  line-height: 1.15;
+}
+
+.stack[data-align='start'] {
+  align-items: flex-start;
+}
+
+.was {
+  font-size: 0.78em;
+  color: var(--promo-was, var(--text-faint));
+  text-decoration-thickness: 1px;
+}
+
+.now {
+  font-weight: 600;
+  color: var(--promo-now, var(--seal));
+}
+
+.soon {
+  font-size: 0.74em;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--promo-soon, var(--seal));
+}
