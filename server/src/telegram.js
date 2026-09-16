@@ -18,6 +18,8 @@ async function call(token, method, payload) {
 
 export const getMe = (token) => call(token, 'getMe')
 
+export const getChat = (token, chatId) => call(token, 'getChat', { chat_id: chatId })
+
 export const sendMessage = (token, chatId, text, keyboard) =>
   call(token, 'sendMessage', {
     chat_id: chatId,

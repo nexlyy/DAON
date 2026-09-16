@@ -24,11 +24,20 @@ import {
   dayList,
   formatDate,
   helpMessage,
+  privateMessage,
   releasedMessage,
   welcomeMessage,
 } from './message.js'
+import { isStaff, nameOf, parseStaff } from './staff.js'
 import { createStore, reference, TablesTaken } from './store.js'
-import { answerCallback, editMessage, getMe, pollUpdates, sendMessage } from './telegram.js'
+import {
+  answerCallback,
+  editMessage,
+  getChat,
+  getMe,
+  pollUpdates,
+  sendMessage,
+} from './telegram.js'
 
 loadEnv()
 
@@ -42,32 +51,80 @@ const ORIGINS = (process.env.ALLOWED_ORIGIN ?? '*')
 const LISTEN = process.env.TELEGRAM_LISTEN !== '0'
 
 const STORE = resolve(root, 'data')
-const CHAT_FILE = resolve(STORE, 'chat.json')
+const ALERTS_FILE = resolve(STORE, 'alerts.json')
+const ALERTS_KEPT_MS = 90 * 24 * 60 * 60 * 1000
+
+const STAFF = parseStaff(process.env.TELEGRAM_STAFF_IDS)
 
 if (!TOKEN) {
   console.error('TELEGRAM_BOT_TOKEN is not set. Copy .env.example to .env and fill it in.')
   process.exit(1)
 }
 
+if (STAFF.size === 0) {
+  console.error('TELEGRAM_STAFF_IDS is empty. List the staff Telegram user ids, comma separated.')
+  process.exit(1)
+}
+
 mkdirSync(STORE, { recursive: true })
 const store = createStore()
 
-function readChatId() {
-  const configured = process.env.TELEGRAM_CHAT_ID?.trim()
-  if (configured) return configured
+function readAlerts() {
   try {
-    return JSON.parse(readFileSync(CHAT_FILE, 'utf8')).chatId ?? null
+    return JSON.parse(readFileSync(ALERTS_FILE, 'utf8'))
   } catch {
-    return null
+    return {}
   }
 }
 
-function rememberChatId(chatId, who) {
-  writeFileSync(
-    CHAT_FILE,
-    JSON.stringify({ chatId, who, savedAt: new Date().toISOString() }, null, 2),
+function rememberAlerts(ref, messages) {
+  const alerts = readAlerts()
+  const cutoff = Date.now() - ALERTS_KEPT_MS
+  for (const [key, entry] of Object.entries(alerts)) {
+    if (!(Date.parse(entry.at) >= cutoff)) delete alerts[key]
+  }
+  alerts[ref] = { at: new Date().toISOString(), messages }
+  writeFileSync(ALERTS_FILE, JSON.stringify(alerts))
+}
+
+async function notifyStaff(text, keyboard) {
+  const sent = []
+  for (const id of STAFF) {
+    try {
+      const message = await sendMessage(TOKEN, id, text, keyboard)
+      sent.push({ chatId: id, messageId: message.message_id })
+    } catch (failure) {
+      console.error(`Telegram refused the message for ${id}:`, failure.message)
+    }
+  }
+  return sent
+}
+
+async function updateAlerts(ref, text, pressed) {
+  const targets = [...(readAlerts()[ref]?.messages ?? []), ...(pressed ? [pressed] : [])]
+  const seen = new Set()
+  for (const { chatId, messageId } of targets) {
+    const key = `${chatId}:${messageId}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    await editMessage(TOKEN, chatId, messageId, text).catch(() => {})
+  }
+}
+
+const strangers = new Set()
+
+function noteStranger(user, chat) {
+  const id = String(user?.id ?? 'unknown')
+  const key = `${id}:${chat?.type}`
+  if (strangers.has(key)) return
+  if (strangers.size > 1000) strangers.clear()
+  strangers.add(key)
+  const who = `${id}${user?.username ? ` (@${user.username})` : ''}`
+  console.log(
+    STAFF.has(id)
+      ? `Ignored ${who} in a ${chat?.type ?? 'unknown'} chat: the bot only answers staff in private.`
+      : `Ignored ${who}: not on the staff list.`,
   )
-  console.log(`Notifications will go to chat ${chatId} (${who}).`)
 }
 
 const RATE = { windowMs: 60 * 60 * 1000, max: 12 }
@@ -195,7 +252,7 @@ async function handle(request, response, url) {
     return send(request, response, 200, {
       ok: true,
       store: store.kind,
-      chat: Boolean(readChatId()),
+      staff: STAFF.size,
     })
   }
 
@@ -297,10 +354,10 @@ async function handle(request, response, url) {
     }
 
     await store.cancel(ref)
-    const chatId = readChatId()
-    if (chatId) {
-      sendMessage(TOKEN, chatId, cancelledMessage(toStaff(booking), 'the guest')).catch(() => {})
-    }
+    const notice = cancelledMessage(toStaff(booking), 'the guest')
+    updateAlerts(ref, notice)
+      .then(() => notifyStaff(notice))
+      .catch((failure) => console.error('Could not tell the staff:', failure.message))
     return send(request, response, 200, { ok: true })
   }
 
@@ -353,17 +410,14 @@ async function handle(request, response, url) {
     }
 
     const id = stored?.id ?? record.id
-    const chatId = readChatId()
-    if (chatId) {
-      sendMessage(TOKEN, chatId, buildMessage(toStaff(record)), [
-        [
-          { text: '✅ Guests left', callback_data: `free:${record.reference}` },
-          { text: '❌ Cancel', callback_data: `cancel:${record.reference}` },
-        ],
-      ]).catch((failure) => console.error('Telegram refused the message:', failure.message))
-    } else {
-      console.warn('A booking came in but no chat is configured — send /start to the bot.')
-    }
+    notifyStaff(buildMessage(toStaff(record)), [
+      [
+        { text: '✅ Guests left', callback_data: `free:${record.reference}` },
+        { text: '❌ Cancel', callback_data: `cancel:${record.reference}` },
+      ],
+    ])
+      .then((sent) => rememberAlerts(record.reference, sent))
+      .catch((failure) => console.error('Could not tell the staff:', failure.message))
 
     return send(request, response, 200, {
       ...record,
@@ -390,12 +444,16 @@ const me = await getMe(TOKEN).catch((failure) => {
 
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`DAON API on :${PORT} — store: ${store.kind}, bot @${me.username}`)
-  const chatId = readChatId()
-  console.log(
-    chatId
-      ? `Notifications go to chat ${chatId}.`
-      : `No chat yet — open https://t.me/${me.username} and send /start.`,
-  )
+  console.log(`Staff: ${STAFF.size} account(s).`)
+
+  for (const id of STAFF) {
+    getChat(TOKEN, id).catch(() =>
+      console.warn(
+        `Staff account ${id} has not opened the bot, so it cannot be written to. ` +
+          `They need to open https://t.me/${me.username} and press Start.`,
+      ),
+    )
+  }
 })
 
 function readDayFirstDate(value) {
@@ -424,20 +482,19 @@ const COMMANDS = {
   '/free': 'free',
 }
 
-const isStaff = (chatId) => String(chatId) === String(readChatId() ?? '')
-
-async function handleCommand(chatId, who, body) {
-
-  const [raw, ...rest] = body.split(/\s+/)
+async function handleCommand(message) {
+  const chatId = message.chat.id
+  const [raw, ...rest] = (message.text ?? '').trim().split(/\s+/)
   const command = raw.split('@')[0].toLowerCase()
   const say = (text, keyboard) => sendMessage(TOKEN, chatId, text, keyboard).catch(() => {})
 
-  if (command === '/start' || command === '/id') {
-    if (!process.env.TELEGRAM_CHAT_ID?.trim()) rememberChatId(chatId, who)
-    return say(welcomeMessage(chatId))
+  if (!isStaff(STAFF, message.from, message.chat)) {
+    noteStranger(message.from, message.chat)
+    if (command === '/start' && message.chat.type === 'private') return say(privateMessage())
+    return
   }
 
-  if (!isStaff(chatId)) return
+  if (command === '/start') return say(welcomeMessage())
 
   const action = COMMANDS[command]
   if (!action) return
@@ -450,9 +507,10 @@ async function handleCommand(chatId, who, body) {
     const booking = await store.find(ref)
     if (!booking) return say(`No reservation ${ref}.`)
     if (booking.tableIds.length === 0) return say(`${ref} is not holding a table.`)
-    const before = toStaff(booking)
+    const notice = releasedMessage(toStaff(booking), nameOf(message.from))
     await store.release(ref)
-    return say(releasedMessage(before))
+    await updateAlerts(ref, notice)
+    return say(notice)
   }
 
   if (action === 'day' || action === 'tomorrow' || action === 'onDate') {
@@ -495,7 +553,7 @@ async function handleFreeButton(query) {
   const chatId = query.message?.chat?.id
   const reference = String(query.data ?? '').split(':')[1] ?? ''
 
-  if (!isStaff(chatId)) {
+  if (!isStaff(STAFF, query.from, query.message?.chat)) {
     return answerCallback(TOKEN, query.id, 'Not allowed.').catch(() => {})
   }
 
@@ -507,19 +565,17 @@ async function handleFreeButton(query) {
     return answerCallback(TOKEN, query.id, 'That table is already free.').catch(() => {})
   }
 
-  const before = toStaff(booking)
+  const notice = releasedMessage(toStaff(booking), nameOf(query.from))
   await store.release(reference)
   await answerCallback(TOKEN, query.id, 'Table is free again.').catch(() => {})
-  await editMessage(TOKEN, chatId, query.message.message_id, releasedMessage(before)).catch(
-    () => {},
-  )
+  await updateAlerts(reference, notice, { chatId, messageId: query.message.message_id })
 }
 
 async function handleCancelButton(query) {
   const chatId = query.message?.chat?.id
   const reference = String(query.data ?? '').split(':')[1] ?? ''
 
-  if (!isStaff(chatId)) {
+  if (!isStaff(STAFF, query.from, query.message?.chat)) {
     return answerCallback(TOKEN, query.id, 'Not allowed.').catch(() => {})
   }
 
@@ -534,12 +590,8 @@ async function handleCancelButton(query) {
   await store.cancel(reference)
   await answerCallback(TOKEN, query.id, 'Cancelled. The table is free again.').catch(() => {})
 
-  await editMessage(
-    TOKEN,
-    chatId,
-    query.message.message_id,
-    cancelledMessage(toStaff(booking), 'the restaurant'),
-  ).catch(() => {})
+  const notice = cancelledMessage(toStaff(booking), `the restaurant (${nameOf(query.from)})`)
+  await updateAlerts(reference, notice, { chatId, messageId: query.message.message_id })
 }
 
 if (LISTEN) {
@@ -548,12 +600,9 @@ if (LISTEN) {
     try {
       offset = await pollUpdates(TOKEN, offset, {
         async onMessage(message) {
-          const chatId = message.chat?.id
-          if (!chatId) return
-          const who = message.chat.title ?? message.chat.username ?? message.chat.first_name ?? ''
-          const body = (message.text ?? '').trim()
-          if (!body.startsWith('/')) return
-          await handleCommand(chatId, who, body)
+          if (!message.chat?.id) return
+          if (!(message.text ?? '').trim().startsWith('/')) return
+          await handleCommand(message)
         },
         async onCallback(query) {
           const data = String(query.data ?? '')

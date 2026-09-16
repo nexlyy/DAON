@@ -83,22 +83,38 @@ for it. If the day already has bookings the bot says so, with the count — it
 does not cancel them, because those guests need a phone call rather than a
 silent disappearance.
 
-Only the chat that registered with `/start` can use these. The closures live in
+Only the accounts in `TELEGRAM_STAFF_IDS` can use these, and only in a private
+chat with the bot. The closures live in
 `server/data/closures.json`; the nightly backup copies them alongside the
 bookings.
 
-## Telling it where to send
+## Who gets the bot
 
-Open the bot in Telegram and send `/start`. It replies with the chat id and
-remembers it in `server/data/chat.json`, so the first message from the
-restaurant is all the setup there is. To pin it instead, put the number in
-`TELEGRAM_CHAT_ID` and that wins over anything saved.
+`TELEGRAM_STAFF_IDS` in `.env` is the whole list: numeric Telegram user ids,
+comma separated. Every reservation goes to each of them, a button pressed by one
+rewrites the message for all, and the bot answers nobody else — a stranger who
+sends `/start` gets one line saying the bot is private, and every other command
+from them is ignored. It only answers in private chats, so adding it to a group
+does not put guests' names and phone numbers in front of the group.
 
-`npm run chat-id` prints the bot's name and every chat that has written to it,
-without starting the service.
+The ids are user ids, not usernames. A username can be dropped and taken by
+someone else; the id stays with the account. The service refuses to start with
+the list empty.
 
-For a group or a channel, add the bot to it and send `/start` there — the id
-will be negative, which is normal.
+Telegram does not let a bot write first. Each person has to open the bot and
+press Start once; until they do, the service logs a line naming the id it cannot
+reach, and that person gets nothing.
+
+To find someone's id: have them message the bot, then stop the service and run
+`npm run chat-id` — it prints every account that has written to the bot lately.
+Stopping matters, because the running service reads the same updates. Or look
+in the log, which names everyone it ignored:
+
+```bash
+ssh mcr 'journalctl -u daon-api --since today | grep Ignored'
+```
+
+Changing the list is an edit to `/opt/daon-api/.env` and a restart.
 
 ## What the restaurant sees
 

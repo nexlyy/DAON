@@ -15,15 +15,20 @@ console.log(`Bot: @${me.username} (${me.first_name})`)
 const response = await fetch(`https://api.telegram.org/bot${token}/getUpdates`)
 const body = await response.json()
 
-const chats = new Map()
-for (const update of body.result ?? []) {
-  const chat = update.message?.chat
-  if (chat) chats.set(chat.id, chat.title ?? chat.username ?? chat.first_name ?? chat.type)
+if (!body.ok) {
+  console.error(`Telegram said: ${body.description}. Stop the service first — it is reading the same updates.`)
+  process.exit(1)
 }
 
-if (chats.size === 0) {
-  console.log(`No one has written to the bot yet. Open https://t.me/${me.username} and send /start.`)
+const people = new Map()
+for (const update of body.result ?? []) {
+  const from = update.message?.from ?? update.callback_query?.from
+  if (from) people.set(from.id, from.username ? `@${from.username}` : from.first_name ?? '')
+}
+
+if (people.size === 0) {
+  console.log(`No one has written to the bot lately. Have them open https://t.me/${me.username} and press Start.`)
 } else {
-  console.log('Chats that have written to it:')
-  for (const [id, who] of chats) console.log(`  ${id}  ${who}`)
+  console.log('Accounts that have written to it — add the ones that belong in TELEGRAM_STAFF_IDS:')
+  for (const [id, who] of people) console.log(`  ${id}  ${who}`)
 }

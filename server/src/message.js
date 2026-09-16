@@ -50,10 +50,11 @@ export function cancelledMessage(booking, by) {
   ].join(NL)
 }
 
-export function releasedMessage(booking) {
+export function releasedMessage(booking, by) {
   return [
     heading('Table free again', booking.reference),
     'The guests have left; the table is back in the calendar.',
+    ...(by ? [`Freed by: ${escapeHtml(by)}`] : []),
     '',
     ...describe(booking),
   ].join(NL)
@@ -101,13 +102,17 @@ export function helpMessage(closures) {
   ].join(NL)
 }
 
-export function welcomeMessage(chatId) {
+export function welcomeMessage() {
   return [
     '<b>DAON — reservation alerts</b>',
     '',
-    `This chat: <code>${chatId}</code>`,
-    'Reservations from the website will arrive here.',
+    'You are on the staff list. Reservations from the website arrive here,',
+    'and whatever one of you does with a reservation shows up for the others.',
     '',
     'Send /help to see what else I can do.',
   ].join(NL)
+}
+
+export function privateMessage() {
+  return 'This bot is private to the DAON staff.'
 }

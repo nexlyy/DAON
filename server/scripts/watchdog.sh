@@ -14,14 +14,14 @@ STATE=/opt/daon-api/data/watchdog.state
 # shellcheck disable=SC1090
 . "$ENV_FILE"
 
-CHAT="${TELEGRAM_CHAT_ID:-}"
-[ -n "$CHAT" ] || CHAT=$(sed -n 's/.*"chatId": *\([0-9-]*\).*/\1/p' /opt/daon-api/data/chat.json 2>/dev/null || true)
-[ -n "$CHAT" ] || exit 0
+[ -n "${TELEGRAM_STAFF_IDS:-}" ] || exit 0
 
 say() {
-  curl -sf -o /dev/null "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-    --data-urlencode "chat_id=$CHAT" \
-    --data-urlencode "text=$1" || true
+  for ID in $(printf '%s' "$TELEGRAM_STAFF_IDS" | tr ',' ' '); do
+    curl -sf -o /dev/null "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+      --data-urlencode "chat_id=$ID" \
+      --data-urlencode "text=$1" || true
+  done
 }
 
 HEALTH=$(curl -sf --max-time 10 http://127.0.0.1:8787/health || true)
