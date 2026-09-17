@@ -344,7 +344,6 @@ const printed: Dish[] = [
     },
     price: 40,
     photo: '19',
-    tags: ['vegetarian'],
   },
   {
     id: 'tuna-kimbap',
@@ -447,7 +446,6 @@ const printed: Dish[] = [
     description: dolsotBibimbapDesc,
     price: 60,
     photo: '26',
-    tags: ['vegetarian'],
   },
   {
     id: 'dolsot-bibimbap-pork',
@@ -460,7 +458,6 @@ const printed: Dish[] = [
     description: dolsotBibimbapDesc,
     price: 60,
     photo: '26',
-    tags: ['vegetarian'],
   },
   {
     id: 'dolsot-bibimbap-chicken',
@@ -473,7 +470,6 @@ const printed: Dish[] = [
     description: dolsotBibimbapDesc,
     price: 60,
     photo: '26',
-    tags: ['vegetarian'],
   },
   {
     id: 'dolsot-bibimbap-tofu',
@@ -595,7 +591,6 @@ const printed: Dish[] = [
     description: koreanFriedChickenDesc,
     price: 85,
     photo: '38',
-    tags: ['extraSpicy'],
     featured: true,
   },
   {
@@ -622,7 +617,6 @@ const printed: Dish[] = [
     description: koreanFriedChickenDesc,
     price: 85,
     photo: '38',
-    tags: ['extraSpicy'],
   },
   {
     id: 'korean-fried-chicken-fried-spicy',
@@ -648,7 +642,6 @@ const printed: Dish[] = [
     description: koreanFriedChickenDesc,
     price: 85,
     photo: '38',
-    tags: ['extraSpicy'],
   },
   {
     id: 'korean-fried-chicken-spicy-sweet',
@@ -741,7 +734,6 @@ const printed: Dish[] = [
     price: 300,
     photo: '44',
     portion: '1000g',
-    tags: ['sharing'],
   },
   {
     id: 'bulgoggie-bbq',
@@ -821,7 +813,6 @@ const printed: Dish[] = [
     price: 450,
     photo: '50',
     portion: '800g',
-    tags: ['sharing'],
   },
   {
     id: 'buckwheat-soba',
@@ -837,7 +828,6 @@ const printed: Dish[] = [
     },
     price: 50,
     photo: '56',
-    tags: ['vegetarian'],
   },
   {
     id: 'bibim-soba',
@@ -866,7 +856,6 @@ const printed: Dish[] = [
     description: kalguksuSeafoodDesc,
     price: 60,
     photo: '58',
-    tags: ['vegetarian'],
   },
   {
     id: 'kalguksu-kimchi',
