@@ -372,27 +372,27 @@
   },
   "promo": {
     "ribbon": {
-      "upcoming": "다온 생일 · {dates} · 모든 요리 {percent}% 할인",
-      "active": "생일 주말 · {end}까지 모든 요리 {percent}% 할인",
+      "upcoming": "다온 생일 · {dates} · 매장 내 모든 요리 {percent}% 할인",
+      "active": "생일 주말 · {end}까지 매장 내 모든 요리 {percent}% 할인",
       "cta": "메뉴 보기",
       "close": "공지 닫기"
     },
     "band": {
       "title": "다온의 생일입니다",
       "titleActive": "이번 주말은 다온의 생일입니다",
-      "body": "금요일, 토요일, 일요일 사흘 동안 메뉴의 모든 요리를 {percent}% 할인해 드립니다. 함께 축하해 주세요.",
-      "bodyActive": "일요일까지 메뉴의 모든 요리를 {percent}% 할인해 드리며, 사이트의 가격에도 이미 반영되어 있습니다. 함께 축하해 주세요.",
+      "body": "금요일, 토요일, 일요일 사흘 동안 매장에서 드시는 모든 요리를 {percent}% 할인해 드립니다. 함께 축하해 주세요.",
+      "bodyActive": "일요일까지 매장에서 드시는 모든 요리를 {percent}% 할인해 드리며, 사이트의 가격에도 이미 반영되어 있습니다. 함께 축하해 주세요.",
       "everyDish": "모든 요리",
-      "fine": "할인은 메뉴의 요리에만 적용되며 음료는 제외됩니다.",
+      "fine": "할인은 매장에서 주문하시는 메뉴의 모든 요리에 적용됩니다. 음료와 Uber Eats 주문은 제외됩니다.",
       "menu": "메뉴 보기"
     },
     "menu": {
-      "upcoming": "{dates}: 다온 생일 기념 모든 요리 {percent}% 할인 (음료 제외)",
-      "active": "{end}까지 생일 특가: 아래 모든 요리가 이미 {percent}% 할인된 가격입니다 (음료 제외)"
+      "upcoming": "{dates}: 다온 생일 기념 매장 내 모든 요리 {percent}% 할인 (음료, Uber Eats 제외)",
+      "active": "{end}까지 생일 특가: 매장에서 주문하시면 아래 모든 요리가 {percent}% 할인된 가격입니다 (음료, Uber Eats 제외)"
     },
     "price": {
       "was": "정상가",
-      "now": "생일 특가"
+      "now": "매장 생일 특가"
     }
   },
   "status": {

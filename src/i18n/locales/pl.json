@@ -372,27 +372,27 @@
   },
   "promo": {
     "ribbon": {
-      "upcoming": "Urodziny DAON · {dates} · −{percent}% na wszystkie dania",
-      "active": "Urodzinowy weekend · −{percent}% na wszystkie dania do {end}",
+      "upcoming": "Urodziny DAON · {dates} · −{percent}% na wszystkie dania w restauracji",
+      "active": "Urodzinowy weekend · −{percent}% na wszystkie dania w restauracji do {end}",
       "cta": "Zobacz menu",
       "close": "Ukryj ogłoszenie"
     },
     "band": {
       "title": "DAON ma urodziny",
       "titleActive": "W ten weekend mamy urodziny",
-      "body": "Piątek, sobota i niedziela: wszystkie dania z menu tańsze o {percent}%. Przyjdźcie świętować razem z nami.",
-      "bodyActive": "Do niedzieli wszystkie dania z menu są tańsze o {percent}%, a ceny na stronie są już obniżone. Przyjdźcie świętować razem z nami.",
+      "body": "Piątek, sobota i niedziela: wszystkie dania z menu tańsze o {percent}%, gdy jecie u nas na miejscu. Przyjdźcie świętować razem z nami.",
+      "bodyActive": "Do niedzieli wszystkie dania z menu są na miejscu w restauracji tańsze o {percent}%, a ceny na stronie są już obniżone. Przyjdźcie świętować razem z nami.",
       "everyDish": "na wszystkie dania",
-      "fine": "Rabat obejmuje dania z menu. Napoje nie są objęte promocją.",
+      "fine": "Rabat obejmuje wszystkie dania z menu zamawiane na miejscu w restauracji. Nie dotyczy napojów ani zamówień przez Uber Eats.",
       "menu": "Zobacz menu"
     },
     "menu": {
-      "upcoming": "{dates}: −{percent}% na wszystkie dania z okazji naszych urodzin. Napoje nie są objęte promocją.",
-      "active": "Ceny urodzinowe do {end}: wszystkie dania poniżej są już tańsze o {percent}%. Napoje nie są objęte promocją."
+      "upcoming": "{dates}: −{percent}% na wszystkie dania z okazji naszych urodzin, tylko na miejscu w restauracji. Nie dotyczy napojów ani Uber Eats.",
+      "active": "Ceny urodzinowe do {end}: wszystkie dania poniżej są już tańsze o {percent}% przy zamówieniu na miejscu w restauracji. Nie dotyczy napojów ani Uber Eats."
     },
     "price": {
       "was": "Cena regularna",
-      "now": "Cena urodzinowa"
+      "now": "Cena urodzinowa w restauracji"
     }
   },
   "status": {

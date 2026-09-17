@@ -46,7 +46,7 @@
     position: relative;
     display: grid;
     justify-items: center;
-    grid-template-rows: repeat(7, auto) 1fr;
+    grid-template-rows: repeat(8, auto) 1fr;
     height: 100%;
     padding: 120px 96px 110px;
     text-align: center;
@@ -88,7 +88,7 @@
 
   .off {
     position: relative;
-    margin-top: 40px;
+    margin-top: 70px;
     font-family: 'Fraunces', serif;
     font-size: 330px;
     font-weight: 500;
@@ -136,6 +136,13 @@
     color: rgba(251, 248, 243, 0.85);
   }
 
+  .place {
+    margin-top: 14px;
+    font-size: 32px;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+  }
+
   .days {
     margin-top: 16px;
     font-family: 'Fraunces', serif;
@@ -165,7 +172,7 @@
   .p3 { width: 280px; height: 280px; right: 10px; top: 250px; z-index: 1; }
 
   .foot {
-    grid-row: 8;
+    grid-row: 9;
     align-self: end;
     display: grid;
     gap: 18px;
@@ -183,7 +190,7 @@
     color: rgba(251, 248, 243, 0.66);
   }
 
-  body[data-format='post'] .page { padding: 96px 90px 84px; grid-template-rows: auto 1fr auto auto auto auto auto 1fr; }
+  body[data-format='post'] .page { padding: 96px 90px 84px; grid-template-rows: auto 1fr auto auto auto auto auto auto 1fr; }
   body[data-format='post'] .brand img { width: 84px; }
   body[data-format='post'] .brand span { font-size: 46px; }
   body[data-format='post'] .eyebrow { align-self: end; margin-top: 0; font-size: 28px; }
@@ -192,6 +199,7 @@
   body[data-format='post'] .seal { width: 118px; height: 118px; top: -30px; right: -96px; border-radius: 17px; }
   body[data-format='post'] .seal span { font-size: 40px; }
   body[data-format='post'] .every { margin-top: 34px; font-size: 32px; }
+  body[data-format='post'] .place { margin-top: 10px; font-size: 28px; }
   body[data-format='post'] .days { margin-top: 18px; font-size: 40px; }
   body[data-format='post'] .plates { display: none; }
   body[data-format='post'] .address { font-size: 32px; }
@@ -214,6 +222,7 @@
       <span class="seal"><span>생일</span></span>
     </p>
     <p class="every">na wszystkie dania</p>
+    <p class="place">tylko na miejscu w restauracji</p>
     <p class="days">piątek · sobota · niedziela</p>
 
     <div class="plates">
@@ -224,7 +233,7 @@
 
     <div class="foot">
       <p class="address"><b>Dworcowa 8</b> · Katowice · daon.pl</p>
-      <p class="fine">Rabat obejmuje dania z menu. Napoje nie są objęte promocją.</p>
+      <p class="fine">Rabat nie dotyczy napojów ani zamówień przez Uber Eats.</p>
     </div>
   </main>
   <script>

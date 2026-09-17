@@ -372,27 +372,27 @@
   },
   "promo": {
     "ribbon": {
-      "upcoming": "DAON's birthday · {dates} · −{percent}% on every dish",
-      "active": "Birthday weekend · −{percent}% on every dish until {end}",
+      "upcoming": "DAON's birthday · {dates} · −{percent}% on every dish in the restaurant",
+      "active": "Birthday weekend · −{percent}% on every dish in the restaurant until {end}",
       "cta": "See the menu",
       "close": "Hide the announcement"
     },
     "band": {
       "title": "DAON is having a birthday",
       "titleActive": "It's our birthday this weekend",
-      "body": "Friday, Saturday and Sunday: every dish on the menu is {percent}% cheaper. Come and celebrate with us.",
-      "bodyActive": "Until Sunday every dish on the menu is {percent}% cheaper, and the prices on the site already show it. Come and celebrate with us.",
+      "body": "Friday, Saturday and Sunday: every dish on the menu is {percent}% cheaper when you eat in. Come and celebrate with us.",
+      "bodyActive": "Until Sunday every dish on the menu is {percent}% cheaper in the restaurant, and the prices on the site already show it. Come and celebrate with us.",
       "everyDish": "on every dish",
-      "fine": "The discount applies to dishes from the menu. Drinks are not included.",
+      "fine": "The discount covers every dish on the menu ordered in the restaurant. It does not apply to drinks or to Uber Eats orders.",
       "menu": "See the menu"
     },
     "menu": {
-      "upcoming": "{dates}: −{percent}% on every dish for our birthday. Drinks are not included.",
-      "active": "Birthday prices until {end}: every dish below is already {percent}% off. Drinks are not included."
+      "upcoming": "{dates}: −{percent}% on every dish for our birthday, in the restaurant only. Not on drinks or Uber Eats.",
+      "active": "Birthday prices until {end}: every dish below is already {percent}% off when you eat in. Not on drinks or Uber Eats."
     },
     "price": {
       "was": "Regular price",
-      "now": "Birthday price"
+      "now": "Birthday price in the restaurant"
     }
   },
   "status": {
