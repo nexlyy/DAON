@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<title>DAON birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Karla:wght@400;500&family=Gowun+Batang:wght@700&display=block"
+/>
+<style>
+  :root {
+    --ink: #2f4256;
+    --paper: #fbf8f3;
+    --gold: #d9c395;
+    --seal: #d8362c;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  html, body { width: 1080px; overflow: hidden; }
+
+  body {
+    position: relative;
+    height: 1920px;
+    font-family: 'Karla', sans-serif;
+    color: var(--paper);
+    background:
+      radial-gradient(ellipse 70% 40% at 20% 42%, rgba(217, 195, 149, 0.17), transparent 70%),
+      radial-gradient(ellipse 55% 35% at 95% 4%, rgba(216, 54, 44, 0.22), transparent 70%),
+      linear-gradient(165deg, #34495f 0%, var(--ink) 55%, #22323f 100%);
+  }
+
+  body[data-format='post'] { height: 1350px; }
+
+  .frame {
+    position: absolute;
+    inset: 36px;
+    border: 2px solid rgba(217, 195, 149, 0.42);
+    border-radius: 28px;
+    box-shadow: inset 0 0 0 10px rgba(217, 195, 149, 0.06);
+  }
+
+  .page {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    grid-template-rows: repeat(7, auto) 1fr;
+    height: 100%;
+    padding: 120px 96px 110px;
+    text-align: center;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .brand img {
+    width: 118px;
+    filter: brightness(0) invert(96%) sepia(8%) saturate(300%) hue-rotate(350deg);
+  }
+
+  .brand span {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+  }
+
+  .eyebrow {
+    margin-top: 70px;
+    font-size: 30px;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  h1 {
+    margin-top: 26px;
+    font-family: 'Fraunces', serif;
+    font-size: 96px;
+    font-weight: 500;
+    line-height: 1.02;
+  }
+
+  .off {
+    position: relative;
+    margin-top: 40px;
+    font-family: 'Fraunces', serif;
+    font-size: 330px;
+    font-weight: 500;
+    line-height: 0.86;
+    letter-spacing: -0.035em;
+    color: var(--gold);
+    text-shadow: 0 16px 60px rgba(0, 0, 0, 0.25);
+  }
+
+  .off .minus { font-size: 0.72em; vertical-align: 0.08em; margin-right: 0.02em; }
+
+  .seal {
+    position: absolute;
+    top: -40px;
+    right: -120px;
+    display: grid;
+    place-items: center;
+    width: 150px;
+    height: 150px;
+    border-radius: 21px;
+    background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.14), transparent 55%), var(--seal);
+    box-shadow:
+      inset 0 0 0 7px var(--seal),
+      inset 0 0 0 11px rgba(251, 248, 243, 0.78),
+      0 18px 45px -18px rgba(80, 20, 15, 0.7);
+    transform: rotate(-7deg);
+    text-shadow: none;
+  }
+
+  .seal span {
+    writing-mode: vertical-rl;
+    font-family: 'Gowun Batang', serif;
+    font-size: 51px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--paper);
+  }
+
+  .every {
+    margin-top: 28px;
+    font-size: 36px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(251, 248, 243, 0.85);
+  }
+
+  .days {
+    margin-top: 16px;
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    font-style: italic;
+    color: rgba(251, 248, 243, 0.9);
+  }
+
+  .plates {
+    position: relative;
+    width: 860px;
+    height: 560px;
+    margin-top: 70px;
+  }
+
+  .plate {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: 0 0 0 12px var(--paper), 0 40px 80px -30px rgba(0, 0, 0, 0.6);
+  }
+
+  .plate img { width: 100%; height: 100%; object-fit: cover; }
+
+  .p1 { width: 470px; height: 470px; left: 195px; top: 0; z-index: 2; }
+  .p2 { width: 300px; height: 300px; left: 0; top: 230px; z-index: 3; }
+  .p3 { width: 280px; height: 280px; right: 10px; top: 250px; z-index: 1; }
+
+  .foot {
+    grid-row: 8;
+    align-self: end;
+    display: grid;
+    gap: 18px;
+  }
+
+  .address {
+    font-size: 38px;
+    letter-spacing: 0.08em;
+  }
+
+  .address b { font-weight: 500; color: var(--gold); }
+
+  .fine {
+    font-size: 26px;
+    color: rgba(251, 248, 243, 0.66);
+  }
+
+  body[data-format='post'] .page { padding: 96px 90px 84px; grid-template-rows: auto 1fr auto auto auto auto auto 1fr; }
+  body[data-format='post'] .brand img { width: 84px; }
+  body[data-format='post'] .brand span { font-size: 46px; }
+  body[data-format='post'] .eyebrow { align-self: end; margin-top: 0; font-size: 28px; }
+  body[data-format='post'] h1 { margin-top: 16px; font-size: 76px; }
+  body[data-format='post'] .off { margin-top: 60px; font-size: 270px; }
+  body[data-format='post'] .seal { width: 118px; height: 118px; top: -30px; right: -96px; border-radius: 17px; }
+  body[data-format='post'] .seal span { font-size: 40px; }
+  body[data-format='post'] .every { margin-top: 34px; font-size: 32px; }
+  body[data-format='post'] .days { margin-top: 18px; font-size: 40px; }
+  body[data-format='post'] .plates { display: none; }
+  body[data-format='post'] .address { font-size: 32px; }
+  body[data-format='post'] .fine { font-size: 23px; }
+</style>
+</head>
+<body>
+  <div class="frame"></div>
+  <main class="page">
+    <div class="brand">
+      <img src="../../public/images/logo-mark.png" alt="" />
+      <span>DAON</span>
+    </div>
+
+    <p class="eyebrow">18–20 września</p>
+    <h1>DAON ma urodziny</h1>
+
+    <p class="off">
+      <span class="minus">−</span>20%
+      <span class="seal"><span>생일</span></span>
+    </p>
+    <p class="every">na wszystkie dania</p>
+    <p class="days">piątek · sobota · niedziela</p>
+
+    <div class="plates">
+      <div class="plate p1"><img src="../../public/images/dishes/03.webp" alt="" /></div>
+      <div class="plate p2"><img src="../../public/images/dishes/38.webp" alt="" /></div>
+      <div class="plate p3"><img src="../../public/images/dishes/60.webp" alt="" /></div>
+    </div>
+
+    <div class="foot">
+      <p class="address"><b>Dworcowa 8</b> · Katowice · daon.pl</p>
+      <p class="fine">Rabat obejmuje dania z menu. Napoje nie są objęte promocją.</p>
+    </div>
+  </main>
+  <script>
+    document.body.dataset.format = location.hash.slice(1) || 'story'
+  </script>
+</body>
+</html>
