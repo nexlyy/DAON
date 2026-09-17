@@ -118,7 +118,14 @@
     "errorBody": "Check the connection and try again.",
     "retry": "Try again",
     "footer": "Prices in Polish złoty. The list is not on the public site yet.",
-    "back": "Back to daon.pl"
+    "back": "Back to daon.pl",
+    "searchLabel": "Search the drinks menu",
+    "searchPlaceholder": "Name or ingredient, e.g. mango",
+    "searchOpen": "Search",
+    "searchClose": "Close search",
+    "results": "Matching items: {count}",
+    "noResults": "Nothing matches “{query}”.",
+    "clear": "Clear"
   },
   "order": {
     "title": "Order online",

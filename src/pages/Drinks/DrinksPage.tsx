@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { useI18n } from '@/i18n/useI18n'
@@ -19,11 +19,59 @@ const bundleUrl = (key: string) => `/d/${encodeURIComponent(key)}/drinks.json`
 const imageUrl = (key: string, photo: string, ext: string, tier?: 'sm' | 'xl') =>
   `/d/${encodeURIComponent(key)}/images/${tier ? `${tier}/` : ''}${photo}.${ext}`
 
+const anchor = (id: string) => `drinks-${id}`
+
+const fold = (value: string) =>
+  value.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/ł/g, 'l')
+
+const textsOf = (value: unknown): string[] => {
+  if (!value) return []
+  if (typeof value === 'string') return [value]
+  if (Array.isArray(value)) return value.flatMap(textsOf)
+  if (typeof value === 'object') return Object.values(value).flatMap(textsOf)
+  return []
+}
+
+const itemTexts = (item: DrinkItem) =>
+  textsOf([item.name, item.title, item.sub, item.desc, item.note, item.prices?.map((price) => price.label)])
+
+function filterSection(section: DrinkSection, matches: (texts: string[]) => boolean) {
+  if (matches(textsOf(section.title))) return section
+
+  switch (section.layout) {
+    case 'columns': {
+      const groups = (section.groups ?? [])
+        .map((group) =>
+          matches(textsOf(group.title))
+            ? group
+            : { ...group, items: group.items.filter((item) => matches(itemTexts(item))) },
+        )
+        .filter((group) => group.items.length > 0)
+      return groups.length > 0 ? { ...section, photo: undefined, groups } : null
+    }
+    case 'steps':
+      return section.items?.some((item) => matches(itemTexts(item))) ? section : null
+    default: {
+      const items = (section.items ?? []).filter((item) => matches(itemTexts(item)))
+      return items.length > 0 ? { ...section, items } : null
+    }
+  }
+}
+
+const countOf = (section: DrinkSection) =>
+  section.layout === 'steps'
+    ? 1
+    : section.layout === 'columns'
+      ? (section.groups ?? []).reduce((total, group) => total + group.items.length, 0)
+      : (section.items ?? []).length
+
 export function DrinksPage() {
   const { t, locale, path } = useI18n()
   const { key = '' } = useParams()
   const [status, setStatus] = useState<Status>('loading')
   const [menu, setMenu] = useState<DrinksMenu | null>(null)
+  const [query, setQuery] = useState('')
+  const deferredQuery = useDeferredValue(query)
 
   useDocumentMeta({
     title: t('drinks.metaTitle'),
@@ -59,8 +107,9 @@ export function DrinksPage() {
   useEffect(load, [load])
 
   const pick = useCallback(
-    (value?: Bilingual) => {
+    (value?: Bilingual | string) => {
       if (!value) return ''
+      if (typeof value === 'string') return value
       if (locale === 'pl') return value.pl || value.en || ''
       return value.en || value.pl || ''
     },
@@ -77,7 +126,18 @@ export function DrinksPage() {
     [locale],
   )
 
-  const sections = menu?.sections ?? []
+  const needle = fold(deferredQuery.trim())
+  const sections = useMemo(() => {
+    const all = menu?.sections ?? []
+    if (!needle) return all
+    const stem = needle.length >= 5 && /[aeiouy]$/.test(needle) ? needle.slice(0, -1) : needle
+    const matches = (texts: string[]) => texts.some((text) => fold(text).includes(stem))
+    return all
+      .map((section) => filterSection(section, matches))
+      .filter((section): section is DrinkSection => section !== null)
+  }, [menu, needle])
+
+  const found = needle ? sections.reduce((total, section) => total + countOf(section), 0) : null
 
   if (status !== 'ready' || !menu) {
     return (
@@ -94,9 +154,18 @@ export function DrinksPage() {
     <>
       <Cover menu={menu} bundleKey={key} />
 
-      <SectionRail sections={sections} pick={pick} />
+      <SectionRail sections={sections} pick={pick} query={query} onQuery={setQuery} />
 
       <div className="shell">
+        {found !== null && (
+          <p className={styles.results} aria-live="polite">
+            {found > 0 ? t('drinks.results', { count: found }) : t('drinks.noResults', { query: query.trim() })}
+            <button type="button" className={styles.resultsClear} onClick={() => setQuery('')}>
+              {t('drinks.clear')}
+            </button>
+          </p>
+        )}
+
         {sections.map((section) => (
           <Section
             key={section.id}
@@ -154,7 +223,7 @@ function Notice({ status, onRetry }: { status: Status; onRetry: () => void }) {
 
 interface Shared {
   bundleKey: string
-  pick: (value?: Bilingual) => string
+  pick: (value?: Bilingual | string) => string
 }
 
 function Cover({ menu, bundleKey }: { menu: DrinksMenu } & Pick<Shared, 'bundleKey'>) {
@@ -178,26 +247,220 @@ function Cover({ menu, bundleKey }: { menu: DrinksMenu } & Pick<Shared, 'bundleK
 function SectionRail({
   sections,
   pick,
+  query,
+  onQuery,
 }: {
   sections: DrinkSection[]
-  pick: (value?: Bilingual) => string
+  pick: Shared['pick']
+  query: string
+  onQuery: (value: string) => void
 }) {
   const { t } = useI18n()
   const [sentinel, stuck] = useStuck<HTMLDivElement>()
+  const railRef = useRef<HTMLElement>(null)
+  const chipsRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [active, setActive] = useState(sections[0]?.id ?? '')
+  const [more, setMore] = useState<'start' | 'end' | 'both' | undefined>()
+  const [searching, setSearching] = useState(false)
+
+  // Pictures load as they come into view, so the page keeps growing under a
+  // long jump and a single scroll lands short. The target is corrected until it
+  // stops moving, or until the reader takes over.
+  const settling = useRef<(() => void) | null>(null)
+
+  const scrollTo = useCallback((id: string, smooth = true) => {
+    settling.current?.()
+
+    const place = () => {
+      const node = document.getElementById(anchor(id))
+      const rail = railRef.current
+      if (!node || !rail) return 0
+      const off = node.getBoundingClientRect().top - rail.getBoundingClientRect().bottom - 12
+      if (Math.abs(off) > 4) window.scrollTo({ top: window.scrollY + off, behavior: smooth ? 'smooth' : 'auto' })
+      return off
+    }
+
+    place()
+
+    let timer = 0
+    const give = () => {
+      window.clearTimeout(timer)
+      settling.current = null
+      for (const event of ['wheel', 'touchstart', 'keydown']) {
+        window.removeEventListener(event, give)
+      }
+    }
+    const until = Date.now() + 3000
+    const again = () => {
+      if (Date.now() > until) return give()
+      if (Math.abs(place()) <= 4 && Date.now() > until - 2400) return give()
+      timer = window.setTimeout(again, 250)
+    }
+    timer = window.setTimeout(again, 350)
+    for (const event of ['wheel', 'touchstart', 'keydown']) {
+      window.addEventListener(event, give, { passive: true })
+    }
+    settling.current = give
+  }, [])
+
+  useEffect(() => () => settling.current?.(), [])
+
+  const measure = useCallback(() => {
+    const chips = chipsRef.current
+    if (!chips) return
+    const before = chips.scrollLeft > 4
+    const after = chips.scrollLeft + chips.clientWidth < chips.scrollWidth - 4
+    setMore(before && after ? 'both' : before ? 'start' : after ? 'end' : undefined)
+  }, [])
+
+  useEffect(() => {
+    const chips = chipsRef.current
+    if (!chips) return
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(chips)
+    return () => observer.disconnect()
+  }, [measure, sections])
+
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    if (!hash.startsWith('drinks-')) return
+    const id = hash.slice('drinks-'.length)
+    if (!sections.some((section) => section.id === id)) return
+    const frame = window.requestAnimationFrame(() => scrollTo(id, false))
+    return () => window.cancelAnimationFrame(frame)
+
+  }, [])
+
+  useEffect(() => {
+    let frame = 0
+    const spy = () => {
+      window.cancelAnimationFrame(frame)
+      frame = window.requestAnimationFrame(() => {
+        const line = (railRef.current?.getBoundingClientRect().bottom ?? 0) + 48
+        let current = sections[0]?.id ?? ''
+        for (const section of sections) {
+          const node = document.getElementById(anchor(section.id))
+          if (node && node.getBoundingClientRect().top <= line) current = section.id
+        }
+        setActive(current)
+      })
+    }
+    spy()
+    window.addEventListener('scroll', spy, { passive: true })
+    window.addEventListener('resize', spy)
+    return () => {
+      window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', spy)
+      window.removeEventListener('resize', spy)
+    }
+  }, [sections])
+
+  useEffect(() => {
+    const chips = chipsRef.current
+    const chip = chips?.querySelector<HTMLElement>('[aria-current="true"]')
+    if (!chips || !chip) return
+    chips.scrollTo({
+      left: chip.offsetLeft - (chips.clientWidth - chip.offsetWidth) / 2,
+      behavior: 'smooth',
+    })
+  }, [active])
+
+  useEffect(() => {
+    if (searching) inputRef.current?.focus()
+  }, [searching])
+
+  const jump = (id: string) => {
+    setActive(id)
+    scrollTo(id)
+    window.history.replaceState(window.history.state, '', `#${anchor(id)}`)
+  }
+
+  const open = searching || query.length > 0
 
   return (
     <>
       <div ref={sentinel} aria-hidden="true" />
-      <nav className={styles.rail} aria-label={t('drinks.jump')} data-stuck={stuck || undefined}>
+      <nav
+        ref={railRef}
+        className={styles.rail}
+        aria-label={t('drinks.jump')}
+        data-stuck={stuck || undefined}
+        data-searching={open || undefined}
+      >
         <div className={`shell ${styles.railInner}`}>
-          {sections.map((section) => (
-            <a key={section.id} className={styles.railLink} href={`#drinks-${section.id}`}>
-              {pick(section.title)}
-            </a>
-          ))}
+          <div className={styles.search} role="search">
+            <button
+              type="button"
+              className={styles.searchToggle}
+              aria-label={t('drinks.searchOpen')}
+              aria-expanded={open}
+              onClick={() => setSearching(true)}
+            >
+              <SearchIcon />
+            </button>
+            <label className={styles.searchField}>
+              <span className="visually-hidden">{t('drinks.searchLabel')}</span>
+              <SearchIcon />
+              <input
+                ref={inputRef}
+                type="search"
+                value={query}
+                placeholder={t('drinks.searchPlaceholder')}
+                enterKeyHint="search"
+                onChange={(event) => onQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    onQuery('')
+                    setSearching(false)
+                  }
+                }}
+              />
+            </label>
+            <button
+              type="button"
+              className={styles.searchClose}
+              aria-label={t('drinks.searchClose')}
+              onClick={() => {
+                onQuery('')
+                setSearching(false)
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className={styles.chips} ref={chipsRef} data-more={more} onScroll={measure}>
+            {sections.map((section) => (
+              <a
+                key={section.id}
+                className={styles.railLink}
+                href={`#${anchor(section.id)}`}
+                aria-current={section.id === active || undefined}
+                onClick={(event) => {
+                  event.preventDefault()
+                  jump(section.id)
+                }}
+              >
+                {pick(section.title)}
+              </a>
+            ))}
+          </div>
         </div>
       </nav>
     </>
+  )
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+        <circle cx="8.5" cy="8.5" r="5.5" />
+        <path d="m13 13 4 4" />
+      </g>
+    </svg>
   )
 }
 
@@ -216,7 +479,7 @@ function Section({
     : undefined
 
   return (
-    <section className={styles.section} id={`drinks-${section.id}`}>
+    <section className={styles.section} id={anchor(section.id)}>
       <header className={styles.sectionHead}>
         <h2 className={styles.sectionTitle}>{title}</h2>
         {other && <p className={styles.sectionAlt}>{other}</p>}
@@ -262,7 +525,7 @@ function Section({
                     </span>
                   )}
                 </div>
-                {item.note && <p className={styles.itemNote}>{item.note}</p>}
+                {item.note && <p className={styles.itemNote}>{pick(item.note)}</p>}
                 {lines(item.desc).map((line) => (
                   <p className={styles.itemDesc} key={line}>
                     {line}

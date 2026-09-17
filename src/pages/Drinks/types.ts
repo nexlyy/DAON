@@ -19,7 +19,7 @@ export interface DrinkItem {
   step?: string
   title?: Bilingual
   sub?: Bilingual
-  note?: string
+  note?: string | Bilingual
   desc?: Bilingual & BilingualLines
   volume?: string
   price?: string

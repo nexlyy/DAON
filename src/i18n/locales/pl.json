@@ -118,7 +118,14 @@
     "errorBody": "Sprawdź połączenie i spróbuj ponownie.",
     "retry": "Spróbuj ponownie",
     "footer": "Ceny w złotych. Karta nie jest jeszcze publikowana na stronie.",
-    "back": "Wróć na daon.pl"
+    "back": "Wróć na daon.pl",
+    "searchLabel": "Szukaj w karcie napojów",
+    "searchPlaceholder": "Nazwa lub składnik, np. mango",
+    "searchOpen": "Szukaj",
+    "searchClose": "Zamknij wyszukiwanie",
+    "results": "Pasujące pozycje: {count}",
+    "noResults": "Nic nie pasuje do „{query}”.",
+    "clear": "Wyczyść"
   },
   "order": {
     "title": "Zamów online",

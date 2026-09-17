@@ -48,6 +48,7 @@
   padding-block: 0.35em;
   font-size: var(--step--1);
   letter-spacing: 0.2em;
+  white-space: nowrap;
   text-transform: uppercase;
   color: var(--text-soft);
   transition: color 0.3s var(--ease);
@@ -211,6 +212,16 @@
   display: grid;
   gap: 0.55rem;
   width: 100%;
+}
+
+@media (max-width: 1320px) {
+  .desktopNav {
+    gap: 1.15rem;
+  }
+
+  .navLink {
+    letter-spacing: 0.12em;
+  }
 }
 
 @media (max-width: 1180px) {
