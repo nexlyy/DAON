@@ -19,7 +19,7 @@ const links = [
 ]
 
 export function Navbar() {
-  const { t } = useI18n()
+  const { t, path } = useI18n()
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -82,13 +82,13 @@ export function Navbar() {
       >
         <PromoRibbon />
         <div className={styles.bar}>
-          <Link to="/" className={styles.brand} aria-label="DAON">
+          <Link to={path('/')} className={styles.brand} aria-label="DAON">
             <Logo />
           </Link>
 
           <nav className={styles.desktopNav} aria-label={t('nav.home')}>
             {links.map((link) => (
-              <NavItem key={link.to} to={link.to} end={link.end}>
+              <NavItem key={link.to} to={path(link.to)} end={link.end}>
                 {t(link.key)}
               </NavItem>
             ))}
@@ -98,7 +98,7 @@ export function Navbar() {
             <LanguageSwitcher />
             <OrderLink kind="pickup" className={`${styles.cta} ${styles.pickup}`} />
             <OrderLink kind="delivery" className={styles.cta} />
-            <Link to="/reservation" className={`btn ${styles.cta}`}>
+            <Link to={path('/reservation')} className={`btn ${styles.cta}`}>
               {t('nav.reservation')}
             </Link>
             <button
@@ -131,7 +131,7 @@ export function Navbar() {
           {links.map((link, index) => (
             <NavLink
               key={link.to}
-              to={link.to}
+              to={path(link.to)}
               end={link.end}
               className={styles.drawerLink}
               style={{ transitionDelay: drawerOpen ? `${90 + index * 45}ms` : '0ms' }}

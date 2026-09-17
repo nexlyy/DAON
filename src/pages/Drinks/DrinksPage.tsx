@@ -15,14 +15,12 @@ import styles from './DrinksPage.module.css'
 
 type Status = 'loading' | 'ready' | 'missing' | 'error'
 
-// The whole menu lives behind the link: nothing about the drinks is in the site
-// bundle, and the key in the address is what fetches it.
 const bundleUrl = (key: string) => `/d/${encodeURIComponent(key)}/drinks.json`
 const imageUrl = (key: string, photo: string, ext: string, tier?: 'sm' | 'xl') =>
   `/d/${encodeURIComponent(key)}/images/${tier ? `${tier}/` : ''}${photo}.${ext}`
 
 export function DrinksPage() {
-  const { t, locale } = useI18n()
+  const { t, locale, path } = useI18n()
   const { key = '' } = useParams()
   const [status, setStatus] = useState<Status>('loading')
   const [menu, setMenu] = useState<DrinksMenu | null>(null)
@@ -38,9 +36,6 @@ export function DrinksPage() {
     let cancelled = false
     setStatus('loading')
 
-    // The bundle and the page that reads it are deployed separately, so the
-    // page always revalidates: a cached copy from before a rebuild would be
-    // read with the shape the new code no longer expects.
     fetch(bundleUrl(key), { headers: { accept: 'application/json' }, cache: 'no-cache' })
       .then((response) => {
         if (response.status === 404 || response.status === 403) return null
@@ -63,8 +58,6 @@ export function DrinksPage() {
 
   useEffect(load, [load])
 
-  // Polish is printed in the menu itself; Korean is not, so it reads the
-  // English line rather than a translation nobody has written.
   const pick = useCallback(
     (value?: Bilingual) => {
       if (!value) return ''
@@ -119,7 +112,7 @@ export function DrinksPage() {
         <GoldDivider />
         <p className={styles.footNote}>{pick(menu.note)}</p>
         <p className={styles.footNote}>{t('drinks.footer')}</p>
-        <Link className={styles.back} to="/">
+        <Link className={styles.back} to={path('/')}>
           {t('drinks.back')}
         </Link>
       </section>
@@ -128,7 +121,7 @@ export function DrinksPage() {
 }
 
 function Notice({ status, onRetry }: { status: Status; onRetry: () => void }) {
-  const { t } = useI18n()
+  const { t, path } = useI18n()
 
   if (status === 'loading') {
     return (
@@ -152,7 +145,7 @@ function Notice({ status, onRetry }: { status: Status; onRetry: () => void }) {
           {t('drinks.retry')}
         </button>
       )}
-      <Link className={styles.back} to="/">
+      <Link className={styles.back} to={path('/')}>
         {t('drinks.back')}
       </Link>
     </section>
@@ -502,8 +495,6 @@ function Photo({
 
   full?: number
 } & Pick<Shared, 'bundleKey'>) {
-  // A photograph inside the page is drawn at a few hundred CSS pixels; the
-  // cover fills the window, so it is told so and offered the whole file.
   const sizes = full ? '100vw' : '(max-width: 720px) 100vw, 420px'
   const width = full ?? 1000
   const height = Math.round(width / ratio)

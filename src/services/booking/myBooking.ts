@@ -24,6 +24,10 @@ export function rememberBooking(booking: Booking & { cancelToken?: string }): vo
     tableIds: booking.tableIds,
     name: booking.name,
   }
+  saveBooking(saved)
+}
+
+export function saveBooking(saved: SavedBooking): void {
   try {
     window.localStorage.setItem(KEY, JSON.stringify(saved))
   } catch {

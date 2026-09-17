@@ -1,10 +1,18 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import en from './locales/en.json'
 import pl from './locales/pl.json'
 import ko from './locales/ko.json'
-import { DEFAULT_LOCALE, LOCALE_META, type Locale } from './config'
-import { resolveInitialLocale, storeLocale } from './detect'
+import {
+  DEFAULT_LOCALE,
+  LOCALE_META,
+  ROOT_LOCALE,
+  localePath,
+  splitLocale,
+  type Locale,
+} from './config'
+import { readStoredLocale, storeLocale } from './detect'
 
 type Dictionary = typeof en
 type Params = Record<string, string | number>
@@ -20,15 +28,19 @@ export type Translatable = { en: string } & Partial<Record<Locale, string>>
 export interface I18nValue {
   locale: Locale
   setLocale: (locale: Locale) => void
-  
+
   switching: boolean
   t: (key: string, params?: Params) => string
-  
+
   list: (key: string) => string[]
-  
+
   resolve: (text: Translatable | undefined) => string
   formatPrice: (amount: number) => string
   formatDate: (date: Date, options?: Intl.DateTimeFormatOptions) => string
+
+  path: (to: string) => string
+
+  page: string
 }
 
 export const I18nContext = createContext<I18nValue | null>(null)
@@ -49,37 +61,51 @@ function interpolate(template: string, params?: Params): string {
   )
 }
 
+export function translate(locale: Locale, key: string, params?: Params): string {
+  const found = lookup(dictionaries[locale], key) ?? lookup(dictionaries[DEFAULT_LOCALE], key)
+  return typeof found === 'string' ? interpolate(found, params) : key
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => resolveInitialLocale())
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { locale, page } = splitLocale(location.pathname)
   const [switching, setSwitching] = useState(false)
   const timer = useRef<number | undefined>(undefined)
-  const current = useRef(locale)
+  const where = useRef({ locale, page, search: location.search, hash: location.hash })
+  where.current = { locale, page, search: location.search, hash: location.hash }
 
   useEffect(() => {
-    current.current = locale
     document.documentElement.lang = LOCALE_META[locale].htmlLang
   }, [locale])
 
+  useEffect(() => {
+    const stored = readStoredLocale()
+    const { locale: shown, page: current, search, hash } = where.current
+    if (stored && stored !== ROOT_LOCALE && shown === ROOT_LOCALE) {
+      navigate(`${localePath(stored, current)}${search}${hash}`, { replace: true })
+    }
+  }, [navigate])
+
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
-  const setLocale = useCallback((next: Locale) => {
-    if (current.current === next) return
-    current.current = next
-
-    storeLocale(next)
-    setLocaleState(next)
-    setSwitching(true)
-    window.clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setSwitching(false), 320)
-  }, [])
+  const setLocale = useCallback(
+    (next: Locale) => {
+      storeLocale(next)
+      const { locale: shown, page: current, search, hash } = where.current
+      if (shown === next) return
+      navigate(`${localePath(next, current)}${search}${hash}`)
+      setSwitching(true)
+      window.clearTimeout(timer.current)
+      timer.current = window.setTimeout(() => setSwitching(false), 320)
+    },
+    [navigate],
+  )
 
   const value = useMemo<I18nValue>(() => {
     const dictionary = dictionaries[locale]
 
-    const t = (key: string, params?: Params) => {
-      const found = lookup(dictionary, key) ?? lookup(dictionaries[DEFAULT_LOCALE], key)
-      return typeof found === 'string' ? interpolate(found, params) : key
-    }
+    const t = (key: string, params?: Params) => translate(locale, key, params)
 
     const list = (key: string) => {
       const found = lookup(dictionary, key) ?? lookup(dictionaries[DEFAULT_LOCALE], key)
@@ -96,14 +122,16 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
         maximumFractionDigits: 2,
       })
-      return `${number.format(amount)} PLN`
+      return `${number.format(amount)} PLN`
     }
 
     const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions) =>
       new Intl.DateTimeFormat(LOCALE_META[locale].htmlLang, options).format(date)
 
-    return { locale, setLocale, switching, t, list, resolve, formatPrice, formatDate }
-  }, [locale, setLocale, switching])
+    const path = (to: string) => localePath(locale, to)
+
+    return { locale, setLocale, switching, t, list, resolve, formatPrice, formatDate, path, page }
+  }, [locale, setLocale, switching, page])
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }

@@ -9,7 +9,7 @@ import { useI18n } from '@/i18n/useI18n'
 import styles from './Footer.module.css'
 
 export function Footer() {
-  const { t } = useI18n()
+  const { t, path } = useI18n()
 
   return (
     <footer className={styles.footer} id="contact">
@@ -26,16 +26,16 @@ export function Footer() {
             <h2 className={styles.colTitle} id="footer-explore">
               {t('footer.explore')}
             </h2>
-            <Link to="/" className={styles.link}>
+            <Link to={path('/')} className={styles.link}>
               {t('nav.home')}
             </Link>
-            <Link to="/menu" className={styles.link}>
+            <Link to={path('/menu')} className={styles.link}>
               {t('nav.menu')}
             </Link>
-            <Link to="/about" className={styles.link}>
+            <Link to={path('/about')} className={styles.link}>
               {t('nav.about')}
             </Link>
-            <Link to="/reservation" className={styles.link}>
+            <Link to={path('/reservation')} className={styles.link}>
               {t('nav.reservation')}
             </Link>
           </nav>
@@ -63,6 +63,14 @@ export function Footer() {
             </a>
             <a
               className={styles.link}
+              href={restaurant.links.review}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('home.visit.review')}
+            </a>
+            <a
+              className={styles.link}
               href={restaurant.links.instagram}
               target="_blank"
               rel="noopener noreferrer"
@@ -84,7 +92,7 @@ export function Footer() {
 
         <p className={styles.legal}>
           © {new Date().getFullYear()} {restaurant.legalName}. {t('footer.rights')}
-          <Link to="/privacy" className={styles.legalLink}>
+          <Link to={path('/privacy')} className={styles.legalLink}>
             {t('footer.privacy')}
           </Link>
         </p>

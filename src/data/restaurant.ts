@@ -11,6 +11,8 @@ const ADDRESS = {
 
 const addressLine = `${ADDRESS.street}, ${ADDRESS.postalCode} ${ADDRESS.city}, ${ADDRESS.country}`
 
+const GOOGLE_PLACE_ID = 'ChIJByi6GQrPFkcRkaPFZ-qNMkw'
+
 export const restaurant = {
   name: 'DAON',
   legalName: 'DAON Korean Restaurant',
@@ -32,8 +34,10 @@ export const restaurant = {
     instagram: 'https://instagram.com/daonpoland',
     
     maps: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      `DAON Korean Restaurant, ${addressLine}`,
-    )}`,
+      `Daon Koreańska Restauracja, ${addressLine}`,
+    )}&query_place_id=${GOOGLE_PLACE_ID}`,
+
+    review: `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`,
     
     delivery:
       'https://www.ubereats.com/pl/store/daon-korean-restaurant/jlFDD3NOTNCqWPgfFwU3tg?diningMode=DELIVERY&rwg_token=AE37R_gRWMtqC00Da1og1yQG6oYZVQzwVjZPCPUHC1d_T3pnJKt8Dk8L0tXZseuKYVS22152LKPF3xbXOe3zqj0z6XjFVQnHgg%3D%3D',

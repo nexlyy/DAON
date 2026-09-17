@@ -19,7 +19,12 @@
     "openMenu": "Open navigation",
     "closeMenu": "Close navigation",
     "language": "Language",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "languageHint": {
+      "text": "This page is also in English.",
+      "switch": "English",
+      "dismiss": "No, thanks"
+    }
   },
   "hero": {
     "eyebrow": "Korean Restaurant",
@@ -59,7 +64,8 @@
       "hours": "Opening hours",
       "contact": "Contact",
       "address": "Address",
-      "directions": "Open in Maps"
+      "directions": "Open in Maps",
+      "review": "Review us on Google"
     },
     "cta": {
       "title": "Reserve a table",
@@ -157,7 +163,8 @@
       "people": "guests",
       "sixPlus": "6+",
       "large": "We can seat up to {count} guests online, with tables pushed together. For a larger party call us at {phone} and we will lay out the room for you.",
-      "custom": "Number of guests"
+      "custom": "Number of guests",
+      "few": "guests"
     },
     "table": {
       "title": "Choose your table",
@@ -187,7 +194,12 @@
       "notes": "Anything we should know?",
       "notesPlaceholder": "Allergies, a birthday, a high chair… (optional)",
       "required": "Required",
-      "privacy": "The controller of your data is {controller}. We use your name, phone number and notes only to handle the reservation and delete them {days} days after your visit. By writing allergy information in the notes, you agree to its use in preparing your visit."
+      "privacy": "Your data is controlled by {controller}, which uses your name, phone number and notes only to handle the reservation and deletes them {days} days after your visit. By writing allergy information in the notes, you agree to its use in preparing your visit.",
+      "email": "Email",
+      "optional": "Optional",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "We send a confirmation with a calendar file and a reminder the day before your visit.",
+      "privacyEmail": "Your data is controlled by {controller}, which uses what you enter here only to handle the reservation. Your name, phone number and notes are deleted {days} days after your visit, and your email address the day after it. By writing allergy information in the notes, you agree to its use in preparing your visit."
     },
     "summary": {
       "title": "Your reservation",
@@ -215,11 +227,23 @@
       "cancelConfirm": "Cancel this booking?",
       "cancelled": "Cancelled. The table is free again.",
       "cancelFailed": "We could not cancel it. Call us on {phone}.",
-      "eventTitle": "Table reservation"
+      "eventTitle": "Table reservation",
+      "emailSent": "We have sent a confirmation to {email}."
     },
     "back": "Back",
     "next": "Continue",
     "change": "Change",
+    "changing": {
+      "banner": "You are changing reservation {reference}: {date} at {time}, {guests}.",
+      "stop": "Keep it as it is",
+      "title": "Check the change",
+      "was": "Before: {date} at {time}, {guests}",
+      "save": "Save the change",
+      "saving": "Saving…",
+      "doneTitle": "Reservation changed",
+      "doneBody": "The new time is saved and the restaurant already knows. If anything else changes, call us on {phone}.",
+      "gone": "This reservation can no longer be changed: it may have been cancelled, or its date has passed. Call us on {phone}."
+    },
     "errors": {
       "nameRequired": "Please tell us a name for the booking.",
       "phoneRequired": "We need a phone number in case anything changes.",
@@ -232,12 +256,17 @@
       "closed": "We can no longer take bookings for that day or time — it may have just been closed. Please pick another date.",
       "incomplete": "Something is missing from the reservation. Please check the highlighted step.",
       "timeLost": "{time} is no longer free for {guests} guests. Please choose another time.",
-      "pickAnotherTime": "Choose another time"
+      "pickAnotherTime": "Choose another time",
+      "emailInvalid": "That does not look like an email address."
     },
     "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}.",
     "upcoming": {
       "title": "You already have a table",
-      "line": "{date} at {time}, {guests} · reference {reference}"
+      "line": "{date} at {time}, {guests} · reference {reference}",
+      "change": "Change date or time"
+    },
+    "manage": {
+      "missing": "We could not find that reservation. It may have been cancelled, or its date has passed."
     }
   },
   "floorPlan": {

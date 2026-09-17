@@ -21,7 +21,7 @@ import { useCallback, useState } from 'react'
 import styles from './HomePage.module.css'
 
 export function HomePage() {
-  const { t, resolve, formatPrice, locale } = useI18n()
+  const { t, resolve, formatPrice, locale, path } = useI18n()
   const promo = usePromo()
   const [openDish, setOpenDish] = useState<Dish | null>(null)
   
@@ -107,7 +107,7 @@ export function HomePage() {
           </div>
 
           <div className={styles.sectionAction}>
-            <Link to="/menu" className="btn btn--ghost">
+            <Link to={path('/menu')} className="btn btn--ghost">
               {t('home.signature.all')}
             </Link>
           </div>
@@ -127,7 +127,7 @@ export function HomePage() {
               const count = dishes.filter((dish) => dish.categoryId === category.id).length
               return (
                 <li key={category.id}>
-                  <Link to="/menu" className={styles.categoryCard}>
+                  <Link to={path('/menu')} className={styles.categoryCard}>
                     <Calligraphy name={category.calligraphy} />
                     <span className={styles.categoryName}>{resolve(category.name)}</span>
                     <span className={styles.categoryMeta}>
@@ -162,6 +162,14 @@ export function HomePage() {
                 rel="noopener noreferrer"
               >
                 {t('home.visit.directions')} →
+              </a>
+              <a
+                className={styles.visitLink}
+                href={restaurant.links.review}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('home.visit.review')} →
               </a>
             </div>
 
@@ -207,7 +215,7 @@ export function HomePage() {
           <div className={`reveal ${styles.ctaCopy}`} ref={ctaRef}>
             <h2>{t('home.cta.title')}</h2>
             <p>{t('home.cta.body')}</p>
-            <Link to="/reservation" className={`btn ${styles.ctaButton}`}>
+            <Link to={path('/reservation')} className={`btn ${styles.ctaButton}`}>
               {t('home.cta.button')}
             </Link>
           </div>

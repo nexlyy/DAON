@@ -19,7 +19,12 @@
     "openMenu": "Otwórz nawigację",
     "closeMenu": "Zamknij nawigację",
     "language": "Język",
-    "skipToContent": "Przejdź do treści"
+    "skipToContent": "Przejdź do treści",
+    "languageHint": {
+      "text": "Ta strona jest też po polsku.",
+      "switch": "Polski",
+      "dismiss": "Nie, dziękuję"
+    }
   },
   "hero": {
     "eyebrow": "Restauracja koreańska",
@@ -59,7 +64,8 @@
       "hours": "Godziny otwarcia",
       "contact": "Kontakt",
       "address": "Adres",
-      "directions": "Otwórz w mapach"
+      "directions": "Otwórz w mapach",
+      "review": "Oceń nas w Google"
     },
     "cta": {
       "title": "Zarezerwuj stolik",
@@ -157,7 +163,8 @@
       "people": "osób",
       "sixPlus": "6+",
       "large": "Przez stronę zarezerwujesz stolik dla maksymalnie {count} osób — zestawiamy stoliki razem. Przy większej grupie zadzwoń pod {phone}, a przygotujemy salę.",
-      "custom": "Liczba osób"
+      "custom": "Liczba osób",
+      "few": "osoby"
     },
     "table": {
       "title": "Wybierz stolik",
@@ -187,7 +194,12 @@
       "notes": "Coś, o czym powinniśmy wiedzieć?",
       "notesPlaceholder": "Alergie, urodziny, krzesełko dla dziecka… (opcjonalnie)",
       "required": "Wymagane",
-      "privacy": "Administratorem Twoich danych jest {controller}. Imię, telefon i uwagi wykorzystamy tylko do obsługi rezerwacji i usuniemy je {days} dni po wizycie. Wpisując w uwagach informacje o alergiach, zgadzasz się na ich wykorzystanie do przygotowania wizyty."
+      "privacy": "Twoje dane przetwarza jako administrator {controller}. Imię, telefon i uwagi wykorzystamy tylko do obsługi rezerwacji i usuniemy je {days} dni po wizycie. Wpisując w uwagach informacje o alergiach, zgadzasz się na ich wykorzystanie do przygotowania wizyty.",
+      "email": "E-mail",
+      "optional": "Opcjonalnie",
+      "emailPlaceholder": "ty@example.com",
+      "emailHint": "Wyślemy potwierdzenie z plikiem do kalendarza i przypomnienie dzień przed wizytą.",
+      "privacyEmail": "Twoje dane przetwarza jako administrator {controller}. Dane z formularza wykorzystamy tylko do obsługi rezerwacji. Imię, telefon i uwagi usuniemy {days} dni po wizycie, a adres e-mail dzień po wizycie. Wpisując w uwagach informacje o alergiach, zgadzasz się na ich wykorzystanie do przygotowania wizyty."
     },
     "summary": {
       "title": "Twoja rezerwacja",
@@ -215,11 +227,23 @@
       "cancelConfirm": "Na pewno anulować tę rezerwację?",
       "cancelled": "Rezerwacja anulowana. Stolik jest znowu wolny.",
       "cancelFailed": "Nie udało się anulować. Zadzwoń: {phone}.",
-      "eventTitle": "Rezerwacja stolika"
+      "eventTitle": "Rezerwacja stolika",
+      "emailSent": "Potwierdzenie wysłaliśmy na {email}."
     },
     "back": "Wstecz",
     "next": "Dalej",
     "change": "Zmień",
+    "changing": {
+      "banner": "Zmieniasz rezerwację {reference}: {date} o {time}, {guests}.",
+      "stop": "Nie zmieniaj",
+      "title": "Sprawdź zmianę",
+      "was": "Było: {date} o {time}, {guests}",
+      "save": "Zapisz zmianę",
+      "saving": "Zapisywanie…",
+      "doneTitle": "Rezerwacja zmieniona",
+      "doneBody": "Nowy termin jest zapisany, a restauracja już o nim wie. Gdyby coś jeszcze się zmieniło, zadzwoń: {phone}.",
+      "gone": "Tej rezerwacji nie da się już zmienić: mogła zostać odwołana albo jej termin minął. Zadzwoń: {phone}."
+    },
     "errors": {
       "nameRequired": "Podaj imię do rezerwacji.",
       "phoneRequired": "Potrzebujemy numeru telefonu, gdyby coś się zmieniło.",
@@ -232,12 +256,17 @@
       "closed": "Nie przyjmujemy już rezerwacji na ten dzień lub godzinę — mógł zostać właśnie zamknięty. Wybierz inną datę.",
       "incomplete": "W rezerwacji czegoś brakuje. Sprawdź zaznaczony krok.",
       "timeLost": "O {time} nie ma już wolnych stolików dla {guests} osób. Wybierz inną godzinę.",
-      "pickAnotherTime": "Wybierz inną godzinę"
+      "pickAnotherTime": "Wybierz inną godzinę",
+      "emailInvalid": "To nie wygląda na adres e-mail."
     },
     "demoNotice": "Rezerwacja demonstracyjna — zapisujemy ją tylko w tej przeglądarce i nie trafia jeszcze do restauracji. Aby zarezerwować naprawdę, zadzwoń pod {phone}.",
     "upcoming": {
       "title": "Masz już rezerwację",
-      "line": "{date} o {time}, {guests} · numer {reference}"
+      "line": "{date} o {time}, {guests} · numer {reference}",
+      "change": "Zmień termin"
+    },
+    "manage": {
+      "missing": "Nie znaleźliśmy tej rezerwacji. Mogła zostać odwołana albo jej termin już minął."
     }
   },
   "floorPlan": {

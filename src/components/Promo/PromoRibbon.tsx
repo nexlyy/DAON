@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useI18n } from '@/i18n/useI18n'
 import { usePromo } from '@/promo/usePromo'
 import styles from './PromoRibbon.module.css'
@@ -15,14 +15,13 @@ function readHidden() {
 }
 
 export function PromoRibbon() {
-  const { t } = useI18n()
+  const { t, path, page } = useI18n()
   const { id, phase, percent, dates, end } = usePromo()
-  const { pathname } = useLocation()
   const [hidden, setHidden] = useState(readHidden)
   const ref = useRef<HTMLDivElement>(null)
 
   const stamp = `${id}:${phase}`
-  const visible = Boolean(phase) && hidden !== stamp && !pathname.startsWith('/drinks')
+  const visible = Boolean(phase) && hidden !== stamp && !page.startsWith('/drinks')
 
   useEffect(() => {
     const root = document.documentElement
@@ -60,10 +59,10 @@ export function PromoRibbon() {
   return (
     <div className={styles.ribbon} ref={ref} data-phase={phase}>
       <div className={styles.inner}>
-        {pathname === '/menu' ? (
+        {page === '/menu' ? (
           <p className={styles.message}>{message}</p>
         ) : (
-          <Link to="/menu" className={styles.message}>
+          <Link to={path('/menu')} className={styles.message}>
             {message}
             <span className={styles.cta}>{t('promo.ribbon.cta')} →</span>
           </Link>

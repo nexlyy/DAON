@@ -7,37 +7,50 @@ const dist = resolve(root, 'dist')
 const ssr = resolve(root, 'dist-ssr')
 const SITE = 'https://daon.pl'
 
-const { render } = await import(pathToFileURL(resolve(ssr, 'entry-server.js')).href)
-const { meta } = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/en.json'), 'utf8'))
-const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
+const LOCALES = [
+  { code: 'pl', prefix: '', og: 'pl_PL' },
+  { code: 'en', prefix: '/en', og: 'en_GB' },
+  { code: 'ko', prefix: '/ko', og: 'ko_KR' },
+]
+const ROOT = LOCALES[0]
 
-const pages = [
-  { url: '/', file: 'index.html', canonical: '/', title: meta.title, description: meta.description },
+const { render } = await import(pathToFileURL(resolve(ssr, 'entry-server.js')).href)
+const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
+const metaOf = (code) =>
+  JSON.parse(readFileSync(resolve(root, `src/i18n/locales/${code}.json`), 'utf8')).meta
+
+const localized = (locale, path) => (locale.prefix ? (path === '/' ? locale.prefix : `${locale.prefix}${path}`) : path)
+const fileFor = (locale, file) => (locale.prefix ? `${locale.prefix.slice(1)}/${file}` : file)
+
+const PAGES = [
+  { path: '/', file: 'index.html', canonical: '/', title: 'title', description: 'description' },
+  { path: '/menu', file: 'menu/index.html', canonical: '/menu', title: 'menuTitle', description: 'menuDescription' },
   {
-    url: '/menu',
-    file: 'menu/index.html',
-    canonical: '/menu',
-    title: meta.menuTitle,
-    description: meta.menuDescription,
-  },
-  {
-    url: '/reservation',
+    path: '/reservation',
     file: 'reservation/index.html',
     canonical: '/reservation',
-    title: meta.reservationTitle,
-    description: meta.reservationDescription,
+    title: 'reservationTitle',
+    description: 'reservationDescription',
   },
-  {
-    url: '/privacy',
-    file: 'privacy/index.html',
-    canonical: '/privacy',
-    title: meta.privacyTitle,
-    description: meta.privacyDescription,
-  },
-  { url: '/about', file: 'about/index.html', canonical: '/', title: meta.title, description: meta.description },
-  { url: '/contact', file: 'contact/index.html', canonical: '/', title: meta.title, description: meta.description },
-  { url: '/404', file: '404.html', title: meta.notFoundTitle, description: meta.description, noindex: true },
-  { url: null, file: 'shell.html', title: meta.title, description: meta.description, noindex: true },
+  { path: '/privacy', file: 'privacy/index.html', canonical: '/privacy', title: 'privacyTitle', description: 'privacyDescription' },
+  { path: '/about', file: 'about/index.html', canonical: '/', title: 'title', description: 'description' },
+  { path: '/contact', file: 'contact/index.html', canonical: '/', title: 'title', description: 'description' },
+]
+
+const pages = [
+  ...LOCALES.flatMap((locale) =>
+    PAGES.map((entry) => ({
+      locale,
+      url: localized(locale, entry.path),
+      file: fileFor(locale, entry.file),
+      canonical: entry.canonical,
+      listed: entry.canonical === entry.path,
+      title: metaOf(locale.code)[entry.title],
+      description: metaOf(locale.code)[entry.description],
+    })),
+  ),
+  { locale: ROOT, url: '/404', file: '404.html', title: metaOf('pl').notFoundTitle, description: metaOf('pl').description, noindex: true },
+  { locale: ROOT, url: null, file: 'shell.html', title: metaOf('pl').title, description: metaOf('pl').description, noindex: true },
 ]
 
 const escape = (value) =>
@@ -49,43 +62,46 @@ function swap(html, pattern, replacement, label) {
   return html.replace(pattern, replacement)
 }
 
-function page({ url, title, description, canonical, noindex }) {
+function page({ locale, url, title, description, canonical, noindex }) {
+  if (!title || !description) throw new Error(`${locale.code} ${url}: missing title or description`)
   let html = template
+  html = swap(html, /<html lang="[^"]*"/g, `<html lang="${locale.code}"`, 'html lang')
   html = swap(html, /<title>[^<]*<\/title>/g, `<title>${escape(title)}</title>`, 'title')
+  for (const [attribute, name, value] of [
+    ['name', 'description', description],
+    ['property', 'og:title', title],
+    ['property', 'og:description', description],
+    ['name', 'twitter:title', title],
+    ['name', 'twitter:description', description],
+  ]) {
+    html = swap(
+      html,
+      new RegExp(`<meta\\s+${attribute}="${name}"\\s+content="[^"]*"\\s*/>`, 'g'),
+      `<meta ${attribute}="${name}" content="${escape(value)}" />`,
+      name,
+    )
+  }
+
   html = swap(
     html,
-    /<meta\s+name="description"\s+content="[^"]*"\s*\/>/g,
-    `<meta name="description" content="${escape(description)}" />`,
-    'description',
-  )
-  html = swap(
-    html,
-    /<meta\s+property="og:title"\s+content="[^"]*"\s*\/>/g,
-    `<meta property="og:title" content="${escape(title)}" />`,
-    'og:title',
-  )
-  html = swap(
-    html,
-    /<meta\s+property="og:description"\s+content="[^"]*"\s*\/>/g,
-    `<meta property="og:description" content="${escape(description)}" />`,
-    'og:description',
-  )
-  html = swap(
-    html,
-    /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/>/g,
-    `<meta name="twitter:title" content="${escape(title)}" />`,
-    'twitter:title',
-  )
-  html = swap(
-    html,
-    /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/>/g,
-    `<meta name="twitter:description" content="${escape(description)}" />`,
-    'twitter:description',
+    /<meta property="og:locale" content="[^"]*" \/>(\s*<meta property="og:locale:alternate" content="[^"]*" \/>)*/g,
+    [
+      `<meta property="og:locale" content="${locale.og}" />`,
+      ...LOCALES.filter((other) => other !== locale).map(
+        (other) => `<meta property="og:locale:alternate" content="${other.og}" />`,
+      ),
+    ].join('\n    '),
+    'og:locale',
   )
 
   if (canonical) {
-    html = swap(html, /<link rel="canonical" href="[^"]*" \/>/g, `<link rel="canonical" href="${SITE}${canonical}" />`, 'canonical')
-    html = swap(html, /<meta property="og:url" content="[^"]*" \/>/g, `<meta property="og:url" content="${SITE}${canonical}" />`, 'og:url')
+    const href = `${SITE}${localized(locale, canonical)}`
+    const alternates = [
+      ...LOCALES.map((other) => `<link rel="alternate" hreflang="${other.code}" href="${SITE}${localized(other, canonical)}" />`),
+      `<link rel="alternate" hreflang="x-default" href="${SITE}${localized(ROOT, canonical)}" />`,
+    ].join('\n    ')
+    html = swap(html, /<link rel="canonical" href="[^"]*" \/>/g, `<link rel="canonical" href="${href}" />\n    ${alternates}`, 'canonical')
+    html = swap(html, /<meta property="og:url" content="[^"]*" \/>/g, `<meta property="og:url" content="${href}" />`, 'og:url')
   } else {
     html = swap(html, /\s*<link rel="canonical" href="[^"]*" \/>/g, '', 'canonical')
   }
@@ -108,21 +124,36 @@ for (const entry of pages) {
   mkdirSync(dirname(target), { recursive: true })
   const html = page(entry)
   writeFileSync(target, html)
-  console.log(`  ${entry.file.padEnd(24)} ${String(Math.round(html.length / 1024)).padStart(4)} KB`)
+  console.log(`  ${entry.file.padEnd(28)} ${String(Math.round(html.length / 1024)).padStart(4)} KB`)
 }
 
 const today = new Date().toISOString().slice(0, 10)
-const listed = pages.filter((entry) => entry.canonical && entry.canonical === entry.url)
+const listed = PAGES.filter((entry) => entry.canonical === entry.path)
+const urls = listed.flatMap((entry) =>
+  LOCALES.map((locale) =>
+    [
+      '  <url>',
+      `    <loc>${SITE}${localized(locale, entry.path)}</loc>`,
+      ...LOCALES.map(
+        (other) =>
+          `    <xhtml:link rel="alternate" hreflang="${other.code}" href="${SITE}${localized(other, entry.path)}" />`,
+      ),
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${localized(ROOT, entry.path)}" />`,
+      `    <lastmod>${today}</lastmod>`,
+      '  </url>',
+    ].join('\n'),
+  ),
+)
 writeFileSync(
   resolve(dist, 'sitemap.xml'),
   [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...listed.map((entry) => `  <url>\n    <loc>${SITE}${entry.canonical}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`),
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    ...urls,
     '</urlset>',
     '',
   ].join('\n'),
 )
-console.log(`  sitemap.xml              ${listed.length} addresses`)
+console.log(`  sitemap.xml                  ${urls.length} addresses`)
 
 rmSync(ssr, { recursive: true, force: true })

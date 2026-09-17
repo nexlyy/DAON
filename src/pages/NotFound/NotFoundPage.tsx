@@ -5,7 +5,7 @@ import { RoofMark } from '@/components/Brand/Logo'
 import styles from './NotFoundPage.module.css'
 
 export function NotFoundPage() {
-  const { t } = useI18n()
+  const { t, path } = useI18n()
 
   useDocumentMeta({ title: t('meta.notFoundTitle'), description: t('meta.description') })
 
@@ -15,10 +15,10 @@ export function NotFoundPage() {
       <h1 className={styles.title}>{t('common.notFound')}</h1>
       <p className={styles.body}>{t('common.notFoundBody')}</p>
       <div className={styles.actions}>
-        <Link to="/" className="btn">
+        <Link to={path('/')} className="btn">
           {t('common.backHome')}
         </Link>
-        <Link to="/menu" className="btn btn--ghost">
+        <Link to={path('/menu')} className="btn btn--ghost">
           {t('nav.menu')}
         </Link>
       </div>

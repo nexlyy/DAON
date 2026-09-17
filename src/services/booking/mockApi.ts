@@ -6,6 +6,8 @@ import type {
   Booking,
   BookingApi,
   BookingRequest,
+  OwnBooking,
+  Seating,
   TableAvailability,
   TableStatusQuery,
   TimeSlot,
@@ -104,12 +106,12 @@ export function createMockBookingApi(): BookingApi {
       return closed
     },
 
-    async getTimeSlots({ date, partySize }: AvailabilityQuery) {
+    async getTimeSlots({ date, partySize, own }: AvailabilityQuery) {
       await wait(LATENCY_MS)
       const now = new Date()
       const isToday = toISODate(now) === date
       const nowMinutes = now.getHours() * 60 + now.getMinutes()
-      const stored = readStored()
+      const stored = readStored().filter((b) => b.reference !== own?.reference)
 
       return slotsForDate(date).map<TimeSlot>((time) => {
         if (isToday && toMinutes(time) <= nowMinutes + 60) {
@@ -134,10 +136,11 @@ export function createMockBookingApi(): BookingApi {
       })
     },
 
-    async getTableStatus({ date, time }: TableStatusQuery) {
+    async getTableStatus({ date, time, own }: TableStatusQuery) {
       await wait(LATENCY_MS)
       const booked = new Set(
         readStored()
+          .filter((b) => b.reference !== own?.reference)
           .filter((b) => b.date === date && b.time === time && b.status === 'confirmed')
           .flatMap((b) => b.tableIds),
       )
@@ -184,7 +187,33 @@ export function createMockBookingApi(): BookingApi {
     async lookupBooking(reference: string) {
       await wait(LATENCY_MS / 2)
       const found = readStored().find((booking) => booking.reference === reference)
-      return found ? { status: found.status } : null
+      return found
+        ? {
+            reference: found.reference,
+            status: found.status,
+            date: found.date,
+            time: found.time,
+            partySize: found.partySize,
+            tableIds: found.tableIds,
+          }
+        : null
+    },
+
+    async moveBooking(own: OwnBooking, seating: Seating) {
+      await wait(LATENCY_MS * 2)
+      const stored = readStored()
+      const found = stored.find((booking) => booking.reference === own.reference)
+      if (!found || found.status !== 'confirmed') throw new BookingError('No such booking', 'closed')
+      if (!slotsForDate(seating.date).includes(seating.time)) {
+        throw new BookingError('The restaurant is closed at that time', 'closed')
+      }
+      Object.assign(found, seating)
+      writeStored(stored)
+      return { reference: found.reference, status: found.status, ...seating }
+    },
+
+    async getConfig() {
+      return { email: false }
     },
 
     async cancelBooking(reference: string) {

@@ -97,6 +97,7 @@ function structuredData() {
             closes: hours![1],
           })),
         sameAs: [restaurant.links.instagram],
+        hasMap: restaurant.links.maps,
         hasMenu: `${SITE}/menu`,
         acceptsReservations: `${SITE}/reservation`,
       },

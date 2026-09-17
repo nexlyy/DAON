@@ -6,10 +6,16 @@ export interface TimeSlot {
   available: boolean
 }
 
+export interface OwnBooking {
+  reference: string
+  token: string
+}
+
 export interface AvailabilityQuery {
   
   date: string
   partySize: number
+  own?: OwnBooking | null
 }
 
 export interface TableStatusQuery extends AvailabilityQuery {
@@ -26,7 +32,20 @@ export interface BookingRequest {
   name: string
   phone: string
   notes?: string
+  email?: string
   locale: string
+}
+
+export interface Seating {
+  date: string
+  time: string
+  partySize: number
+  tableIds: string[]
+}
+
+export interface BookingState extends Seating {
+  reference: string
+  status: string
 }
 
 export interface Booking extends BookingRequest {
@@ -61,5 +80,9 @@ export interface BookingApi {
   
   cancelBooking(reference: string, token: string): Promise<void>
   
-  lookupBooking(reference: string, token: string): Promise<{ status: string } | null>
+  lookupBooking(reference: string, token: string): Promise<BookingState | null>
+
+  moveBooking(own: OwnBooking, seating: Seating): Promise<BookingState>
+
+  getConfig(): Promise<{ email: boolean }>
 }

@@ -9,7 +9,7 @@ import { useI18n } from '@/i18n/useI18n'
 import styles from './Hero.module.css'
 
 export function Hero() {
-  const { t, resolve } = useI18n()
+  const { t, resolve, path } = useI18n()
   const alt = (photo: string) => resolve(dishPhotoAlt(photo))
 
   return (
@@ -30,15 +30,15 @@ export function Hero() {
           <p className={styles.lead}>{t('hero.lead')}</p>
 
           <div className={styles.actions}>
-            <Link to="/menu" className="btn">
+            <Link to={path('/menu')} className="btn">
               {t('hero.viewMenu')}
             </Link>
-            <Link to="/reservation" className="btn btn--ghost">
+            <Link to={path('/reservation')} className="btn btn--ghost">
               {t('hero.bookTable')}
             </Link>
           </div>
 
-          <OpenStatus to="/#hours" />
+          <OpenStatus to={path('/#hours')} />
         </div>
 
         <div className={styles.collage}>

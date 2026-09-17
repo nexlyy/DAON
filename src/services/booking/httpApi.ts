@@ -5,10 +5,16 @@ import type {
   Booking,
   BookingApi,
   BookingRequest,
+  BookingState,
+  OwnBooking,
+  Seating,
   TableAvailability,
   TableStatusQuery,
   TimeSlot,
 } from './types'
+
+const ownQuery = (own?: OwnBooking | null) =>
+  own ? `&reference=${encodeURIComponent(own.reference)}&token=${encodeURIComponent(own.token)}` : ''
 
 export function createHttpBookingApi(baseUrl: string): BookingApi {
   const base = baseUrl.replace(/\/$/, '')
@@ -39,13 +45,22 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
     getClosedDates: (from, to) =>
       request<string[]>(`/closed-dates?from=${from}&to=${to}`),
 
-    getTimeSlots: ({ date, partySize }: AvailabilityQuery) =>
-      request<TimeSlot[]>(`/slots?date=${date}&partySize=${partySize}`),
+    getTimeSlots: ({ date, partySize, own }: AvailabilityQuery) =>
+      request<TimeSlot[]>(`/slots?date=${date}&partySize=${partySize}${ownQuery(own)}`),
 
-    getTableStatus: ({ date, time, partySize }: TableStatusQuery) =>
+    getTableStatus: ({ date, time, partySize, own }: TableStatusQuery) =>
       request<Record<string, TableAvailability>>(
-        `/tables?date=${date}&time=${time}&partySize=${partySize}`,
+        `/tables?date=${date}&time=${time}&partySize=${partySize}${ownQuery(own)}`,
       ),
+
+    moveBooking: (own: OwnBooking, seating: Seating) =>
+      request<BookingState>('/bookings/move', {
+        method: 'POST',
+        body: JSON.stringify({ ...own, ...seating }),
+      }),
+
+    getConfig: () =>
+      request<{ email: boolean }>('/config').catch(() => ({ email: false })),
 
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
@@ -64,7 +79,7 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
 
       if (response.status === 404) return null
       if (!response.ok) throw new BookingError(`Lookup failed with ${response.status}`)
-      return (await response.json()) as { status: string }
+      return (await response.json()) as BookingState
     },
 
     cancelBooking: async (reference: string, token: string) => {

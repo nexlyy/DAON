@@ -5,7 +5,7 @@ import { BirthdaySeal } from './BirthdaySeal'
 import styles from './BirthdayBand.module.css'
 
 export function BirthdayBand() {
-  const { t } = useI18n()
+  const { t, path } = useI18n()
   const { phase, percent, dates, end } = usePromo()
 
   if (!phase) return null
@@ -34,10 +34,10 @@ export function BirthdayBand() {
           </p>
           <p className={styles.fine}>{t('promo.band.fine')}</p>
           <div className={styles.actions}>
-            <Link to="/menu" className={`btn ${styles.primary}`}>
+            <Link to={path('/menu')} className={`btn ${styles.primary}`}>
               {t('promo.band.menu')}
             </Link>
-            <Link to="/reservation" className={`btn ${styles.secondary}`}>
+            <Link to={path('/reservation')} className={`btn ${styles.secondary}`}>
               {t('hero.bookTable')}
             </Link>
           </div>

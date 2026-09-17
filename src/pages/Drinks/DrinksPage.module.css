@@ -36,13 +36,6 @@
   padding-bottom: 0.2em;
 }
 
-/* --- cover ---------------------------------------------------------------- */
-
-/* Three layers, in document order and with no z-index between them: the ground
-   colour, the photograph over it, then the veil. It used to hang the picture on
-   a negative z-index inside an isolated stacking context, which Chrome painted
-   behind the section's own background the moment nothing else in the cover
-   forced a composited layer. */
 .cover {
   position: relative;
   display: grid;
@@ -66,9 +59,6 @@
   content: '';
   position: absolute;
   inset: 0;
-  /* The bar carries dark navy links over a night sky, so it needs paper under
-     it. The veil ends just below the bar: any longer and it washes out the
-     blossom and the moon, which are the reason the cover is there at all. */
   background:
     linear-gradient(
       180deg,
@@ -78,8 +68,6 @@
     ),
     linear-gradient(180deg, transparent 45%, rgba(8, 13, 20, 0.85));
 }
-
-/* --- rail ----------------------------------------------------------------- */
 
 .rail {
   position: sticky;
@@ -139,8 +127,6 @@
   }
 }
 
-/* --- sections ------------------------------------------------------------- */
-
 .section {
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
   scroll-margin-top: 7rem;
@@ -169,8 +155,6 @@
 .sectionRule {
   margin-top: 0.5rem;
 }
-
-/* --- shared bits ---------------------------------------------------------- */
 
 .rowHead {
   display: flex;
@@ -226,8 +210,6 @@
   border-bottom: 1px dotted rgba(198, 176, 150, 0.75);
 }
 
-/* --- cocktail cards ------------------------------------------------------- */
-
 .cards {
   display: grid;
   gap: clamp(1rem, 2.2vw, 1.6rem);
@@ -272,8 +254,6 @@
 .cardBody {
   padding: clamp(0.9rem, 2vw, 1.2rem);
 }
-
-/* --- feature (bowl, Korean alcohols) -------------------------------------- */
 
 .feature,
 .wines,
@@ -357,8 +337,6 @@
   color: var(--gold-text);
 }
 
-/* --- grouped lists -------------------------------------------------------- */
-
 .groups {
   display: grid;
   gap: clamp(1.6rem, 4vw, 2.8rem);
@@ -393,8 +371,6 @@
 .row .itemName {
   font-size: var(--step-0);
 }
-
-/* --- wines ---------------------------------------------------------------- */
 
 .wineTable {
   width: 100%;
@@ -479,8 +455,6 @@
   }
 }
 
-/* --- build your own tea --------------------------------------------------- */
-
 .stepsPrice {
   grid-column: 1 / -1;
   justify-self: center;
@@ -519,8 +493,6 @@
   line-height: 1;
   color: var(--gold-line);
 }
-
-/* --- foot ----------------------------------------------------------------- */
 
 .foot {
   display: grid;

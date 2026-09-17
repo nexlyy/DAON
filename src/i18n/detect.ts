@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, LOCALES, isLocale, type Locale } from './config'
+import { LOCALE_STORAGE_KEY, LOCALES, isLocale, type Locale } from './config'
 
 export function matchLocale(tag: string | undefined | null): Locale | null {
   if (!tag) return null
@@ -20,19 +20,4 @@ export function storeLocale(locale: Locale): void {
     window.localStorage.setItem(LOCALE_STORAGE_KEY, locale)
   } catch {
   }
-}
-
-export function resolveInitialLocale(): Locale {
-  const stored = readStoredLocale()
-  if (stored) return stored
-
-  if (typeof navigator !== 'undefined') {
-    const candidates = [...(navigator.languages ?? []), navigator.language]
-    for (const candidate of candidates) {
-      const match = matchLocale(candidate)
-      if (match) return match
-    }
-  }
-
-  return DEFAULT_LOCALE
 }

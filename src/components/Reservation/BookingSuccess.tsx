@@ -11,8 +11,15 @@ import { RoofMark } from '@/components/Brand/Logo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import styles from './BookingSuccess.module.css'
 
-export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset: () => void }) {
-  const { t, formatDate } = useI18n()
+interface Props {
+  booking: Booking
+  onReset: () => void
+  changed?: boolean
+  emailSent?: boolean
+}
+
+export function BookingSuccess({ booking, onReset, changed = false, emailSent = false }: Props) {
+  const { t, formatDate, path } = useI18n()
   const primary = tableById.get(booking.tableIds[0])
   const zone = primary ? zoneById.get(primary.zone) : undefined
   const joined = booking.tableIds.length > 1
@@ -45,11 +52,14 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
           <RoofMark />
         </span>
 
-        <h2 className={styles.title}>{t('reservation.success.title')}</h2>
+        <h2 className={styles.title}>{t(changed ? 'reservation.changing.doneTitle' : 'reservation.success.title')}</h2>
         
         <p className={styles.body}>
-          {t('reservation.success.body', { phone: restaurant.phone })}
+          {t(changed ? 'reservation.changing.doneBody' : 'reservation.success.body', { phone: restaurant.phone })}
         </p>
+        {emailSent && booking.email && (
+          <p className={styles.body}>{t('reservation.success.emailSent', { email: booking.email })}</p>
+        )}
 
         <GoldDivider className={styles.divider} />
 
@@ -82,10 +92,12 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
               {zone && <span className={styles.zone}>{t(`floorPlan.zones.${zone.labelKey}`)}</span>}
             </dd>
           </div>
-          <div>
-            <dt>{t('reservation.summary.name')}</dt>
-            <dd>{booking.name}</dd>
-          </div>
+          {booking.name && (
+            <div>
+              <dt>{t('reservation.summary.name')}</dt>
+              <dd>{booking.name}</dd>
+            </div>
+          )}
           {booking.notes && (
             <div className={styles.wide}>
               <dt>{t('reservation.summary.notes')}</dt>
@@ -109,7 +121,7 @@ export function BookingSuccess({ booking, onReset }: { booking: Booking; onReset
           <button type="button" className="btn btn--ghost" onClick={onReset}>
             {t('reservation.success.addAnother')}
           </button>
-          <Link to="/" className="btn">
+          <Link to={path('/')} className="btn">
             {t('reservation.success.backHome')}
           </Link>
         </div>

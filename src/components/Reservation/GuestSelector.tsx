@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { reservation as reservationConfig, restaurant } from '@/data/restaurant'
+import { guestsKey } from '@/i18n/plural'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './GuestSelector.module.css'
 
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function GuestSelector({ value, onChange }: Props) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { partySizes, maxPartySize } = reservationConfig
   const largest = partySizes[partySizes.length - 1]
 
@@ -33,7 +34,7 @@ export function GuestSelector({ value, onChange }: Props) {
           >
             <span className={styles.number}>{size}</span>
             <span className={styles.caption}>
-              {size === 1 ? t('reservation.guests.person') : t('reservation.guests.people')}
+              {t(guestsKey(locale, size))}
             </span>
           </button>
         ))}
