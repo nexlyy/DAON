@@ -109,6 +109,7 @@
   "drinks": {
     "title": "Napoje",
     "subtitle": "Bar jeszcze nie działa. Ta strona nie jest podlinkowana na stronie ani indeksowana.",
+    "lede": "Karta napojów przepisana z menu, które leży w restauracji. Bar jeszcze nie działa.",
     "metaTitle": "Napoje — DAON",
     "jump": "Przejdź do sekcji",
     "loading": "Wczytywanie karty napojów…",

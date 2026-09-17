@@ -109,6 +109,7 @@
   "drinks": {
     "title": "Drinks",
     "subtitle": "The bar is not open yet. This page is not linked from the site and is not indexed.",
+    "lede": "The drinks list, taken line by line from the menu that sits on the tables. The bar is not open yet.",
     "metaTitle": "Drinks — DAON",
     "jump": "Jump to a section",
     "loading": "Loading the drinks list…",

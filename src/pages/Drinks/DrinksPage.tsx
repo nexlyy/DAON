@@ -1,6 +1,8 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
+import { Vine } from '@/components/Ornament/Vine'
+import { translate } from '@/i18n/I18nProvider'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useStuck } from '@/hooks/useStuck'
@@ -16,7 +18,7 @@ import styles from './DrinksPage.module.css'
 type Status = 'loading' | 'ready' | 'missing' | 'error'
 
 const bundleUrl = (key: string) => `/d/${encodeURIComponent(key)}/drinks.json`
-const imageUrl = (key: string, photo: string, ext: string, tier?: 'sm' | 'xl') =>
+const imageUrl = (key: string, photo: string, ext: string, tier?: 'sm') =>
   `/d/${encodeURIComponent(key)}/images/${tier ? `${tier}/` : ''}${photo}.${ext}`
 
 const anchor = (id: string) => `drinks-${id}`
@@ -152,7 +154,7 @@ export function DrinksPage() {
 
   return (
     <>
-      <Cover menu={menu} bundleKey={key} />
+      <Masthead />
 
       <SectionRail sections={sections} pick={pick} query={query} onQuery={setQuery} />
 
@@ -226,21 +228,45 @@ interface Shared {
   pick: (value?: Bilingual | string) => string
 }
 
-function Cover({ menu, bundleKey }: { menu: DrinksMenu } & Pick<Shared, 'bundleKey'>) {
-  const { t } = useI18n()
+function Masthead() {
+  const { t, locale } = useI18n()
+  const stamp = translate(locale === 'ko' ? 'en' : 'ko', 'drinks.title')
 
   return (
-    <section className={styles.cover}>
-      <Photo
-        bundleKey={bundleKey}
-        photo={menu.cover.photo}
-        alt=""
-        ratio={menu.cover.ratio}
-        full={menu.cover.width}
-        priority
-      />
-      <h1 className="visually-hidden">{t('drinks.title')}</h1>
-    </section>
+    <header className={styles.masthead}>
+      <div className={styles.frame} aria-hidden="true" />
+      <Vine className={styles.vine} />
+      <Rings />
+
+      <div className={`shell ${styles.mastheadInner}`}>
+        <p className={`eyebrow eyebrow--center ${styles.eyebrow}`}>{t('hero.eyebrow')}</p>
+
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>{t('drinks.title')}</h1>
+          <span className={styles.stamp} aria-hidden="true">
+            {stamp}
+          </span>
+        </div>
+
+        <GoldDivider className={styles.rule} />
+        <p className={`lede ${styles.lede}`}>{t('drinks.lede')}</p>
+      </div>
+    </header>
+  )
+}
+
+// The mark a cold glass leaves on a paper menu.
+function Rings() {
+  return (
+    <svg className={styles.rings} viewBox="0 0 520 300" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="currentColor">
+        <circle cx="132" cy="150" r="118" strokeWidth="2.4" opacity="0.5" />
+        <circle cx="132" cy="150" r="109" strokeWidth="0.9" opacity="0.32" />
+        <circle cx="366" cy="96" r="74" strokeWidth="2" opacity="0.38" />
+        <circle cx="366" cy="96" r="67" strokeWidth="0.8" opacity="0.24" />
+        <circle cx="300" cy="238" r="46" strokeWidth="1.6" opacity="0.3" />
+      </g>
+    </svg>
   )
 }
 
@@ -749,34 +775,25 @@ function Photo({
   alt,
   ratio = 1.5,
   priority = false,
-  full,
 }: {
   photo: string
   alt: string
   ratio?: number
   priority?: boolean
-
-  full?: number
 } & Pick<Shared, 'bundleKey'>) {
-  const sizes = full ? '100vw' : '(max-width: 720px) 100vw, 420px'
-  const width = full ?? 1000
+  const sizes = '(max-width: 720px) 100vw, 420px'
+  const width = 1000
   const height = Math.round(width / ratio)
 
   const set = (ext: string) =>
-    [
-      `${imageUrl(bundleKey, photo, ext, 'sm')} 360w`,
-      `${imageUrl(bundleKey, photo, ext)} 1000w`,
-      full ? `${imageUrl(bundleKey, photo, ext, 'xl')} ${full}w` : '',
-    ]
-      .filter(Boolean)
-      .join(', ')
+    [`${imageUrl(bundleKey, photo, ext, 'sm')} 360w`, `${imageUrl(bundleKey, photo, ext)} 1000w`].join(', ')
 
   return (
     <picture>
       <source type="image/avif" srcSet={set('avif')} sizes={sizes} />
       <source type="image/webp" srcSet={set('webp')} sizes={sizes} />
       <img
-        src={imageUrl(bundleKey, photo, 'webp', full ? 'xl' : undefined)}
+        src={imageUrl(bundleKey, photo, 'webp')}
         alt={alt}
         width={width}
         height={height}
