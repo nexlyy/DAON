@@ -47,8 +47,9 @@ export function Navbar() {
     if (!header) return
 
     const publish = () => {
-      const offset = hidden && !drawerOpen ? 0 : header.offsetHeight
-      document.documentElement.style.setProperty('--nav-offset', `${offset}px`)
+      const away = hidden && !drawerOpen
+      document.documentElement.style.setProperty('--nav-offset', `${away ? 0 : header.offsetHeight}px`)
+      document.documentElement.toggleAttribute('data-nav-away', away)
     }
 
     publish()

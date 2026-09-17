@@ -5,6 +5,7 @@ import { dishes } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useStuck } from '@/hooks/useStuck'
 import { CategoryRail } from '@/components/Menu/CategoryRail'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
@@ -21,6 +22,7 @@ export function MenuPage() {
   
   const closeDish = useCallback(() => setOpenDish(null), [])
   const deferredQuery = useDeferredValue(query)
+  const [sentinel, stuck] = useStuck<HTMLDivElement>()
 
   useDocumentMeta({
     title: t('meta.menuTitle'),
@@ -69,7 +71,8 @@ export function MenuPage() {
         </div>
       </section>
 
-      <div className={styles.controls}>
+      <div ref={sentinel} aria-hidden="true" />
+      <div className={styles.controls} data-stuck={stuck || undefined}>
         <div className={`shell ${styles.controlsInner}`}>
           <CategoryRail active={category} onChange={setCategory} />
 

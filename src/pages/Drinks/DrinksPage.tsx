@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useStuck } from '@/hooks/useStuck'
 import type {
   Bilingual,
   DrinkGroup,
@@ -189,17 +190,21 @@ function SectionRail({
   pick: (value?: Bilingual) => string
 }) {
   const { t } = useI18n()
+  const [sentinel, stuck] = useStuck<HTMLDivElement>()
 
   return (
-    <nav className={styles.rail} aria-label={t('drinks.jump')}>
-      <div className={`shell ${styles.railInner}`}>
-        {sections.map((section) => (
-          <a key={section.id} className={styles.railLink} href={`#drinks-${section.id}`}>
-            {pick(section.title)}
-          </a>
-        ))}
-      </div>
-    </nav>
+    <>
+      <div ref={sentinel} aria-hidden="true" />
+      <nav className={styles.rail} aria-label={t('drinks.jump')} data-stuck={stuck || undefined}>
+        <div className={`shell ${styles.railInner}`}>
+          {sections.map((section) => (
+            <a key={section.id} className={styles.railLink} href={`#drinks-${section.id}`}>
+              {pick(section.title)}
+            </a>
+          ))}
+        </div>
+      </nav>
+    </>
   )
 }
 

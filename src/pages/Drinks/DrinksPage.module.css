@@ -84,11 +84,22 @@
 .rail {
   position: sticky;
   top: var(--nav-offset, 0px);
-  transition: top 0.5s var(--ease);
   z-index: 40;
-  background: rgba(251, 248, 243, 0.92);
-  backdrop-filter: blur(12px);
+  background: var(--paper);
   border-bottom: 1px solid rgba(198, 176, 150, 0.35);
+  transition:
+    top 0.5s var(--ease),
+    transform 0.5s var(--ease),
+    box-shadow 0.3s var(--ease);
+}
+
+.rail[data-stuck] {
+  box-shadow: 0 14px 26px -22px rgba(60, 47, 30, 0.5);
+}
+
+:global(html[data-nav-away]) .rail[data-stuck]:not(:focus-within) {
+  transform: translateY(calc(-100% - 1.5rem));
+  box-shadow: none;
 }
 
 .railInner {
