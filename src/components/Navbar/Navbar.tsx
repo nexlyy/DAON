@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Logo } from '@/components/Brand/Logo'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
+import { OpenStatus } from '@/components/OpenStatus/OpenStatus'
 import { OrderLink } from '@/components/Order/OrderLink'
 import { PromoRibbon } from '@/components/Promo/PromoRibbon'
 import { useI18n } from '@/i18n/useI18n'
@@ -141,6 +142,7 @@ export function Navbar() {
           ))}
         </nav>
         <div className={styles.drawerFooter}>
+          <OpenStatus variant="line" />
           <div className={styles.drawerOrder}>
             <OrderLink kind="delivery" />
             <OrderLink kind="pickup" />

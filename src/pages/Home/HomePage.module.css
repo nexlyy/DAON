@@ -244,6 +244,7 @@
 .hoursCard {
   display: grid;
   gap: 1rem;
+  scroll-margin-top: 3rem;
   padding: clamp(1.4rem, 3vw, 2rem);
   background: var(--white);
   border: 1px solid var(--gold-line);

@@ -365,5 +365,25 @@
       "was": "Regular price",
       "now": "Birthday price"
     }
+  },
+  "status": {
+    "open": "Open now",
+    "soon": "Closes in {minutes} min",
+    "before": "Opens at {open}",
+    "after": "Closed now",
+    "closed": "Closed today",
+    "until": "until {close} today",
+    "next": "opens {day} at {open}",
+    "tomorrow": "tomorrow",
+    "on": [
+      "on Sunday",
+      "on Monday",
+      "on Tuesday",
+      "on Wednesday",
+      "on Thursday",
+      "on Friday",
+      "on Saturday"
+    ],
+    "onDate": "on {date}"
   }
 }

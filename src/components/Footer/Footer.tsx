@@ -3,6 +3,7 @@ import { OrderLink } from '@/components/Order/OrderLink'
 import { Logo } from '@/components/Brand/Logo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { OpeningHours } from '@/components/OpeningHours/OpeningHours'
+import { OpenStatus } from '@/components/OpenStatus/OpenStatus'
 import { companyLine, restaurant } from '@/data/restaurant'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './Footer.module.css'
@@ -76,6 +77,7 @@ export function Footer() {
 
           <div className={styles.col}>
             <h2 className={styles.colTitle}>{t('footer.hours')}</h2>
+            <OpenStatus variant="line" />
             <OpeningHours labels="short" />
           </div>
         </div>

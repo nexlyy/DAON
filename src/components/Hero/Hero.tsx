@@ -3,6 +3,7 @@ import { Calligraphy } from '@/components/Media/Calligraphy'
 import { DishPhoto } from '@/components/Media/DishPhoto'
 import { RoofMark } from '@/components/Brand/Logo'
 import { Vine } from '@/components/Ornament/Vine'
+import { OpenStatus } from '@/components/OpenStatus/OpenStatus'
 import { dishPhotoAlt } from '@/data/menu/dishes'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './Hero.module.css'
@@ -36,6 +37,8 @@ export function Hero() {
               {t('hero.bookTable')}
             </Link>
           </div>
+
+          <OpenStatus to="/#hours" />
         </div>
 
         <div className={styles.collage}>

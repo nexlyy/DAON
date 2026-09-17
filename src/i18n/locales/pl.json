@@ -365,5 +365,25 @@
       "was": "Cena regularna",
       "now": "Cena urodzinowa"
     }
+  },
+  "status": {
+    "open": "Otwarte",
+    "soon": "Zamykamy za {minutes} min",
+    "before": "Otwieramy o {open}",
+    "after": "Już zamknięte",
+    "closed": "Dziś nieczynne",
+    "until": "dziś do {close}",
+    "next": "otwieramy {day} o {open}",
+    "tomorrow": "jutro",
+    "on": [
+      "w niedzielę",
+      "w poniedziałek",
+      "we wtorek",
+      "w środę",
+      "w czwartek",
+      "w piątek",
+      "w sobotę"
+    ],
+    "onDate": "{date}"
   }
 }

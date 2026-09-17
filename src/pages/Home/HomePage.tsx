@@ -14,6 +14,7 @@ import { BirthdayBand } from '@/components/Promo/BirthdayBand'
 import { usePromo } from '@/promo/usePromo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { OpeningHours } from '@/components/OpeningHours/OpeningHours'
+import { OpenStatus } from '@/components/OpenStatus/OpenStatus'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
 import { useCallback, useState } from 'react'
@@ -192,9 +193,10 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className={styles.hoursCard}>
+          <div className={styles.hoursCard} id="hours">
             <h3 className={styles.hoursTitle}>{t('home.visit.hours')}</h3>
             <GoldDivider />
+            <OpenStatus variant="line" />
             <OpeningHours />
           </div>
         </div>
