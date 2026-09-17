@@ -82,7 +82,23 @@
     "close": "Close",
     "details": "Dish details",
     "categoryJump": "Jump to category",
-    "results": "{count} dishes"
+    "results": "{count} dishes",
+    "filters": {
+      "button": "Filters",
+      "active": "Active filters: {count}",
+      "features": "Dish",
+      "without": "Without allergens",
+      "no": {
+        "nuts": "No nuts",
+        "dairy": "No dairy",
+        "shellfish": "No shellfish or seafood",
+        "fish": "No fish"
+      },
+      "note": "Based on the allergen table in our menu. Ingredients such as {list} are in most dishes, so they cannot be filtered out here. If you have an allergy, always ask our staff.",
+      "clear": "Clear filters",
+      "done": "Done",
+      "empty": "No dish matches these filters."
+    }
   },
   "drinks": {
     "title": "Drinks",

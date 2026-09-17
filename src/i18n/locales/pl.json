@@ -82,7 +82,23 @@
     "close": "Zamknij",
     "details": "Szczegóły dania",
     "categoryJump": "Przejdź do kategorii",
-    "results": "{count} dań"
+    "results": "{count} dań",
+    "filters": {
+      "button": "Filtry",
+      "active": "Aktywne filtry: {count}",
+      "features": "Cechy dania",
+      "without": "Bez alergenów",
+      "no": {
+        "nuts": "Bez orzechów",
+        "dairy": "Bez nabiału",
+        "shellfish": "Bez skorupiaków i owoców morza",
+        "fish": "Bez ryb"
+      },
+      "note": "Według tabeli alergenów z naszego menu. Składniki takie jak {list} są w większości dań, dlatego nie da się ich tu wykluczyć. Przy alergii zawsze zapytaj obsługę.",
+      "clear": "Wyczyść filtry",
+      "done": "Gotowe",
+      "empty": "Żadne danie nie spełnia wybranych filtrów."
+    }
   },
   "drinks": {
     "title": "Napoje",

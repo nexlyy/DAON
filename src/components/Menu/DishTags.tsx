@@ -19,7 +19,7 @@ export function DishTags({ dish }: { dish: Dish }) {
   )
 }
 
-function LeafIcon() {
+export function LeafIcon() {
   return (
     <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" focusable="false">
       <path
@@ -30,7 +30,7 @@ function LeafIcon() {
   )
 }
 
-function FlameIcon() {
+export function FlameIcon() {
   return (
     <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" focusable="false">
       <path

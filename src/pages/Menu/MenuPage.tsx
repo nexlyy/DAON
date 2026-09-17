@@ -1,23 +1,44 @@
 import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { Calligraphy } from '@/components/Media/Calligraphy'
 import { categories } from '@/data/menu/categories'
-import { dishes } from '@/data/menu/dishes'
-import type { Dish } from '@/data/menu/types'
+import { dishAllergens, dishes } from '@/data/menu/dishes'
+import type { Dish, DishTag } from '@/data/menu/types'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useStuck } from '@/hooks/useStuck'
 import { CategoryRail } from '@/components/Menu/CategoryRail'
+import { FilterButton, FilterPanel } from '@/components/Menu/MenuFilters'
 import { DishCard } from '@/components/Menu/DishCard'
 import { DishDialog } from '@/components/Menu/DishDialog'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
-import { widespreadAllergens } from '@/data/menu/allergens'
+import { allergenNumbers, widespreadAllergens } from '@/data/menu/allergens'
+import type { Allergen } from '@/data/menu/allergens'
 import { MenuPromoNotice } from '@/components/Promo/BirthdayBand'
 import styles from './MenuPage.module.css'
+
+const TAG_ORDER: DishTag[] = ['vegetarian', 'extraSpicy', 'mildAvailable', 'sharing']
+const tagOptions = TAG_ORDER.filter((tag) => dishes.some((dish) => dish.tags?.includes(tag)))
+const allergenOptions = (Object.keys(allergenNumbers) as Allergen[]).filter(
+  (allergen) => !widespreadAllergens.includes(allergen),
+)
+const allergensOf = new Map(dishes.map((dish) => [dish.id, new Set(dishAllergens(dish))]))
+
+interface Filters {
+  tags: DishTag[]
+  without: Allergen[]
+}
+
+const toggle = <T,>(list: T[], value: T) =>
+  list.includes(value) ? list.filter((item) => item !== value) : [...list, value]
 
 export function MenuPage() {
   const { t, resolve, locale } = useI18n()
   const [category, setCategory] = useState('all')
   const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState<Filters>({ tags: [], without: [] })
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const closeFilters = useCallback(() => setFiltersOpen(false), [])
+  const clearFilters = useCallback(() => setFilters({ tags: [], without: [] }), [])
   const [openDish, setOpenDish] = useState<Dish | null>(null)
   
   const closeDish = useCallback(() => setOpenDish(null), [])
@@ -30,24 +51,27 @@ export function MenuPage() {
     path: '/menu',
   })
 
-  const visible = useMemo(() => {
-    const needle = deferredQuery.trim().toLowerCase()
+  const matching = useCallback(
+    (applied: Filters) => {
+      const needle = deferredQuery.trim().toLowerCase()
 
-    const matches = (dish: Dish) => {
-      if (category !== 'all' && dish.categoryId !== category) return false
-      if (!needle) return true
-      const haystack = [
-        resolve(dish.name),
-        resolve(dish.description),
-        dish.number,
-      ]
-        .join(' ')
-        .toLowerCase()
-      return haystack.includes(needle)
-    }
+      return dishes.filter((dish: Dish) => {
+        if (category !== 'all' && dish.categoryId !== category) return false
+        if (!applied.tags.every((tag) => dish.tags?.includes(tag))) return false
+        const contains = allergensOf.get(dish.id)
+        if (applied.without.some((allergen) => contains?.has(allergen))) return false
+        if (!needle) return true
+        const haystack = [resolve(dish.name), resolve(dish.description), dish.number]
+          .join(' ')
+          .toLowerCase()
+        return haystack.includes(needle)
+      })
+    },
+    [category, deferredQuery, resolve],
+  )
 
-    return dishes.filter(matches)
-  }, [category, deferredQuery, resolve])
+  const visible = useMemo(() => matching(filters), [matching, filters])
+  const activeFilters = filters.tags.length + filters.without.length
 
   const grouped = useMemo(
     () =>
@@ -92,16 +116,53 @@ export function MenuPage() {
                 </button>
               )}
             </label>
+            <FilterButton
+              open={filtersOpen}
+              active={activeFilters}
+              onToggle={() => setFiltersOpen((open) => !open)}
+            />
             <p className={styles.count} aria-live="polite">
               {t('menu.results', { count: visible.length })}
             </p>
           </div>
         </div>
+
+        {filtersOpen && (
+          <FilterPanel
+            tagOptions={tagOptions}
+            allergenOptions={allergenOptions}
+            tags={filters.tags}
+            without={filters.without}
+            countWithTag={(tag) =>
+              matching({ ...filters, tags: filters.tags.includes(tag) ? filters.tags : [...filters.tags, tag] })
+                .length
+            }
+            countWithout={(allergen) =>
+              matching({
+                ...filters,
+                without: filters.without.includes(allergen) ? filters.without : [...filters.without, allergen],
+              }).length
+            }
+            onToggleTag={(tag) => setFilters((current) => ({ ...current, tags: toggle(current.tags, tag) }))}
+            onToggleWithout={(allergen) =>
+              setFilters((current) => ({ ...current, without: toggle(current.without, allergen) }))
+            }
+            onClear={clearFilters}
+            onClose={closeFilters}
+          />
+        )}
       </div>
 
       <div className="shell">
         {grouped.length === 0 ? (
-          <p className={styles.empty}>{t('menu.empty')}</p>
+          <div className={styles.empty}>
+            <p>{t(activeFilters > 0 ? 'menu.filters.empty' : 'menu.empty')}</p>
+            {activeFilters > 0 && (
+              <button type="button" className="btn btn--ghost" onClick={clearFilters}>
+                {t('menu.filters.clear')}
+              </button>
+            )}
+          </div>
         ) : (
           grouped.map(({ category: entry, items }) => (
             <section className={styles.group} key={entry.id} id={`category-${entry.id}`}>

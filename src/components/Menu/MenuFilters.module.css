@@ -1,0 +1,192 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+  padding: 0.55em 1em;
+  border: 1px solid rgba(198, 176, 150, 0.55);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--text-soft);
+  transition:
+    border-color 0.3s var(--ease),
+    color 0.3s var(--ease),
+    background-color 0.3s var(--ease);
+}
+
+.button[aria-expanded='true'],
+.button[data-active] {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .button:hover {
+    border-color: var(--gold-line);
+    color: var(--ink);
+  }
+}
+
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding-inline: 0.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  color: var(--paper);
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  width: min(100% - var(--gutter) * 2, var(--max-w));
+  margin: 0.6rem auto 0.2rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(198, 176, 150, 0.45);
+  border-radius: var(--radius-m);
+  background: var(--white);
+  box-shadow: var(--shadow-soft);
+  animation: daon-fade 0.25s var(--ease) both;
+}
+
+.group {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 0.55rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.5em 0.9em;
+  border: 1px solid rgba(198, 176, 150, 0.55);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: var(--text-soft);
+  transition:
+    background-color 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+
+.chip[data-tag='vegetarian'] svg {
+  color: #5b7440;
+}
+
+.chip[data-tag='extraSpicy'] svg {
+  color: #b04437;
+}
+
+@media (hover: hover) {
+  .chip:hover:not(:disabled) {
+    border-color: var(--gold-line);
+    color: var(--ink);
+  }
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.chip[aria-pressed='true'] svg {
+  color: var(--gold-line);
+}
+
+.chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.count {
+  min-width: 1.2rem;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  opacity: 0.7;
+}
+
+.note {
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: var(--text-faint);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+}
+
+.clear {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.done {
+  padding: 0.5em 1.3em;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+@media (max-width: 640px) {
+  .buttonLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .button {
+    padding: 0.5em 0.8em;
+  }
+
+  .panel {
+    width: auto;
+    margin-inline: var(--gutter);
+    padding: 0.85rem;
+    max-height: min(60dvh, 30rem);
+    overflow-y: auto;
+  }
+
+  .chip {
+    font-size: 0.76rem;
+    padding: 0.45em 0.8em;
+  }
+}

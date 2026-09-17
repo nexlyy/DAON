@@ -82,7 +82,23 @@
     "close": "닫기",
     "details": "요리 상세",
     "categoryJump": "분류로 이동",
-    "results": "{count}개 요리"
+    "results": "{count}개 요리",
+    "filters": {
+      "button": "필터",
+      "active": "적용된 필터 {count}개",
+      "features": "메뉴 특징",
+      "without": "알레르기 성분 제외",
+      "no": {
+        "nuts": "견과류 없음",
+        "dairy": "유제품 없음",
+        "shellfish": "갑각류·해산물 없음",
+        "fish": "생선 없음"
+      },
+      "note": "메뉴의 알레르기 표를 기준으로 합니다. {list} 같은 재료는 대부분의 요리에 들어 있어 여기서 제외할 수 없습니다. 알레르기가 있으시면 꼭 직원에게 문의해 주세요.",
+      "clear": "필터 초기화",
+      "done": "완료",
+      "empty": "선택한 필터에 맞는 요리가 없습니다."
+    }
   },
   "drinks": {
     "title": "음료",
