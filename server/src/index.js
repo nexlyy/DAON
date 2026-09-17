@@ -18,6 +18,9 @@ import { cardKeyboard, createBot } from './bot.js'
 import { cancelToken, tokenMatches } from './cancel.js'
 import { isClosed } from './closures.js'
 import { loadEnv, root } from './env.js'
+import { createGuestMail, readEmail } from './guestmail.js'
+import { createMailer } from './mailer.js'
+import { createStats } from './stats.js'
 import { buildMessage, cancelledMessage, scrubbedMessage } from './message.js'
 import { parseStaff } from './staff.js'
 import { createStore, reference, TablesTaken } from './store.js'
@@ -55,6 +58,8 @@ if (STAFF.size === 0) {
 
 mkdirSync(STORE, { recursive: true })
 const store = createStore()
+const guestMail = createGuestMail({ mailer: createMailer(), store })
+const stats = createStats()
 
 function readAlerts() {
   try {
@@ -366,6 +371,23 @@ async function handle(request, response, url) {
     })
   }
 
+  if (request.method === 'GET' && url.pathname === '/hit') {
+    stats.hit({
+      ip: clientIp(request),
+      userAgent: request.headers['user-agent'],
+      event: url.searchParams.get('e'),
+      page: url.searchParams.get('p'),
+      locale: url.searchParams.get('l'),
+      referrer: url.searchParams.get('r'),
+    })
+    response.writeHead(204, { 'Cache-Control': 'no-store' })
+    return response.end()
+  }
+
+  if (request.method === 'GET' && url.pathname === '/config') {
+    return send(request, response, 200, { email: guestMail.enabled })
+  }
+
   if (request.method === 'GET' && url.pathname === '/closed-dates') {
     const from = url.searchParams.get('from') ?? ''
     const to = url.searchParams.get('to') ?? ''
@@ -456,6 +478,7 @@ async function handle(request, response, url) {
     }
 
     await store.cancel(ref)
+    guestMail.cancelled(booking).catch(() => {})
     const notice = cancelledMessage(toStaff(booking), 'the guest')
     updateAlerts(ref, notice)
       .then(() => notifyStaff(notice))
@@ -498,6 +521,7 @@ async function handle(request, response, url) {
     })
     if (!outcome.after) return send(request, response, outcome.status, outcome.body)
 
+    stats.booked('changedOnline')
     bot
       .announceMove(booking, outcome.after, 'the guest, on the website')
       .catch((failure) => console.error('Could not tell the staff:', failure.message))
@@ -554,6 +578,11 @@ async function handle(request, response, url) {
       })
       .catch((failure) => console.error('Could not tell the staff:', failure.message))
 
+    stats.booked('online')
+    guestMail
+      .booked({ ...record, id }, readEmail(raw.email), booking.locale)
+      .catch((failure) => console.error('Could not email the guest:', failure.message))
+
     return send(request, response, 200, {
       ...record,
       id,
@@ -582,6 +611,10 @@ bot = createBot({
   updateAlerts,
   oneAtATime,
   retentionDays: RETENTION_DAYS,
+  onMoved: (before, after) => guestMail.moved({ ...before, ...after }),
+  onCancelled: (booking) => guestMail.cancelled(booking),
+  onBooked: () => stats.booked('staff'),
+  stats,
 })
 
 const server = createServer((request, response) => {
@@ -613,6 +646,12 @@ server.listen(PORT, '127.0.0.1', () => {
   }, 6 * 60 * 60 * 1000)
 
   bot.setup().catch(() => {})
+
+  const mailTick = () =>
+    guestMail.tick().catch((failure) => console.error('Could not send reminders:', failure.message))
+  setTimeout(mailTick, 30_000)
+  setInterval(mailTick, 10 * 60 * 1000)
+  console.log(guestMail.enabled ? 'Guest emails: on.' : 'Guest emails: off (no SMTP settings).')
 
   for (const id of STAFF) {
     getChat(TOKEN, id).catch(() =>

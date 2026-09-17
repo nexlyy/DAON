@@ -45,7 +45,11 @@
   },
   "restaurant": {
     "name": "DAON",
-    "phone": "+48 728 550 310"
+    "phone": "+48 728 550 310",
+    "email": "daonpolska@gmail.com",
+    "address": "Dworcowa 8, 40-012 Katowice",
+    "site": "https://daon.pl",
+    "company": "DAON POLSKA sp. z o.o."
   },
   "tables": [
     {

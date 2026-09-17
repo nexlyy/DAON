@@ -1,4 +1,4 @@
-import { prettyDay } from './dates.js'
+import { prettyDay, shortDay } from './dates.js'
 
 const EMPTY = '—'
 const NL = '\n'
@@ -84,11 +84,9 @@ export function movedMessage(before, after, by) {
   ].join(NL)
 }
 
-function row(booking, { withDate = false } = {}) {
+function row(booking) {
   const note = String(booking.notes ?? '').trim()
-  const when = withDate
-    ? `${formatDay(booking.date)} <b>${escapeHtml(formatTime(booking.time))}</b>`
-    : `<b>${escapeHtml(formatTime(booking.time))}</b>`
+  const when = `<b>${escapeHtml(formatTime(booking.time))}</b>`
   const tables = booking.tables ? `tables ${escapeHtml(booking.tables)}` : 'no table held'
   return [
     `${when} · ${escapeHtml(filled(booking.name))} · ${escapeHtml(filled(booking.partySize))} guests · ${tables}`,
@@ -164,6 +162,7 @@ export function helpMessage(closures) {
     '/all past — the last 30 days',
     '/today, /tomorrow, /day saturday',
     '/find Anna — by name, phone or DAON code',
+    '/stats — website visits and bookings; /stats 30 for a month',
     '',
     '<b>Change a booking</b>',
     '/move DAON-XXXXX — new day, time, guests or table',
@@ -178,6 +177,60 @@ export function helpMessage(closures) {
     '',
     '<b>Closed days</b>',
     list,
+  ].join(NL)
+}
+
+const PAGE_NAMES = {
+  '/': 'home',
+  '/menu': 'menu',
+  '/reservation': 'reservation',
+  '/about': 'about',
+  '/contact': 'contact',
+  '/privacy': 'privacy',
+  '/drinks': 'drinks',
+}
+
+export function statsMessage(days) {
+  const sum = (pick) => days.reduce((total, day) => total + (pick(day) ?? 0), 0)
+  const merged = (field) => {
+    const table = {}
+    for (const day of days) {
+      for (const [key, value] of Object.entries(day[field] ?? {})) table[key] = (table[key] ?? 0) + value
+    }
+    return Object.entries(table).sort((a, b) => b[1] - a[1])
+  }
+  const joined = (entries, name = (key) => key) =>
+    entries.length ? entries.map(([key, value]) => `${escapeHtml(name(key))} ${value}`).join(' · ') : '—'
+
+  const visitors = sum((day) => day.visitors)
+  const locales = merged('locales')
+  const localeTotal = locales.reduce((total, [, value]) => total + value, 0)
+  const event = (name) => sum((day) => day.events?.[name])
+  const booked = (name) => sum((day) => day.booked?.[name])
+
+  return [
+    `<b>daon.pl — last ${days.length} day${days.length === 1 ? '' : 's'}</b>`,
+    '',
+    `Visitors: <b>${visitors}</b> (each counted once a day)`,
+    days
+      .slice(-14)
+      .map((day) => `${shortDay(day.date)}: ${day.visitors ?? 0}`)
+      .join(NL),
+    '',
+    `Pages: ${joined(merged('views'), (key) => PAGE_NAMES[key] ?? key)}`,
+    '',
+    `Reservations: started ${event('book_start')} · booked online <b>${booked('online')}</b> · changed online ${booked('changedOnline')} · taken in the bot ${booked('staff')}`,
+    `Uber Eats: delivery ${event('delivery')} · pickup ${event('pickup')}`,
+    `Taps: call ${event('call')} · directions ${event('directions')} · Instagram ${event('instagram')}`,
+    '',
+    `Languages: ${
+      localeTotal
+        ? locales.map(([key, value]) => `${key} ${Math.round((value / localeTotal) * 100)}%`).join(' · ')
+        : '—'
+    }`,
+    `Came from: ${joined(merged('referrers').slice(0, 8))}`,
+    '',
+    '<i>Counted without cookies. No IP address or other identifier is stored.</i>',
   ].join(NL)
 }
 

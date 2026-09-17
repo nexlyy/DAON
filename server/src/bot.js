@@ -24,6 +24,7 @@ import {
   listMessages,
   movedMessage,
   privateMessage,
+  statsMessage,
   releasedMessage,
   welcomeMessage,
 } from './message.js'
@@ -75,6 +76,8 @@ const COMMANDS = {
   '/zamknij': 'close',
   '/open': 'open',
   '/otworz': 'open',
+  '/stats': 'stats',
+  '/statystyki': 'stats',
   '/closed': 'help',
   '/zamkniete': 'help',
 }
@@ -91,6 +94,7 @@ const MENU = [
   ['free', 'Guests left: /free DAON-XXXXX'],
   ['close', 'Close a day: /close 24.12'],
   ['open', 'Open a closed day: /open 24.12'],
+  ['stats', 'Website visits and bookings: /stats 30'],
   ['help', 'Everything the bot can do'],
 ]
 
@@ -120,6 +124,10 @@ export function createBot({
   updateAlerts,
   oneAtATime,
   retentionDays,
+  onMoved = async () => {},
+  onCancelled = async () => {},
+  onBooked = () => {},
+  stats,
 }) {
   const drafts = new Map()
   const today = () => toISODate(new Date())
@@ -573,6 +581,7 @@ export function createBot({
       }
 
       drafts.delete(draft.chatId)
+      onBooked()
       const card = buildMessage(toStaff(outcome.record), { by })
       const keyboard = cardKeyboard(outcome.record.reference)
       const mine = await editMessage(token, draft.chatId, draft.messageId, card, keyboard)
@@ -633,6 +642,7 @@ export function createBot({
     const others = await notifyStaff(card, keyboard, { except: draft?.chatId })
     addAlerts(after.reference, [...mine, ...others])
     recordSent([...mine, ...others], after.date)
+    onMoved(before, after).catch((failure) => console.error('Could not email the guest:', failure.message))
   }
 
   async function onCommand(message, action, args) {
@@ -674,6 +684,10 @@ export function createBot({
       }
       case 'book':
         return startBooking(chatId, argText)
+      case 'stats': {
+        const count = Math.min(Math.max(Number.parseInt(argText, 10) || 7, 1), 90)
+        return say(chatId, statsMessage(stats.days(count)))
+      }
       case 'move': {
         const reference = (args[0] ?? '').toUpperCase()
         if (!/^DAON-/.test(reference)) return say(chatId, 'Which one? /move DAON-XXXXX (the code is on every booking card, or use /find).')
@@ -863,6 +877,7 @@ export function createBot({
     if (booking.status === 'cancelled') return ack('Already cancelled.')
 
     await store.cancel(reference)
+    onCancelled(booking).catch((failure) => console.error('Could not email the guest:', failure.message))
     await ack('Cancelled. The table is free again.')
     const notice = cancelledMessage(toStaff(booking), `the restaurant (${nameOf(query.from)})`)
     await updateAlerts(reference, notice, { chatId, messageId: query.message.message_id })

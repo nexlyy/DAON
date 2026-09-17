@@ -5,7 +5,7 @@ import { root } from './env.js'
 
 const data = JSON.parse(readFileSync(resolve(root, 'reservation-data.json'), 'utf8'))
 
-export const { openingHours, reservation: rules, tables, zones } = data
+export const { openingHours, reservation: rules, restaurant, tables, zones } = data
 export const tableById = new Map(tables.map((table) => [table.id, table]))
 
 const pad = (value) => String(value).padStart(2, '0')

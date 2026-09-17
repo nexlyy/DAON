@@ -8,7 +8,7 @@ const root = resolve(here, '..', '..')
 
 const load = (relative) => import(pathToFileURL(resolve(root, relative)).href)
 
-const { openingHours, reservation, restaurant } = await load('src/data/restaurant.ts')
+const { legal, openingHours, reservation, restaurant } = await load('src/data/restaurant.ts')
 const { floorPlan } = await load('src/data/tables/floorPlan.ts')
 
 const strings = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/en.json'), 'utf8'))
@@ -17,7 +17,14 @@ const data = {
   generatedFrom: 'src/data/restaurant.ts, src/data/tables/floorPlan.ts',
   openingHours,
   reservation,
-  restaurant: { name: restaurant.name, phone: restaurant.phone },
+  restaurant: {
+    name: restaurant.name,
+    phone: restaurant.phone,
+    email: restaurant.email,
+    address: `${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`,
+    site: 'https://daon.pl',
+    company: legal.companyName,
+  },
   tables: floorPlan.tables.map((table) => ({
     id: table.id,
     label: table.label,
