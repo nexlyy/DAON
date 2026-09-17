@@ -7,6 +7,7 @@ import { MenuPage } from '@/pages/Menu/MenuPage'
 import { DrinksPage } from '@/pages/Drinks/DrinksPage'
 import { ReservationPage } from '@/pages/Reservation/ReservationPage'
 import { NotFoundPage } from '@/pages/NotFound/NotFoundPage'
+import { PrivacyPage } from '@/pages/Privacy/PrivacyPage'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './App.module.css'
 
@@ -33,6 +34,7 @@ export function App() {
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/drinks/:key" element={<DrinksPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

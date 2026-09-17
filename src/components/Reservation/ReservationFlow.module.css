@@ -43,6 +43,19 @@
   color: var(--text-soft);
 }
 
+.privacy {
+  margin-top: 0.4rem;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+
+.privacy a {
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .warning,
 .error {
   width: 100%;

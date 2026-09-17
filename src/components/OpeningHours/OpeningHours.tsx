@@ -1,5 +1,6 @@
 import { hoursFor, weekOrder } from '@/data/restaurant'
 import { useI18n } from '@/i18n/useI18n'
+import { warsawWeekday } from '@/lib/warsaw'
 import styles from './OpeningHours.module.css'
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
 export function OpeningHours({ labels = 'long', className }: Props) {
   const { t, list } = useI18n()
   const dayNames = list(`days.${labels}`)
-  const today = new Date().getDay()
+  const today = warsawWeekday()
 
   return (
     <dl className={[styles.hours, className].filter(Boolean).join(' ')}>

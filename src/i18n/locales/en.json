@@ -6,7 +6,9 @@
     "menuDescription": "The full menu of DAON, a Korean restaurant in Katowice: Korean table sets, handmade ramen, kimbap, Korean BBQ, hot pots and more, with prices in PLN.",
     "reservationTitle": "Book a Table — DAON Korean Restaurant, Katowice",
     "reservationDescription": "Book a table at DAON, Dworcowa 8, Katowice: pick a day, a time and your table on the floor plan.",
-    "notFoundTitle": "Page not found — DAON"
+    "notFoundTitle": "Page not found — DAON",
+    "privacyTitle": "Privacy policy — DAON Korean Restaurant, Katowice",
+    "privacyDescription": "What data DAON collects when you book a table, why, how long it is kept and what your rights are under the GDPR."
   },
   "nav": {
     "home": "Home",
@@ -168,7 +170,8 @@
       "phonePlaceholder": "+48 …",
       "notes": "Anything we should know?",
       "notesPlaceholder": "Allergies, a birthday, a high chair… (optional)",
-      "required": "Required"
+      "required": "Required",
+      "privacy": "The controller of your data is {controller}. We use your name, phone number and notes only to handle the reservation and delete them {days} days after your visit. By writing allergy information in the notes, you agree to its use in preparing your visit."
     },
     "summary": {
       "title": "Your reservation",
@@ -207,7 +210,13 @@
       "phoneInvalid": "That does not look like a phone number.",
       "generic": "The reservation could not be saved. Please try again.",
       "unavailable": "That table was just taken. Please pick another one.",
-      "offline": "We could not check availability just now. Reload the page, or call us on {phone}."
+      "offline": "We could not check availability just now. Reload the page, or call us on {phone}.",
+      "phoneLimit": "This phone number already has the most upcoming reservations we can take online. Call us on {phone} and we will sort it out.",
+      "rateLimit": "Too many attempts from this connection. Please wait a little, or call us on {phone}.",
+      "closed": "We can no longer take bookings for that day or time — it may have just been closed. Please pick another date.",
+      "incomplete": "Something is missing from the reservation. Please check the highlighted step.",
+      "timeLost": "{time} is no longer free for {guests} guests. Please choose another time.",
+      "pickAnotherTime": "Choose another time"
     },
     "demoNotice": "Demo booking — reservations are stored in this browser only and do not reach the restaurant yet. To book for real, call {phone}.",
     "upcoming": {
@@ -246,7 +255,8 @@
     "explore": "Explore",
     "visit": "Visit us",
     "rights": "All rights reserved.",
-    "hours": "Opening hours"
+    "hours": "Opening hours",
+    "privacy": "Privacy policy"
   },
   "days": {
     "long": [

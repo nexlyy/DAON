@@ -6,7 +6,9 @@
     "menuDescription": "Pełne menu DAON, restauracji koreańskiej w Katowicach: zestawy koreańskie, ramen domowej roboty, kimbap, grill koreański, kociołki i więcej. Ceny w PLN.",
     "reservationTitle": "Rezerwacja stolika — DAON, restauracja koreańska w Katowicach",
     "reservationDescription": "Zarezerwuj stolik w DAON przy ul. Dworcowej 8 w Katowicach: wybierz dzień, godzinę i stolik na planie sali.",
-    "notFoundTitle": "Nie znaleziono strony — DAON"
+    "notFoundTitle": "Nie znaleziono strony — DAON",
+    "privacyTitle": "Polityka prywatności — DAON, restauracja koreańska w Katowicach",
+    "privacyDescription": "Jakie dane zbiera DAON przy rezerwacji stolika, po co, jak długo je przechowujemy i jakie masz prawa zgodnie z RODO."
   },
   "nav": {
     "home": "Strona główna",
@@ -168,7 +170,8 @@
       "phonePlaceholder": "+48 …",
       "notes": "Coś, o czym powinniśmy wiedzieć?",
       "notesPlaceholder": "Alergie, urodziny, krzesełko dla dziecka… (opcjonalnie)",
-      "required": "Wymagane"
+      "required": "Wymagane",
+      "privacy": "Administratorem Twoich danych jest {controller}. Imię, telefon i uwagi wykorzystamy tylko do obsługi rezerwacji i usuniemy je {days} dni po wizycie. Wpisując w uwagach informacje o alergiach, zgadzasz się na ich wykorzystanie do przygotowania wizyty."
     },
     "summary": {
       "title": "Twoja rezerwacja",
@@ -207,7 +210,13 @@
       "phoneInvalid": "To nie wygląda na numer telefonu.",
       "generic": "Nie udało się zapisać rezerwacji. Spróbuj ponownie.",
       "unavailable": "Ten stolik właśnie został zajęty. Wybierz inny.",
-      "offline": "Nie udało się sprawdzić dostępności. Odśwież stronę albo zadzwoń: {phone}."
+      "offline": "Nie udało się sprawdzić dostępności. Odśwież stronę albo zadzwoń: {phone}.",
+      "phoneLimit": "Ten numer telefonu ma już maksymalną liczbę nadchodzących rezerwacji online. Zadzwoń do nas: {phone}, a wszystko ustalimy.",
+      "rateLimit": "Zbyt wiele prób z tego połączenia. Poczekaj chwilę albo zadzwoń: {phone}.",
+      "closed": "Nie przyjmujemy już rezerwacji na ten dzień lub godzinę — mógł zostać właśnie zamknięty. Wybierz inną datę.",
+      "incomplete": "W rezerwacji czegoś brakuje. Sprawdź zaznaczony krok.",
+      "timeLost": "O {time} nie ma już wolnych stolików dla {guests} osób. Wybierz inną godzinę.",
+      "pickAnotherTime": "Wybierz inną godzinę"
     },
     "demoNotice": "Rezerwacja demonstracyjna — zapisujemy ją tylko w tej przeglądarce i nie trafia jeszcze do restauracji. Aby zarezerwować naprawdę, zadzwoń pod {phone}.",
     "upcoming": {
@@ -246,7 +255,8 @@
     "explore": "Nawigacja",
     "visit": "Odwiedź nas",
     "rights": "Wszelkie prawa zastrzeżone.",
-    "hours": "Godziny otwarcia"
+    "hours": "Godziny otwarcia",
+    "privacy": "Polityka prywatności"
   },
   "days": {
     "long": [

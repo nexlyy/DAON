@@ -250,7 +250,7 @@
     transform: translateY(1.35rem) rotate(-10deg);
   }
 
-  .card[data-variant='auto']   .card[data-variant='auto'] .desc {
+  .card[data-variant='auto'] .desc {
     -webkit-line-clamp: 2;
     line-clamp: 2;
     font-size: 0.79rem;

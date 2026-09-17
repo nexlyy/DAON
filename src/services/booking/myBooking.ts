@@ -1,3 +1,4 @@
+import { warsawToday } from '@/lib/warsaw'
 import type { Booking } from './types'
 
 const KEY = 'daon.booking'
@@ -37,11 +38,7 @@ export function readBooking(): SavedBooking | null {
     const saved = JSON.parse(raw) as SavedBooking
     if (!saved?.reference || !saved?.token || !saved?.date) return null
 
-    const today = new Date()
-    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(
-      today.getDate(),
-    ).padStart(2, '0')}`
-    if (saved.date < iso) {
+    if (saved.date < warsawToday()) {
       forgetBooking()
       return null
     }

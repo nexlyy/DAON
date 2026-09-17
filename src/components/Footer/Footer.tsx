@@ -82,6 +82,9 @@ export function Footer() {
 
         <p className={styles.legal}>
           © {new Date().getFullYear()} {restaurant.legalName}. {t('footer.rights')}
+          <Link to="/privacy" className={styles.legalLink}>
+            {t('footer.privacy')}
+          </Link>
         </p>
       </div>
     </footer>

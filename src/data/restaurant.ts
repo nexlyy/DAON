@@ -69,4 +69,19 @@ export const reservation = {
   partySizes: [1, 2, 3, 4, 5, 6],
   
   maxPartySize: 12,
+
+  retentionDays: 30,
 } as const
+
+export const legal = {
+  companyName: null as string | null,
+  nip: null as string | null,
+  backupDays: 30,
+  serverLogDays: 14,
+  policyUpdated: '2026-09-17',
+}
+
+export function controllerName() {
+  if (!legal.companyName) return restaurant.legalName
+  return `${legal.companyName}${legal.nip ? `, NIP ${legal.nip}` : ''} (${restaurant.legalName})`
+}

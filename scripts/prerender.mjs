@@ -27,6 +27,13 @@ const pages = [
     title: meta.reservationTitle,
     description: meta.reservationDescription,
   },
+  {
+    url: '/privacy',
+    file: 'privacy/index.html',
+    canonical: '/privacy',
+    title: meta.privacyTitle,
+    description: meta.privacyDescription,
+  },
   { url: '/about', file: 'about/index.html', canonical: '/', title: meta.title, description: meta.description },
   { url: '/contact', file: 'contact/index.html', canonical: '/', title: meta.title, description: meta.description },
   { url: '/404', file: '404.html', title: meta.notFoundTitle, description: meta.description, noindex: true },

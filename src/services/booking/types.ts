@@ -39,11 +39,13 @@ export interface Booking extends BookingRequest {
   status: 'confirmed' | 'pending' | 'cancelled'
 }
 
+export type BookingErrorCode = 'unavailable' | 'phoneLimit' | 'rateLimit' | 'closed' | 'generic'
+
 export class BookingError extends Error {
   constructor(
     message: string,
     
-    readonly code: 'unavailable' | 'generic' = 'generic',
+    readonly code: BookingErrorCode = 'generic',
   ) {
     super(message)
     this.name = 'BookingError'

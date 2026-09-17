@@ -1,0 +1,289 @@
+{
+  "pl": {
+    "title": "Polityka prywatności",
+    "lead": "Wyjaśniamy tu, jakie dane zbiera strona daon.pl, po co je zbieramy, jak długo je przechowujemy i jakie masz prawa.",
+    "updated": "Ostatnia aktualizacja: {updated}",
+    "sections": [
+      {
+        "heading": "Administrator danych",
+        "paragraphs": [
+          "Administratorem Twoich danych osobowych jest {controller}, {address}.",
+          "W sprawach dotyczących danych osobowych napisz na {email} lub zadzwoń: {phone}."
+        ]
+      },
+      {
+        "heading": "Jakie dane zbieramy",
+        "paragraphs": ["Gdy rezerwujesz stolik przez stronę, podajesz:"],
+        "items": [
+          "imię lub nazwę, na którą ma być rezerwacja,",
+          "numer telefonu,",
+          "uwagi, jeśli zechcesz je dodać — na przykład informację o alergii, okazji albo krzesełku dla dziecka."
+        ],
+        "after": [
+          "Razem z nimi zapisujemy datę, godzinę, liczbę osób, wybrany stolik i język strony.",
+          "Serwer strony, jak każdy serwer WWW, zapisuje w dziennikach adres IP, czas i adres odwiedzonej podstrony oraz informacje o przeglądarce."
+        ]
+      },
+      {
+        "heading": "Po co i na jakiej podstawie",
+        "items": [
+          "Przyjęcie i obsługa rezerwacji, w tym kontakt w jej sprawie — art. 6 ust. 1 lit. b RODO (działania podejmowane na Twoje żądanie przed zawarciem umowy).",
+          "Informacje o alergiach lub zdrowiu wpisane w uwagach — art. 9 ust. 2 lit. a RODO (Twoja wyraźna zgoda, której udzielasz, wpisując je). Wykorzystujemy je wyłącznie do przygotowania Twojej wizyty. Zgodę możesz w każdej chwili wycofać, pisząc na {email}.",
+          "Bezpieczeństwo strony i ochrona przed nadużyciami, na przykład masowym składaniem fałszywych rezerwacji — art. 6 ust. 1 lit. f RODO (nasz prawnie uzasadniony interes)."
+        ]
+      },
+      {
+        "heading": "Kto ma dostęp do danych",
+        "paragraphs": [
+          "Dane rezerwacji widzi personel restauracji. Korzystamy też z zewnętrznych usług, które przetwarzają dane w naszym imieniu:"
+        ],
+        "items": [
+          "Supabase — baza danych, w której przechowywane są rezerwacje,",
+          "Hetzner Online GmbH — serwer, na którym działa strona (centrum danych w Helsinkach, Finlandia),",
+          "Telegram — komunikator, przez który personel dostaje powiadomienie o rezerwacji z imieniem, numerem telefonu i uwagami,",
+          "Google — czcionki strony są pobierane z serwerów Google, które otrzymują przy tym adres IP Twojego urządzenia."
+        ],
+        "after": [
+          "Supabase, Telegram i Google mogą przetwarzać dane poza Europejskim Obszarem Gospodarczym. Takie przekazanie odbywa się z zachowaniem zabezpieczeń wymaganych przez rozdział V RODO.",
+          "Linki do Uber Eats, Instagrama i Map Google prowadzą do zewnętrznych serwisów, które przetwarzają dane według własnych zasad."
+        ]
+      },
+      {
+        "heading": "Jak długo przechowujemy dane",
+        "items": [
+          "Imię, numer telefonu i uwagi usuwamy automatycznie {retentionDays} dni po dacie rezerwacji — z bazy danych i z powiadomień wysłanych personelowi przez Telegram. Zostaje sama rezerwacja bez danych osobowych: data, godzina, liczba osób i stolik.",
+          "Kopie zapasowe bazy przechowujemy nie dłużej niż {backupDays} dni.",
+          "Dzienniki serwera usuwamy po {logDays} dniach."
+        ]
+      },
+      {
+        "heading": "Twoje prawa",
+        "paragraphs": ["Masz prawo do:"],
+        "items": [
+          "dostępu do swoich danych i otrzymania ich kopii,",
+          "sprostowania danych,",
+          "usunięcia danych,",
+          "ograniczenia przetwarzania,",
+          "przeniesienia danych,",
+          "sprzeciwu wobec przetwarzania opartego na naszym prawnie uzasadnionym interesie,",
+          "wycofania zgody w dowolnym momencie, bez wpływu na zgodność z prawem przetwarzania przed jej wycofaniem."
+        ],
+        "after": [
+          "Aby skorzystać z tych praw, napisz na {email}.",
+          "Możesz też wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych, ul. Stawki 2, 00-193 Warszawa."
+        ]
+      },
+      {
+        "heading": "Czy musisz podać dane",
+        "paragraphs": [
+          "Podanie danych jest dobrowolne, ale bez imienia i numeru telefonu nie przyjmiemy rezerwacji przez stronę. Stolik możesz zawsze zarezerwować telefonicznie: {phone}."
+        ]
+      },
+      {
+        "heading": "Pliki cookie i pamięć przeglądarki",
+        "paragraphs": [
+          "Strona nie używa plików cookie ani narzędzi analitycznych czy reklamowych.",
+          "W pamięci przeglądarki zapisuje wybrany język, to, czy zamknięto ogłoszenie na górze strony, a po rezerwacji — jej numer, datę, godzinę i kod pozwalający ją odwołać. Dane rezerwacji znikają z pamięci przeglądarki po dacie wizyty; możesz je też usunąć, czyszcząc dane strony w ustawieniach przeglądarki."
+        ]
+      },
+      {
+        "heading": "Zautomatyzowane decyzje",
+        "paragraphs": ["Nie podejmujemy wobec Ciebie decyzji w sposób zautomatyzowany i nie profilujemy Cię."]
+      },
+      {
+        "heading": "Zmiany",
+        "paragraphs": ["Jeśli zmienimy sposób przetwarzania danych, zaktualizujemy tę stronę."]
+      }
+    ]
+  },
+  "en": {
+    "title": "Privacy policy",
+    "lead": "What data daon.pl collects, why, how long we keep it and what your rights are. This is a translation; the Polish version is the binding one.",
+    "updated": "Last updated: {updated}",
+    "sections": [
+      {
+        "heading": "Who is responsible for your data",
+        "paragraphs": [
+          "The controller of your personal data is {controller}, {address}.",
+          "For anything about your personal data, write to {email} or call {phone}."
+        ]
+      },
+      {
+        "heading": "What we collect",
+        "paragraphs": ["When you book a table on the website, you give us:"],
+        "items": [
+          "the name the booking is under,",
+          "a phone number,",
+          "notes, if you choose to add them — an allergy, an occasion, a high chair."
+        ],
+        "after": [
+          "Along with these we store the date, time, number of guests, the table you chose and the language of the site.",
+          "Like any web server, ours logs the IP address, the time and the page requested, and details of the browser."
+        ]
+      },
+      {
+        "heading": "Why, and on what legal basis",
+        "items": [
+          "Taking and handling your reservation, including contacting you about it — Art. 6(1)(b) GDPR (steps taken at your request before entering into a contract).",
+          "Allergy or health information you write in the notes — Art. 9(2)(a) GDPR (your explicit consent, given by writing it). We use it only to prepare for your visit. You can withdraw consent at any time by writing to {email}.",
+          "Keeping the website secure and preventing abuse, such as mass fake bookings — Art. 6(1)(f) GDPR (our legitimate interest)."
+        ]
+      },
+      {
+        "heading": "Who can see your data",
+        "paragraphs": [
+          "The restaurant staff see reservations. We also use outside services that process data on our behalf:"
+        ],
+        "items": [
+          "Supabase — the database where reservations are stored,",
+          "Hetzner Online GmbH — the server the website runs on (data centre in Helsinki, Finland),",
+          "Telegram — the messenger through which staff receive each reservation with the name, phone number and notes,",
+          "Google — the site's fonts are loaded from Google's servers, which receive your device's IP address when they do."
+        ],
+        "after": [
+          "Supabase, Telegram and Google may process data outside the European Economic Area. Any such transfer takes place with the safeguards required by Chapter V of the GDPR.",
+          "Links to Uber Eats, Instagram and Google Maps lead to outside services that handle data under their own terms."
+        ]
+      },
+      {
+        "heading": "How long we keep it",
+        "items": [
+          "Your name, phone number and notes are deleted automatically {retentionDays} days after the booking date — from the database and from the Telegram notifications sent to staff. What remains is the reservation without personal data: date, time, number of guests and table.",
+          "Database backups are kept for no longer than {backupDays} days.",
+          "Server logs are deleted after {logDays} days."
+        ]
+      },
+      {
+        "heading": "Your rights",
+        "paragraphs": ["You have the right to:"],
+        "items": [
+          "access your data and receive a copy,",
+          "have it corrected,",
+          "have it deleted,",
+          "restrict its processing,",
+          "data portability,",
+          "object to processing based on our legitimate interest,",
+          "withdraw consent at any time, without affecting processing that took place before."
+        ],
+        "after": [
+          "To use any of these rights, write to {email}.",
+          "You can also lodge a complaint with the Polish data protection authority: Prezes Urzędu Ochrony Danych Osobowych, ul. Stawki 2, 00-193 Warszawa."
+        ]
+      },
+      {
+        "heading": "Do you have to give us your data",
+        "paragraphs": [
+          "No, but without a name and phone number we cannot take a booking through the website. You can always book by phone: {phone}."
+        ]
+      },
+      {
+        "heading": "Cookies and browser storage",
+        "paragraphs": [
+          "The website uses no cookies and no analytics or advertising tools.",
+          "It keeps in your browser's storage the language you chose, whether you closed the announcement at the top of the page and, after you book, the booking's number, date, time and a code that lets you cancel it. The booking details disappear from the browser after the date of the visit; you can also remove them by clearing the site's data in your browser settings."
+        ]
+      },
+      {
+        "heading": "Automated decisions",
+        "paragraphs": ["We make no automated decisions about you and do not profile you."]
+      },
+      {
+        "heading": "Changes",
+        "paragraphs": ["If we change how we handle data, we will update this page."]
+      }
+    ]
+  },
+  "ko": {
+    "title": "개인정보 처리방침",
+    "lead": "daon.pl이 어떤 정보를 수집하는지, 그 목적과 보관 기간, 그리고 귀하의 권리를 안내합니다. 이 문서는 번역본이며, 법적 효력은 폴란드어 원문에 있습니다.",
+    "updated": "최종 수정일: {updated}",
+    "sections": [
+      {
+        "heading": "개인정보 관리자",
+        "paragraphs": [
+          "귀하의 개인정보 관리자는 {controller}({address})입니다.",
+          "개인정보와 관련된 문의는 {email}로 이메일을 보내시거나 {phone}로 전화해 주세요."
+        ]
+      },
+      {
+        "heading": "수집하는 정보",
+        "paragraphs": ["웹사이트에서 테이블을 예약하실 때 다음 정보를 입력하십니다."],
+        "items": [
+          "예약자 이름,",
+          "전화번호,",
+          "원하시는 경우 메모 — 예: 알레르기, 행사, 유아용 의자."
+        ],
+        "after": [
+          "이와 함께 날짜, 시간, 인원 수, 선택하신 테이블과 사이트 언어를 저장합니다.",
+          "다른 웹 서버와 마찬가지로 저희 서버도 IP 주소, 접속 시간, 방문한 페이지 주소와 브라우저 정보를 기록합니다."
+        ]
+      },
+      {
+        "heading": "처리 목적과 법적 근거",
+        "items": [
+          "예약 접수와 처리, 예약 관련 연락 — GDPR 제6조 제1항 (b)호 (계약 체결 전 귀하의 요청에 따른 조치).",
+          "메모에 적으신 알레르기 또는 건강 정보 — GDPR 제9조 제2항 (a)호 (정보를 입력하심으로써 주시는 명시적 동의). 이 정보는 방문 준비에만 사용합니다. 동의는 언제든지 {email}로 연락하여 철회하실 수 있습니다.",
+          "웹사이트 보안 및 허위 예약 대량 접수 같은 악용 방지 — GDPR 제6조 제1항 (f)호 (저희의 정당한 이익)."
+        ]
+      },
+      {
+        "heading": "정보에 접근하는 사람",
+        "paragraphs": ["예약 정보는 레스토랑 직원이 확인합니다. 또한 저희를 대신해 정보를 처리하는 외부 서비스를 이용합니다."],
+        "items": [
+          "Supabase — 예약이 저장되는 데이터베이스,",
+          "Hetzner Online GmbH — 웹사이트가 운영되는 서버 (핀란드 헬싱키 데이터 센터),",
+          "Telegram — 직원이 이름, 전화번호, 메모가 포함된 예약 알림을 받는 메신저,",
+          "Google — 사이트 글꼴을 Google 서버에서 불러오며, 이때 Google은 귀하 기기의 IP 주소를 받습니다."
+        ],
+        "after": [
+          "Supabase, Telegram, Google은 유럽경제지역(EEA) 밖에서 정보를 처리할 수 있습니다. 이러한 이전은 GDPR 제5장이 요구하는 보호 조치에 따라 이루어집니다.",
+          "Uber Eats, Instagram, Google 지도 링크는 각 서비스의 자체 정책에 따라 정보를 처리하는 외부 사이트로 연결됩니다."
+        ]
+      },
+      {
+        "heading": "보관 기간",
+        "items": [
+          "이름, 전화번호, 메모는 예약일로부터 {retentionDays}일 후 데이터베이스와 직원에게 보낸 Telegram 알림에서 자동으로 삭제됩니다. 날짜, 시간, 인원 수, 테이블처럼 개인정보가 아닌 예약 기록만 남습니다.",
+          "데이터베이스 백업은 {backupDays}일을 넘기지 않고 보관합니다.",
+          "서버 기록은 {logDays}일 후 삭제됩니다."
+        ]
+      },
+      {
+        "heading": "귀하의 권리",
+        "paragraphs": ["귀하에게는 다음과 같은 권리가 있습니다."],
+        "items": [
+          "자신의 정보를 열람하고 사본을 받을 권리,",
+          "정보를 정정할 권리,",
+          "정보를 삭제할 권리,",
+          "처리를 제한할 권리,",
+          "정보 이동권,",
+          "저희의 정당한 이익에 근거한 처리에 반대할 권리,",
+          "언제든지 동의를 철회할 권리 (철회 전 처리의 적법성에는 영향이 없습니다)."
+        ],
+        "after": [
+          "권리를 행사하시려면 {email}로 연락해 주세요.",
+          "폴란드 개인정보보호청(Prezes Urzędu Ochrony Danych Osobowych, ul. Stawki 2, 00-193 Warszawa)에 민원을 제기하실 수도 있습니다."
+        ]
+      },
+      {
+        "heading": "정보 제공이 필수인가요",
+        "paragraphs": ["필수는 아니지만, 이름과 전화번호가 없으면 웹사이트로 예약을 받을 수 없습니다. 전화로는 언제든지 예약하실 수 있습니다: {phone}."]
+      },
+      {
+        "heading": "쿠키와 브라우저 저장소",
+        "paragraphs": [
+          "이 웹사이트는 쿠키, 분석 도구, 광고 도구를 사용하지 않습니다.",
+          "브라우저 저장소에는 선택하신 언어, 페이지 상단 공지를 닫았는지 여부, 그리고 예약 후에는 예약 번호, 날짜, 시간과 예약 취소용 코드가 저장됩니다. 예약 정보는 방문일이 지나면 브라우저에서 사라지며, 브라우저 설정에서 사이트 데이터를 지워 직접 삭제하실 수도 있습니다."
+        ]
+      },
+      {
+        "heading": "자동화된 결정",
+        "paragraphs": ["저희는 귀하에 대해 자동화된 방식으로 결정을 내리거나 프로파일링을 하지 않습니다."]
+      },
+      {
+        "heading": "변경 사항",
+        "paragraphs": ["정보 처리 방식이 바뀌면 이 페이지를 수정하겠습니다."]
+      }
+    ]
+  }
+}

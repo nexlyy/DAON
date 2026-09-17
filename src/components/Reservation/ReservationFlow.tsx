@@ -8,13 +8,15 @@ import {
   zoneById,
 } from '@/data/tables/floorPlan'
 import type { FloorTable } from '@/data/tables/floorPlan'
-import { restaurant, reservation as reservationConfig } from '@/data/restaurant'
+import { controllerName, restaurant, reservation as reservationConfig } from '@/data/restaurant'
+import { Link } from 'react-router-dom'
 import { bookingApi, isDemoBooking, toISODate } from '@/services/booking'
 import { forgetBooking, readBooking, rememberBooking } from '@/services/booking/myBooking'
 import type { SavedBooking } from '@/services/booking/myBooking'
 import type { Booking, TableAvailability, TimeSlot } from '@/services/booking'
 import { BookingError } from '@/services/booking/types'
 import { useI18n } from '@/i18n/useI18n'
+import { warsawDate, warsawToday } from '@/lib/warsaw'
 import { RestaurantFloorPlan, tableState } from '@/components/RestaurantFloorPlan/RestaurantFloorPlan'
 import type { FloorPlanHandle } from '@/components/RestaurantFloorPlan/RestaurantFloorPlan'
 import { DatePicker } from './DatePicker'
@@ -43,6 +45,11 @@ export function ReservationFlow() {
   
   const [saved, setSaved] = useState<SavedBooking | null>(() => readBooking())
   const [dropping, setDropping] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
+  const [timeLost, setTimeLost] = useState<string | null>(null)
+  const [statusVersion, setStatusVersion] = useState(0)
+  const [closedVersion, setClosedVersion] = useState(0)
+  const timeRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!saved) return
@@ -86,13 +93,16 @@ export function ReservationFlow() {
   const firstRender = useRef(true)
 
   useEffect(() => {
-    const from = new Date()
-    const to = new Date()
+    timeRef.current = time
+  }, [time])
+
+  useEffect(() => {
+    const to = warsawDate()
     to.setDate(to.getDate() + reservationConfig.maxDaysAhead)
     let cancelled = false
 
     bookingApi
-      .getClosedDates(toISODate(from), toISODate(to))
+      .getClosedDates(warsawToday(), toISODate(to))
       .then((dates) => {
         if (!cancelled) setClosedDates(dates)
       })
@@ -106,7 +116,7 @@ export function ReservationFlow() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [closedVersion])
 
   useEffect(() => {
     if (!date) return
@@ -119,9 +129,12 @@ export function ReservationFlow() {
         if (cancelled) return
         setSlots(result)
         setOffline(false)
-        setTime((current) =>
-          current && result.some((slot) => slot.time === current && slot.available) ? current : null,
-        )
+        const current = timeRef.current
+        if (current && !result.some((slot) => slot.time === current && slot.available)) {
+          setTime(null)
+          setTableIds([])
+          setTimeLost(current)
+        }
       })
       .catch(() => {
         if (cancelled) return
@@ -157,7 +170,7 @@ export function ReservationFlow() {
     return () => {
       cancelled = true
     }
-  }, [date, time, partySize])
+  }, [date, time, partySize, statusVersion])
 
   useEffect(() => {
     if (tableIds.length === 0) return
@@ -202,9 +215,9 @@ export function ReservationFlow() {
       case 'time':
         return Boolean(time)
       case 'guests':
-        return Boolean(partySize)
+        return Boolean(partySize && time)
       case 'table':
-        return tableIds.length > 0
+        return Boolean(time) && tableIds.length > 0
       default:
         return false
     }
@@ -218,8 +231,17 @@ export function ReservationFlow() {
   const back = () => stepIndex > 0 && goTo(STEPS[stepIndex - 1])
   const next = () => stepIndex < STEPS.length - 1 && canContinue && goTo(STEPS[stepIndex + 1])
 
+  const pickTime = (value: string) => {
+    setTime(value)
+    setTimeLost(null)
+  }
+
   const submit = async () => {
-    if (!date || !time || !partySize || tableIds.length === 0) return
+    if (!date || !time || !partySize || tableIds.length === 0) {
+      setSubmitError(t('reservation.errors.incomplete'))
+      goTo(!date ? 'date' : !time ? 'time' : !partySize ? 'guests' : 'table')
+      return
+    }
 
     const errors: { name?: string; phone?: string } = {}
     if (!name.trim()) errors.name = t('reservation.errors.nameRequired')
@@ -246,10 +268,17 @@ export function ReservationFlow() {
       rememberBooking(result)
     } catch (error) {
       const code = error instanceof BookingError ? error.code : 'generic'
-      setSubmitError(t(`reservation.errors.${code}`))
+      setSubmitError(t(`reservation.errors.${code}`, { phone: restaurant.phone }))
       if (code === 'unavailable') {
         setTableIds([])
+        setStatusVersion((version) => version + 1)
         goTo('table')
+      }
+      if (code === 'closed') {
+        setTime(null)
+        setTableIds([])
+        setClosedVersion((version) => version + 1)
+        goTo('date')
       }
     } finally {
       setSubmitting(false)
@@ -321,12 +350,13 @@ export function ReservationFlow() {
                 onClick={async () => {
                   if (!window.confirm(t('reservation.success.cancelConfirm'))) return
                   setDropping(true)
+                  setCancelError(null)
                   try {
                     await bookingApi.cancelBooking(saved.reference, saved.token)
                     forgetBooking()
                     setSaved(null)
                   } catch {
-                    setSubmitError(
+                    setCancelError(
                       t('reservation.success.cancelFailed', { phone: restaurant.phone }),
                     )
                   } finally {
@@ -336,7 +366,34 @@ export function ReservationFlow() {
               >
                 {dropping ? t('reservation.success.cancelling') : t('reservation.success.cancel')}
               </button>
+              {cancelError && (
+                <p className={styles.error} role="alert">
+                  {cancelError}
+                </p>
+              )}
             </div>
+          )}
+
+          {timeLost && !time && step !== 'date' && (
+            <div className={styles.warning} role="alert">
+              <p>
+                {t('reservation.errors.timeLost', {
+                  time: timeLost,
+                  guests: partySize ?? 1,
+                })}
+              </p>
+              {step !== 'time' && (
+                <button type="button" className={styles.upcomingCancel} onClick={() => goTo('time')}>
+                  {t('reservation.errors.pickAnotherTime')}
+                </button>
+              )}
+            </div>
+          )}
+
+          {step === 'date' && submitError && (
+            <p className={styles.error} role="alert">
+              {submitError}
+            </p>
           )}
 
           {step === 'date' && (
@@ -355,7 +412,7 @@ export function ReservationFlow() {
                   {t('reservation.errors.offline', { phone: restaurant.phone })}
                 </p>
               ) : (
-                <TimePicker slots={slots} value={time} loading={slotsLoading} onChange={setTime} />
+                <TimePicker slots={slots} value={time} loading={slotsLoading} onChange={pickTime} />
               )}
             </>
           )}
@@ -499,6 +556,14 @@ export function ReservationFlow() {
                   />
                 </label>
               </div>
+
+              <p className={styles.privacy}>
+                {t('reservation.details.privacy', {
+                  controller: controllerName(),
+                  days: reservationConfig.retentionDays,
+                })}{' '}
+                <Link to="/privacy">{t('footer.privacy')}</Link>
+              </p>
 
               {isDemoBooking && (
                 <p className={styles.demo}>

@@ -158,7 +158,7 @@ export function createMockBookingApi(): BookingApi {
       await wait(LATENCY_MS * 2)
       
       if (!slotsForDate(request.date).includes(request.time)) {
-        throw new BookingError('The restaurant is closed at that time', 'unavailable')
+        throw new BookingError('The restaurant is closed at that time', 'closed')
       }
       const status = await api.getTableStatus({
         date: request.date,

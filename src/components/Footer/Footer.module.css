@@ -77,6 +77,20 @@
   font-size: 0.66rem;
 }
 
+.legalLink {
+  margin-left: 1.2em;
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgba(198, 176, 150, 0.7);
+}
+
+@media (hover: hover) {
+  .legalLink:hover {
+    color: var(--ink);
+  }
+}
+
 .legal {
   margin-top: clamp(2.5rem, 5vw, 4rem);
   padding-top: 1.5rem;

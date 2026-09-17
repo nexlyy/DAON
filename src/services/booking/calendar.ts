@@ -15,6 +15,26 @@ const localStamp = (date: string, time: string) =>
 const escape = (value: string) =>
   value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1')
 
+const WARSAW_ZONE = [
+  'BEGIN:VTIMEZONE',
+  `TZID:${TZ}`,
+  'BEGIN:DAYLIGHT',
+  'TZOFFSETFROM:+0100',
+  'TZOFFSETTO:+0200',
+  'TZNAME:CEST',
+  'DTSTART:19700329T020000',
+  'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU',
+  'END:DAYLIGHT',
+  'BEGIN:STANDARD',
+  'TZOFFSETFROM:+0200',
+  'TZOFFSETTO:+0100',
+  'TZNAME:CET',
+  'DTSTART:19701025T030000',
+  'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+  'END:STANDARD',
+  'END:VTIMEZONE',
+]
+
 export function calendarFile(booking: Booking, title: string): string {
   const [hour, minute] = booking.time.split(':').map(Number)
   const endTime = `${String((hour + HOURS) % 24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
@@ -30,6 +50,7 @@ export function calendarFile(booking: Booking, title: string): string {
     'VERSION:2.0',
     'PRODID:-//DAON//Reservation//EN',
     'CALSCALE:GREGORIAN',
+    ...WARSAW_ZONE,
     'BEGIN:VEVENT',
     `UID:${booking.reference}@daon`,
     `DTSTAMP:${utcStamp(new Date())}`,
@@ -54,5 +75,5 @@ export function downloadCalendar(booking: Booking, title: string): void {
   document.body.append(link)
   link.click()
   link.remove()
-  URL.revokeObjectURL(url)
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }

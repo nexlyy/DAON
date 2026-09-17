@@ -3,11 +3,13 @@ import { Calligraphy } from '@/components/Media/Calligraphy'
 import { DishPhoto } from '@/components/Media/DishPhoto'
 import { RoofMark } from '@/components/Brand/Logo'
 import { Vine } from '@/components/Ornament/Vine'
+import { dishPhotoAlt } from '@/data/menu/dishes'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './Hero.module.css'
 
 export function Hero() {
-  const { t } = useI18n()
+  const { t, resolve } = useI18n()
+  const alt = (photo: string) => resolve(dishPhotoAlt(photo))
 
   return (
     <section className={styles.hero}>
@@ -40,7 +42,7 @@ export function Hero() {
           <figure className={`${styles.plate} ${styles.plateOne}`}>
             <DishPhoto
               photo="03"
-              alt="Bulgogi served with rice and side dishes"
+              alt={alt('03')}
               sizes="(max-width: 900px) 46vw, 340px"
               priority
             />
@@ -48,14 +50,14 @@ export function Hero() {
           <figure className={`${styles.plate} ${styles.plateTwo}`}>
             <DishPhoto
               photo="38"
-              alt="Korean fried chicken glazed and scattered with spring onion"
+              alt={alt('38')}
               sizes="(max-width: 900px) 36vw, 250px"
             />
           </figure>
           <figure className={`${styles.plate} ${styles.plateThree}`}>
             <DishPhoto
               photo="60"
-              alt="Kimchi-jjigae simmering in a stone pot"
+              alt={alt('60')}
               sizes="(max-width: 900px) 30vw, 210px"
             />
           </figure>

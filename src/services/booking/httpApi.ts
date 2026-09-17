@@ -1,5 +1,6 @@
 import { BookingError } from './types'
 import type {
+  BookingErrorCode,
   AvailabilityQuery,
   Booking,
   BookingApi,
@@ -23,10 +24,12 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
       throw new BookingError('Network request failed')
     }
 
-    if (response.status === 409) {
-      throw new BookingError('Table is no longer available', 'unavailable')
-    }
     if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { code?: string } | null
+      const known: BookingErrorCode[] = ['unavailable', 'phoneLimit', 'rateLimit', 'closed']
+      const code = known.find((candidate) => candidate === body?.code)
+      if (code) throw new BookingError(`Request refused: ${code}`, code)
+      if (response.status === 409) throw new BookingError('Table is no longer available', 'unavailable')
       throw new BookingError(`Request failed with ${response.status}`)
     }
     return (await response.json()) as T

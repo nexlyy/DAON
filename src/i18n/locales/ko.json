@@ -6,7 +6,9 @@
     "menuDescription": "카토비체 한국 레스토랑 다온의 전체 메뉴: 한상차림, 수제라면, 김밥, 바베큐, 전골 등. 가격은 PLN입니다.",
     "reservationTitle": "예약 — DAON 다온, 카토비체 한국 레스토랑",
     "reservationDescription": "카토비체 Dworcowa 8 다온 테이블 예약: 날짜와 시간, 배치도에서 테이블을 고르세요.",
-    "notFoundTitle": "페이지를 찾을 수 없습니다 — DAON"
+    "notFoundTitle": "페이지를 찾을 수 없습니다 — DAON",
+    "privacyTitle": "개인정보 처리방침 — DAON 다온, 카토비체 한국 레스토랑",
+    "privacyDescription": "테이블 예약 시 다온이 수집하는 정보, 그 목적과 보관 기간, GDPR에 따른 귀하의 권리를 안내합니다."
   },
   "nav": {
     "home": "홈",
@@ -168,7 +170,8 @@
       "phonePlaceholder": "+48 …",
       "notes": "미리 알려 주실 것이 있나요?",
       "notesPlaceholder": "알레르기, 생일, 유아용 의자… (선택)",
-      "required": "필수"
+      "required": "필수",
+      "privacy": "개인정보 관리자는 {controller}입니다. 이름, 전화번호, 메모는 예약 처리에만 사용하며 방문 {days}일 후 삭제합니다. 메모에 알레르기 정보를 적으시면 방문 준비를 위한 사용에 동의하시는 것으로 봅니다."
     },
     "summary": {
       "title": "예약 내용",
@@ -207,7 +210,13 @@
       "phoneInvalid": "전화번호 형식이 아닙니다.",
       "generic": "예약을 저장하지 못했습니다. 다시 시도해 주세요.",
       "unavailable": "방금 그 자리가 예약되었습니다. 다른 자리를 골라 주세요.",
-      "offline": "지금은 예약 가능 여부를 확인할 수 없습니다. 페이지를 새로고침하시거나 {phone}으로 전화 주세요."
+      "offline": "지금은 예약 가능 여부를 확인할 수 없습니다. 페이지를 새로고침하시거나 {phone}으로 전화 주세요.",
+      "phoneLimit": "이 전화번호로는 온라인으로 받을 수 있는 예약 수를 이미 채웠습니다. {phone}로 전화 주시면 도와드리겠습니다.",
+      "rateLimit": "이 연결에서 시도가 너무 많습니다. 잠시 후 다시 시도하시거나 {phone}로 전화해 주세요.",
+      "closed": "해당 날짜나 시간에는 더 이상 예약을 받을 수 없습니다. 방금 휴무로 변경되었을 수 있습니다. 다른 날짜를 선택해 주세요.",
+      "incomplete": "예약 정보가 빠져 있습니다. 표시된 단계를 확인해 주세요.",
+      "timeLost": "{time}에는 {guests}명이 앉을 수 있는 자리가 더 이상 없습니다. 다른 시간을 선택해 주세요.",
+      "pickAnotherTime": "다른 시간 선택"
     },
     "demoNotice": "시연용 예약입니다 — 이 브라우저에만 저장되며 아직 매장으로 전달되지 않습니다. 실제 예약은 {phone}으로 전화 주세요.",
     "upcoming": {
@@ -246,7 +255,8 @@
     "explore": "바로가기",
     "visit": "오시는 길",
     "rights": "All rights reserved.",
-    "hours": "영업시간"
+    "hours": "영업시간",
+    "privacy": "개인정보 처리방침"
   },
   "days": {
     "long": [

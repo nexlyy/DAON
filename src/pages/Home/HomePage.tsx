@@ -3,7 +3,7 @@ import { OrderLink } from '@/components/Order/OrderLink'
 import { Calligraphy } from '@/components/Media/Calligraphy'
 import { DishPhoto } from '@/components/Media/DishPhoto'
 import { categories } from '@/data/menu/categories'
-import { dishes, featuredDishes } from '@/data/menu/dishes'
+import { dishes, dishPhotoAlt, featuredDishes } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
 import { restaurant } from '@/data/restaurant'
 import { useI18n } from '@/i18n/useI18n'
@@ -70,14 +70,14 @@ export function HomePage() {
             <figure className={styles.aboutPhoto}>
               <DishPhoto
                 photo="19"
-                alt="Basic kimbap sliced into rounds"
+                alt={resolve(dishPhotoAlt('19'))}
                 sizes="(max-width: 900px) 60vw, 420px"
               />
             </figure>
             <figure className={`${styles.aboutPhoto} ${styles.aboutPhotoSmall}`}>
               <DishPhoto
                 photo="82"
-                alt="Haemul pajeon, a seafood and spring onion pancake"
+                alt={resolve(dishPhotoAlt('82'))}
                 sizes="(max-width: 900px) 34vw, 240px"
               />
             </figure>

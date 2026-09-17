@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { toISODate } from '@/services/booking'
 import { reservation as reservationConfig } from '@/data/restaurant'
+import { warsawDate } from '@/lib/warsaw'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './DatePicker.module.css'
 
@@ -14,7 +15,7 @@ const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(),
 
 export function DatePicker({ value, closedDates, onChange }: Props) {
   const { t, list } = useI18n()
-  const today = startOfDay(new Date())
+  const today = startOfDay(warsawDate())
   const closed = useMemo(() => new Set(closedDates), [closedDates])
 
   const [cursor, setCursor] = useState(() => {
