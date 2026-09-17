@@ -1,94 +1,57 @@
+import { site } from '@/content/site'
+
 export type DayIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 export type DayHours = readonly [open: string, close: string] | null
 
-const ADDRESS = {
-  street: 'Dworcowa 8',
-  postalCode: '40-012',
-  city: 'Katowice',
-  country: 'Poland',
-} as const
+const { place, hours } = site.restaurant
 
-const addressLine = `${ADDRESS.street}, ${ADDRESS.postalCode} ${ADDRESS.city}, ${ADDRESS.country}`
-
-const GOOGLE_PLACE_ID = 'ChIJByi6GQrPFkcRkaPFZ-qNMkw'
+const addressLine = `${place.address.street}, ${place.address.postalCode} ${place.address.city}, ${place.address.country}`
 
 export const restaurant = {
-  name: 'DAON',
-  legalName: 'DAON Korean Restaurant',
+  name: place.name,
+  legalName: place.legalName,
 
-  address: ADDRESS,
+  address: place.address,
   addressLine,
 
-  phone: '+48 728 550 310',
-  phoneHref: 'tel:+48728550310',
+  phone: place.phone,
+  phoneHref: `tel:${place.phone.replace(/\s/g, '')}`,
 
-  email: 'daonpolska@gmail.com',
-  emailHref: 'mailto:daonpolska@gmail.com',
+  email: place.email,
+  emailHref: `mailto:${place.email}`,
 
-  instagram: 'daonpoland',
+  instagram: place.instagram,
 
-  currency: 'PLN',
+  currency: place.currency,
 
   links: {
-    instagram: 'https://instagram.com/daonpoland',
-    
+    instagram: `https://instagram.com/${place.instagram}`,
+
+    // Both addresses are built from the Google place id, so the map and the
+    // review form can never end up pointing at two different restaurants.
     maps: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       `Daon Koreańska Restauracja, ${addressLine}`,
-    )}&query_place_id=${GOOGLE_PLACE_ID}`,
+    )}&query_place_id=${place.googlePlaceId}`,
 
-    review: `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`,
-    
-    delivery:
-      'https://www.ubereats.com/pl/store/daon-korean-restaurant/jlFDD3NOTNCqWPgfFwU3tg?diningMode=DELIVERY&rwg_token=AE37R_gRWMtqC00Da1og1yQG6oYZVQzwVjZPCPUHC1d_T3pnJKt8Dk8L0tXZseuKYVS22152LKPF3xbXOe3zqj0z6XjFVQnHgg%3D%3D',
-    pickup:
-      'https://www.ubereats.com/pl/store/daon-korean-restaurant/jlFDD3NOTNCqWPgfFwU3tg?diningMode=PICKUP&rwg_token=AE37R_gRWMtqC00Da1og1yQG6oYZVQzwVjZPCPUHC1d_T3pnJKt8Dk8L0tXZseuKYVS22152LKPF3xbXOe3zqj0z6XjFVQnHgg%3D%3D',
+    review: `https://search.google.com/local/writereview?placeid=${place.googlePlaceId}`,
+
+    delivery: place.links.delivery,
+    pickup: place.links.pickup,
   },
-} as const
-
-export const openingHours: Readonly<Record<DayIndex, DayHours>> = {
-  0: ['12:00', '21:00'], // Sunday
-  1: null, //              Monday — closed
-  2: ['13:00', '22:00'], // Tuesday
-  3: ['13:00', '22:00'], // Wednesday
-  4: ['13:00', '22:00'], // Thursday
-  5: ['13:00', '23:00'], // Friday
-  6: ['12:00', '23:00'], // Saturday
 }
+
+export const openingHours: Readonly<Record<DayIndex, DayHours>> = Object.fromEntries(
+  Object.entries(hours).map(([day, span]) => [Number(day), span as DayHours]),
+) as Record<DayIndex, DayHours>
 
 export const weekOrder: DayIndex[] = [1, 2, 3, 4, 5, 6, 0]
 
 export const hoursFor = (day: number): DayHours => openingHours[day as DayIndex] ?? null
 
-export const reservation = {
-  
-  slotMinutes: 30,
-  
-  lastSeatingBeforeClose: 90,
+export const reservation = site.restaurant.reservation
 
-  holdMinutes: 90,
-  
-  maxDaysAhead: 60,
-  
-  partySizes: [1, 2, 3, 4, 5, 6],
-  
-  maxPartySize: 12,
-
-  retentionDays: 30,
-} as const
-
-export const legal = {
-  companyName: 'DAON POLSKA sp. z o.o.',
-  address: 'ul. Zabrska 17, 40-083 Katowice',
-  krs: '0001173486',
-  nip: '6343055877',
-  regon: '541760574',
-  court: 'Sąd Rejonowy Katowice-Wschód w Katowicach, VIII Wydział Gospodarczy Krajowego Rejestru Sądowego',
-  shareCapital: '50 000,00 zł',
-  backupDays: 30,
-  serverLogDays: 14,
-  policyUpdated: '2026-09-17',
-}
+export const legal = site.restaurant.legal
 
 export const controllerName = () => legal.companyName
 

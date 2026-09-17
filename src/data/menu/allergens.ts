@@ -1,3 +1,5 @@
+import { site } from '@/content/site'
+
 export type Allergen =
   | 'gluten'
   | 'nuts'
@@ -8,14 +10,22 @@ export type Allergen =
   | 'fish'
   | 'sesame'
 
-export const allergenNumbers: Partial<Record<Allergen, number[]>> = {
-  nuts: [34, 35, 36, 37, 38, 39],
-  dairy: [2, 24, 30, 61, 76, 88, 92, 93, 94],
-  shellfish: [16, 17, 18, 19, 20, 23, 56, 58, 60, 64, 66, 74, 75, 77, 83],
-  fish: [6, 30, 31, 85, 89],
+/**
+ * Which dish numbers carry which allergen. The kitchen marks it dish by dish;
+ * this is the same thing read the other way round, which is what the menu
+ * filter needs.
+ */
+export const allergenNumbers: Partial<Record<Allergen, number[]>> = {}
+
+for (const allergen of site.allergens.tracked as Allergen[]) {
+  const numbers = site.dishes
+    .filter((dish) => dish.allergens?.includes(allergen))
+    .map((dish) => Number(dish.number))
+  if (numbers.length > 0) allergenNumbers[allergen] = numbers
 }
 
-export const widespreadAllergens: Allergen[] = ['gluten', 'eggs', 'soy', 'sesame']
+// In nearly every dish, so the menu says it once rather than on every card.
+export const widespreadAllergens: Allergen[] = site.allergens.widespread as Allergen[]
 
 const byNumber = new Map<number, Allergen[]>()
 for (const [allergen, numbers] of Object.entries(allergenNumbers)) {

@@ -2,8 +2,7 @@ import { defineConfig, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import { createReadStream, existsSync, readFileSync } from 'node:fs'
 import { extname, resolve } from 'node:path'
-import { dishes } from './src/data/menu/dishes'
-import { hoursFor, legal, restaurant, weekOrder } from './src/data/restaurant'
+import { injectContent, readContent } from './scripts/content.mjs'
 
 const requested = process.env.BASE_PATH ?? '/'
 
@@ -45,93 +44,32 @@ function privateBundle() {
   }
 }
 
-function structuredData() {
-  const DAY_NAMES = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ]
-
-  const SITE = 'https://daon.pl'
-  const prices = dishes.map((dish) => dish.price)
-  const names = [restaurant.legalName, 'Daon', '다온', 'Даон']
-
-  const data = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Restaurant',
-        '@id': `${SITE}/#restaurant`,
-        name: restaurant.name,
-        alternateName: names,
-        legalName: legal.companyName,
-        taxID: legal.nip,
-        url: `${SITE}/`,
-        image: `${SITE}/og-image.jpg`,
-        logo: `${SITE}/favicon-512.png`,
-        description:
-          'Korean restaurant in Katowice, Dworcowa 8, serving handmade ramen, Korean BBQ, hot pots and kimbap.',
-        servesCuisine: 'Korean',
-        priceRange: `${Math.min(...prices)}–${Math.max(...prices)} ${restaurant.currency}`,
-        currenciesAccepted: restaurant.currency,
-        telephone: restaurant.phone,
-        email: restaurant.email,
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: restaurant.address.street,
-          postalCode: restaurant.address.postalCode,
-          addressLocality: restaurant.address.city,
-          addressCountry: 'PL',
-        },
-        openingHoursSpecification: weekOrder
-          .map((day) => ({ day, hours: hoursFor(day) }))
-          .filter(({ hours }) => hours)
-          .map(({ day, hours }) => ({
-            '@type': 'OpeningHoursSpecification',
-            dayOfWeek: `https://schema.org/${DAY_NAMES[day]}`,
-            opens: hours![0],
-            closes: hours![1],
-          })),
-        sameAs: [restaurant.links.instagram],
-        hasMap: restaurant.links.maps,
-        hasMenu: `${SITE}/menu`,
-        acceptsReservations: `${SITE}/reservation`,
-      },
-      {
-        '@type': 'WebSite',
-        '@id': `${SITE}/#website`,
-        url: `${SITE}/`,
-        name: restaurant.name,
-        alternateName: names,
-        inLanguage: ['en', 'pl', 'ko'],
-        publisher: { '@id': `${SITE}/#restaurant` },
-      },
-    ],
-  }
+function contentSnapshot() {
+  const dir = resolve(__dirname, 'src/content')
 
   return {
-    name: 'structured-data',
+    name: 'content-snapshot',
     transformIndexHtml(html: string) {
-      return html.replace(
-        /<script type="application\/ld\+json">[\s\S]*?<\/script>/,
-        `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n    </script>`,
-      )
+      return injectContent(html, readContent(dir))
     },
   }
 }
 
 export default defineConfig({
   base,
-  plugins: [react(), structuredData(), privateBundle()],
+  plugins: [react(), contentSnapshot(), privateBundle()],
   resolve: {
     alias: { '@': resolve(__dirname, 'src') },
   },
   build: {
     outDir: 'dist',
     assetsInlineLimit: 2048,
+  },
+
+  // The server renders the pages again after an edit in the admin, and it has
+  // no node_modules of its own: react and the router travel inside the server
+  // bundle rather than being required from beside it.
+  ssr: {
+    noExternal: true,
   },
 })

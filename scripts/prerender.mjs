@@ -1,10 +1,24 @@
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { injectContent, injectStructuredData, readContent } from './content.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const dist = resolve(root, 'dist')
-const ssr = resolve(root, 'dist-ssr')
+
+// Building the site uses all the defaults. The server passes its own paths:
+// it renders the pages again after an edit in the admin, from the content it
+// holds, without a checkout or a toolchain.
+const dist = process.env.DAON_DIST ? resolve(process.env.DAON_DIST) : resolve(root, 'dist')
+const ssr = process.env.DAON_SSR ? resolve(process.env.DAON_SSR) : resolve(root, 'dist-ssr')
+const content = process.env.DAON_CONTENT
+  ? resolve(process.env.DAON_CONTENT)
+  : resolve(root, 'src/content')
+const locales = process.env.DAON_LOCALES
+  ? resolve(process.env.DAON_LOCALES)
+  : resolve(root, 'src/i18n/locales')
+const templateFile = process.env.DAON_TEMPLATE
+  ? resolve(process.env.DAON_TEMPLATE)
+  : resolve(dist, 'index.html')
 const SITE = 'https://daon.pl'
 
 const LOCALES = [
@@ -14,10 +28,21 @@ const LOCALES = [
 ]
 const ROOT = LOCALES[0]
 
+const snapshot = readContent(content)
+
+// The page modules read the menu at import time, so the snapshot has to be in
+// place before the server bundle is loaded.
+globalThis.__DAON__ = snapshot
+
 const { render } = await import(pathToFileURL(resolve(ssr, 'entry-server.js')).href)
-const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
-const metaOf = (code) =>
-  JSON.parse(readFileSync(resolve(root, `src/i18n/locales/${code}.json`), 'utf8')).meta
+
+// index.html as vite left it, before the first page is written over it. The
+// copy goes next to the server bundle, which is what the server renders from.
+const template = readFileSync(templateFile, 'utf8')
+mkdirSync(ssr, { recursive: true })
+writeFileSync(resolve(ssr, 'template.html'), template)
+
+const metaOf = (code) => JSON.parse(readFileSync(resolve(locales, `${code}.json`), 'utf8')).meta
 
 const localized = (locale, path) => (locale.prefix ? (path === '/' ? locale.prefix : `${locale.prefix}${path}`) : path)
 const fileFor = (locale, file) => (locale.prefix ? `${locale.prefix.slice(1)}/${file}` : file)
@@ -110,6 +135,9 @@ function page({ locale, url, title, description, canonical, noindex }) {
     html = html.replace('</title>', '</title>\n    <meta name="robots" content="noindex" />')
   }
 
+  html = injectContent(html, snapshot)
+  html = injectStructuredData(html, snapshot)
+
   if (url) {
     const body = render(url)
     if (!body) throw new Error(`${url} rendered nothing`)
@@ -156,4 +184,3 @@ writeFileSync(
 )
 console.log(`  sitemap.xml                  ${urls.length} addresses`)
 
-rmSync(ssr, { recursive: true, force: true })

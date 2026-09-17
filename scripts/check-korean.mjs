@@ -65,36 +65,24 @@ if (en && ko) {
   }
 }
 
-const menu = load('src/content/menu.ko.json')
+const menu = load('src/content/menu.json')
 if (menu) {
-  const dishesSource = readFileSync(resolve(root, 'src/data/menu/dishes.ts'), 'utf8')
-  const numbers = [...dishesSource.matchAll(/number: '(\d+)'/g)].map((m) => m[1])
-  const described = new Set()
-  for (const block of dishesSource.split(/\n  \{\n/).slice(1)) {
-    const number = /number: '(\d+)'/.exec(block)?.[1]
-    if (number && /description:/.test(block)) described.add(number)
+  for (const dish of menu.dishes ?? []) {
+    if (!dish.name?.ko?.trim()) {
+      problems.push(`menu.json: ${dish.number}번 메뉴의 한국어 이름이 비어 있습니다.`)
+    }
+    if (dish.description && !dish.description.ko?.trim()) {
+      warnings.push(`menu.json: ${dish.number}번 메뉴에 한국어 설명이 없습니다.`)
+    }
   }
+}
 
-  for (const number of numbers) {
-    const dish = menu.dishes?.[number]
-    if (!dish) {
-      problems.push(`menu.ko.json: ${number}번 메뉴가 없습니다.`)
-      continue
+const categories = load('src/content/categories.json')
+if (categories) {
+  for (const category of categories.categories ?? []) {
+    if (!category.name?.ko?.trim()) {
+      problems.push(`categories.json: 분류 "${category.id}"의 한국어 이름이 비어 있습니다.`)
     }
-    if (typeof dish.name !== 'string' || dish.name.trim() === '') {
-      problems.push(`menu.ko.json: ${number}번 메뉴의 이름("name")이 비어 있습니다.`)
-    }
-    if (described.has(number) && !dish.description?.trim()) {
-      warnings.push(`menu.ko.json: ${number}번 메뉴에 설명("description")이 없습니다.`)
-    }
-  }
-  for (const number of Object.keys(menu.dishes ?? {})) {
-    if (!numbers.includes(number)) problems.push(`menu.ko.json: ${number}번은 메뉴에 없는 번호입니다.`)
-  }
-
-  const categoriesSource = readFileSync(resolve(root, 'src/data/menu/categories.ts'), 'utf8')
-  for (const id of [...categoriesSource.matchAll(/id: '([^']+)'/g)].map((m) => m[1])) {
-    if (!menu.categories?.[id]?.name?.trim()) problems.push(`menu.ko.json: 분류 "${id}"의 이름이 비어 있습니다.`)
   }
 }
 
