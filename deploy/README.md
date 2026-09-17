@@ -94,6 +94,14 @@ hashed assets, and a page a browser kept by guesswork would point at files that
 are gone. The drinks route is served `shell.html`, an empty page marked
 noindex, rather than the prerendered home.
 
+Each language has its own addresses: Polish at the root (`/menu`), English under
+`/en` and Korean under `/ko`. Every page is prerendered three times with its own
+`lang`, title and description, a canonical address, and `hreflang` links to the
+other two with the Polish page as `x-default`; `sitemap.xml` lists all of them
+with the same alternates. A visitor who once picked English is sent to the
+English address, but nobody is redirected by browser language — a crawler
+without a stored choice sees Polish at the root. `/pl/...` redirects to the root.
+
 Titles, descriptions and `sitemap.xml` come from the build; the structured data
 (a `Restaurant` and a `WebSite`, with Daon, 다온 and Даон as alternate names) is
 generated in `vite.config.ts` from `src/data/restaurant.ts` and the dish prices.
@@ -105,3 +113,26 @@ host, so every call the reservation makes would be cross-origin — a preflight
 before each one, a CORS list to keep in step with the domain, and a second
 certificate to renew. The VPS already serves a site behind nginx with certbot
 renewing on a timer; adding a name to it is a config file.
+
+## A second copy of the backups
+
+The nightly backup lands in `/var/backups/daon` on the same server that runs
+the API. The reservations themselves live in Supabase, so one lost machine does
+not lose them, but a copy somewhere else as well costs nothing.
+`deploy/pull-backups.ps1` fetches the backups over the same `ssh mcr` login the
+deploy uses and keeps the last 30 days in `Documents\DAON backups`:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\pull-backups.ps1
+```
+
+To run it every day on a Windows machine that stays on (it catches up the next
+time the machine is on):
+
+```powershell
+schtasks /Create /SC DAILY /ST 10:00 /TN "DAON backups" /TR "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\path\to\DAON\deploy\pull-backups.ps1\""
+```
+
+The files hold guests' names and phone numbers, so the machine has to be one
+the restaurant would name in its privacy policy, and it deletes anything older
+than 30 days just as the server does.
