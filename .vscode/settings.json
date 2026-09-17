@@ -1,0 +1,20 @@
+{
+  "files.encoding": "utf8",
+  "files.insertFinalNewline": true,
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "editor.unicodeHighlight.invisibleCharacters": false,
+  "[json]": {
+    "editor.wordWrap": "on",
+    "editor.formatOnSave": false,
+    "editor.quickSuggestions": {
+      "strings": false
+    }
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+  "search.exclude": {
+    "dist": true,
+    "node_modules": true
+  }
+}
