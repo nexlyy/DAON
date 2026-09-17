@@ -74,14 +74,26 @@ export const reservation = {
 } as const
 
 export const legal = {
-  companyName: null as string | null,
-  nip: null as string | null,
+  companyName: 'DAON POLSKA sp. z o.o.',
+  address: 'ul. Zabrska 17, 40-083 Katowice',
+  krs: '0001173486',
+  nip: '6343055877',
+  regon: '541760574',
+  court: 'Sąd Rejonowy Katowice-Wschód w Katowicach, VIII Wydział Gospodarczy Krajowego Rejestru Sądowego',
+  shareCapital: '50 000,00 zł',
   backupDays: 30,
   serverLogDays: 14,
   policyUpdated: '2026-09-17',
 }
 
-export function controllerName() {
-  if (!legal.companyName) return restaurant.legalName
-  return `${legal.companyName}${legal.nip ? `, NIP ${legal.nip}` : ''} (${restaurant.legalName})`
-}
+export const controllerName = () => legal.companyName
+
+export const companyLine = () =>
+  [
+    `${legal.companyName}, ${legal.address}`,
+    legal.court,
+    `KRS ${legal.krs}`,
+    `NIP ${legal.nip}`,
+    `REGON ${legal.regon}`,
+    `Kapitał zakładowy ${legal.shareCapital}`,
+  ].join(' · ')

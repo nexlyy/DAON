@@ -7,13 +7,15 @@
       {
         "heading": "Administrator danych",
         "paragraphs": [
-          "Administratorem Twoich danych osobowych jest {controller}, {address}.",
+          "Administratorem Twoich danych osobowych jest {controller} z siedzibą w Katowicach, {address}, wpisana do rejestru przedsiębiorców Krajowego Rejestru Sądowego pod numerem KRS {krs}, NIP {nip}, REGON {regon}. Spółka prowadzi restaurację DAON pod adresem {restaurantAddress}.",
           "W sprawach dotyczących danych osobowych napisz na {email} lub zadzwoń: {phone}."
         ]
       },
       {
         "heading": "Jakie dane zbieramy",
-        "paragraphs": ["Gdy rezerwujesz stolik przez stronę, podajesz:"],
+        "paragraphs": [
+          "Gdy rezerwujesz stolik przez stronę, podajesz:"
+        ],
         "items": [
           "imię lub nazwę, na którą ma być rezerwacja,",
           "numer telefonu,",
@@ -58,7 +60,9 @@
       },
       {
         "heading": "Twoje prawa",
-        "paragraphs": ["Masz prawo do:"],
+        "paragraphs": [
+          "Masz prawo do:"
+        ],
         "items": [
           "dostępu do swoich danych i otrzymania ich kopii,",
           "sprostowania danych,",
@@ -88,11 +92,15 @@
       },
       {
         "heading": "Zautomatyzowane decyzje",
-        "paragraphs": ["Nie podejmujemy wobec Ciebie decyzji w sposób zautomatyzowany i nie profilujemy Cię."]
+        "paragraphs": [
+          "Nie podejmujemy wobec Ciebie decyzji w sposób zautomatyzowany i nie profilujemy Cię."
+        ]
       },
       {
         "heading": "Zmiany",
-        "paragraphs": ["Jeśli zmienimy sposób przetwarzania danych, zaktualizujemy tę stronę."]
+        "paragraphs": [
+          "Jeśli zmienimy sposób przetwarzania danych, zaktualizujemy tę stronę."
+        ]
       }
     ]
   },
@@ -104,13 +112,15 @@
       {
         "heading": "Who is responsible for your data",
         "paragraphs": [
-          "The controller of your personal data is {controller}, {address}.",
+          "The controller of your personal data is {controller}, registered office {address}, entered in the register of businesses of the National Court Register under KRS number {krs}, NIP {nip}, REGON {regon}. The company runs the DAON restaurant at {restaurantAddress}.",
           "For anything about your personal data, write to {email} or call {phone}."
         ]
       },
       {
         "heading": "What we collect",
-        "paragraphs": ["When you book a table on the website, you give us:"],
+        "paragraphs": [
+          "When you book a table on the website, you give us:"
+        ],
         "items": [
           "the name the booking is under,",
           "a phone number,",
@@ -155,7 +165,9 @@
       },
       {
         "heading": "Your rights",
-        "paragraphs": ["You have the right to:"],
+        "paragraphs": [
+          "You have the right to:"
+        ],
         "items": [
           "access your data and receive a copy,",
           "have it corrected,",
@@ -185,11 +197,15 @@
       },
       {
         "heading": "Automated decisions",
-        "paragraphs": ["We make no automated decisions about you and do not profile you."]
+        "paragraphs": [
+          "We make no automated decisions about you and do not profile you."
+        ]
       },
       {
         "heading": "Changes",
-        "paragraphs": ["If we change how we handle data, we will update this page."]
+        "paragraphs": [
+          "If we change how we handle data, we will update this page."
+        ]
       }
     ]
   },
@@ -201,13 +217,15 @@
       {
         "heading": "개인정보 관리자",
         "paragraphs": [
-          "귀하의 개인정보 관리자는 {controller}({address})입니다.",
+          "귀하의 개인정보 관리자는 {controller}입니다 (본사 주소: {address}, 폴란드 국가법원등기(KRS) 번호 {krs}, 세금번호(NIP) {nip}, REGON {regon}). 이 회사는 {restaurantAddress}에서 다온 레스토랑을 운영합니다.",
           "개인정보와 관련된 문의는 {email}로 이메일을 보내시거나 {phone}로 전화해 주세요."
         ]
       },
       {
         "heading": "수집하는 정보",
-        "paragraphs": ["웹사이트에서 테이블을 예약하실 때 다음 정보를 입력하십니다."],
+        "paragraphs": [
+          "웹사이트에서 테이블을 예약하실 때 다음 정보를 입력하십니다."
+        ],
         "items": [
           "예약자 이름,",
           "전화번호,",
@@ -228,7 +246,9 @@
       },
       {
         "heading": "정보에 접근하는 사람",
-        "paragraphs": ["예약 정보는 레스토랑 직원이 확인합니다. 또한 저희를 대신해 정보를 처리하는 외부 서비스를 이용합니다."],
+        "paragraphs": [
+          "예약 정보는 레스토랑 직원이 확인합니다. 또한 저희를 대신해 정보를 처리하는 외부 서비스를 이용합니다."
+        ],
         "items": [
           "Supabase — 예약이 저장되는 데이터베이스,",
           "Hetzner Online GmbH — 웹사이트가 운영되는 서버 (핀란드 헬싱키 데이터 센터),",
@@ -250,7 +270,9 @@
       },
       {
         "heading": "귀하의 권리",
-        "paragraphs": ["귀하에게는 다음과 같은 권리가 있습니다."],
+        "paragraphs": [
+          "귀하에게는 다음과 같은 권리가 있습니다."
+        ],
         "items": [
           "자신의 정보를 열람하고 사본을 받을 권리,",
           "정보를 정정할 권리,",
@@ -267,7 +289,9 @@
       },
       {
         "heading": "정보 제공이 필수인가요",
-        "paragraphs": ["필수는 아니지만, 이름과 전화번호가 없으면 웹사이트로 예약을 받을 수 없습니다. 전화로는 언제든지 예약하실 수 있습니다: {phone}."]
+        "paragraphs": [
+          "필수는 아니지만, 이름과 전화번호가 없으면 웹사이트로 예약을 받을 수 없습니다. 전화로는 언제든지 예약하실 수 있습니다: {phone}."
+        ]
       },
       {
         "heading": "쿠키와 브라우저 저장소",
@@ -278,11 +302,15 @@
       },
       {
         "heading": "자동화된 결정",
-        "paragraphs": ["저희는 귀하에 대해 자동화된 방식으로 결정을 내리거나 프로파일링을 하지 않습니다."]
+        "paragraphs": [
+          "저희는 귀하에 대해 자동화된 방식으로 결정을 내리거나 프로파일링을 하지 않습니다."
+        ]
       },
       {
         "heading": "변경 사항",
-        "paragraphs": ["정보 처리 방식이 바뀌면 이 페이지를 수정하겠습니다."]
+        "paragraphs": [
+          "정보 처리 방식이 바뀌면 이 페이지를 수정하겠습니다."
+        ]
       }
     ]
   }

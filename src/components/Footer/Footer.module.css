@@ -77,6 +77,14 @@
   font-size: 0.66rem;
 }
 
+.company {
+  margin-top: 0.5rem;
+  font-size: 0.68rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+}
+
 .legalLink {
   margin-left: 1.2em;
   color: var(--text-soft);

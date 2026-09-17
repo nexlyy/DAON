@@ -31,7 +31,11 @@ export function PrivacyPage() {
 
   const values: Record<string, string> = {
     controller: controllerName(),
-    address: `${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`,
+    address: legal.address,
+    krs: legal.krs,
+    nip: legal.nip,
+    regon: legal.regon,
+    restaurantAddress: `${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`,
     email: restaurant.email,
     phone: restaurant.phone,
     retentionDays: String(reservation.retentionDays),

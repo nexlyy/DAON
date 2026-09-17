@@ -3,7 +3,7 @@ import { OrderLink } from '@/components/Order/OrderLink'
 import { Logo } from '@/components/Brand/Logo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { OpeningHours } from '@/components/OpeningHours/OpeningHours'
-import { restaurant } from '@/data/restaurant'
+import { companyLine, restaurant } from '@/data/restaurant'
 import { useI18n } from '@/i18n/useI18n'
 import styles from './Footer.module.css'
 
@@ -86,6 +86,7 @@ export function Footer() {
             {t('footer.privacy')}
           </Link>
         </p>
+        <p className={styles.company}>{companyLine()}</p>
       </div>
     </footer>
   )

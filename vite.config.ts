@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { createReadStream, existsSync, readFileSync } from 'node:fs'
 import { extname, resolve } from 'node:path'
 import { dishes } from './src/data/menu/dishes'
-import { hoursFor, restaurant, weekOrder } from './src/data/restaurant'
+import { hoursFor, legal, restaurant, weekOrder } from './src/data/restaurant'
 
 const requested = process.env.BASE_PATH ?? '/'
 
@@ -68,7 +68,8 @@ function structuredData() {
         '@id': `${SITE}/#restaurant`,
         name: restaurant.name,
         alternateName: names,
-        legalName: restaurant.legalName,
+        legalName: legal.companyName,
+        taxID: legal.nip,
         url: `${SITE}/`,
         image: `${SITE}/og-image.jpg`,
         logo: `${SITE}/favicon-512.png`,
