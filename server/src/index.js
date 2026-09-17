@@ -650,7 +650,7 @@ async function handleCommand(message) {
     return say(
       [
         added
-          ? `${formatDate(date)} is closed — no new bookings will be taken.`
+          ? `${formatDate(date)} is closed — no new bookings, and the website shows DAON as closed that day.`
           : `${formatDate(date)} was already closed.`,
         booked.length > 0
           ? `\nCareful: ${booked.length} guest(s) already booked that day. Call them — /day ${formatDate(date)}`
@@ -663,7 +663,7 @@ async function handleCommand(message) {
 
   return say(
     removeClosure(date)
-      ? `${formatDate(date)} is taking bookings again.`
+      ? `${formatDate(date)} is open again — bookings are back and the website shows the usual hours.`
       : `${formatDate(date)} was not closed.`,
   )
 }

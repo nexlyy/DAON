@@ -93,7 +93,7 @@ export function helpMessage(closures) {
     '/tomorrow — reservations for tomorrow',
     '/day 24-12-2026 — reservations for a given day',
     '/free DAON-XXXXX — guests left, free the table now',
-    '/close 24-12-2026 Christmas Eve — close a day for bookings',
+    '/close 24-12-2026 Christmas Eve — close a day: no bookings, the website shows DAON as closed',
     '/open 24-12-2026 — open it again',
     '/closed — the days currently closed',
     '',
