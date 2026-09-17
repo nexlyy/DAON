@@ -1,9 +1,11 @@
 {
   "meta": {
-    "title": "DAON — Korean Restaurant",
-    "description": "DAON is a Korean restaurant serving handmade ramen, Korean BBQ, hot pots and kimbap. Browse the menu and reserve your table.",
-    "menuTitle": "Menu — DAON Korean Restaurant",
-    "reservationTitle": "Book a Table — DAON Korean Restaurant",
+    "title": "DAON — Korean Restaurant in Katowice",
+    "description": "DAON is a Korean restaurant in Katowice, Dworcowa 8: handmade ramen, Korean BBQ, hot pots and kimbap. See the menu and book a table.",
+    "menuTitle": "Menu — DAON Korean Restaurant, Katowice",
+    "menuDescription": "The full menu of DAON, a Korean restaurant in Katowice: Korean table sets, handmade ramen, kimbap, Korean BBQ, hot pots and more, with prices in PLN.",
+    "reservationTitle": "Book a Table — DAON Korean Restaurant, Katowice",
+    "reservationDescription": "Book a table at DAON, Dworcowa 8, Katowice: pick a day, a time and your table on the floor plan.",
     "notFoundTitle": "Page not found — DAON"
   },
   "nav": {

@@ -22,7 +22,11 @@ export function MenuPage() {
   const closeDish = useCallback(() => setOpenDish(null), [])
   const deferredQuery = useDeferredValue(query)
 
-  useDocumentMeta({ title: t('meta.menuTitle'), description: t('meta.description'), path: '/menu' })
+  useDocumentMeta({
+    title: t('meta.menuTitle'),
+    description: t('meta.menuDescription'),
+    path: '/menu',
+  })
 
   const visible = useMemo(() => {
     const needle = deferredQuery.trim().toLowerCase()

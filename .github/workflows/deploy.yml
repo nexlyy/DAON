@@ -1,8 +1,10 @@
-name: Deploy to GitHub Pages
+name: Redirect GitHub Pages to daon.pl
 
 on:
   push:
     branches: [main]
+    paths:
+      - .github/workflows/deploy.yml
   workflow_dispatch:
 
 permissions:
@@ -18,26 +20,34 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-      - run: npm run build
-        env:
-          BASE_PATH: /${{ github.event.repository.name }}/
-          # The reservation API (server/ in this repository). Without it the
-          # site falls back to the in-browser demo adapter, which forgets every
-          # booking on reload — set the variable in Settings → Variables.
-          VITE_BOOKING_API_URL: ${{ vars.BOOKING_API_URL }}
+      - name: Write a page that forwards every address to daon.pl
+        run: |
+          mkdir -p site
+          cat > site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <title>DAON — Korean Restaurant in Katowice</title>
+              <meta name="robots" content="noindex" />
+              <link rel="canonical" href="https://daon.pl/" />
+              <meta http-equiv="refresh" content="0; url=https://daon.pl/" />
+              <script>
+                var path = location.pathname.replace(/^\/DAON/, '') || '/'
+                location.replace('https://daon.pl' + path + location.search + location.hash)
+              </script>
+            </head>
+            <body>
+              <p>DAON has moved to <a href="https://daon.pl/">daon.pl</a>.</p>
+            </body>
+          </html>
+          HTML
+          cp site/index.html site/404.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
   deploy:
     needs: build

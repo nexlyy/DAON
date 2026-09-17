@@ -79,10 +79,24 @@ zero-byte stub that exits successfully having copied nothing.
 
 ## The old address
 
-The GitHub Pages copy still builds and still works; every page on it declares
-`https://daon.pl/` as its canonical address, so search engines are pointed at
-the domain. Turning it off is a one-line change to the workflow whenever you
-want to — nothing depends on it any more.
+The GitHub Pages copy no longer carries the site. The workflow publishes a
+single page that forwards any address to the same path on daon.pl and asks not
+to be indexed, so old links still land somewhere and search engines see one
+site instead of two.
+
+## What search engines are given
+
+Every route is a prerendered file, so nginx answers `try_files $uri
+$uri/index.html =404` and a made-up address gets a real 404 with the site's own
+page, not the home page under a 200. HTML goes out with `Cache-Control:
+no-cache` through a `map` on the content type: a deploy deletes the previous
+hashed assets, and a page a browser kept by guesswork would point at files that
+are gone. The drinks route is served `shell.html`, an empty page marked
+noindex, rather than the prerendered home.
+
+Titles, descriptions and `sitemap.xml` come from the build; the structured data
+(a `Restaurant` and a `WebSite`, with Daon, 다온 and Даон as alternate names) is
+generated in `vite.config.ts` from `src/data/restaurant.ts` and the dish prices.
 
 ## Why not GitHub Pages with a custom domain
 

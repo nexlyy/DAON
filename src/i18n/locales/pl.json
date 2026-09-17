@@ -1,9 +1,11 @@
 {
   "meta": {
-    "title": "DAON — Restauracja koreańska",
-    "description": "DAON to koreańska restauracja: ramen domowej roboty, grill koreański, kociołki i kimbap. Zobacz menu i zarezerwuj stolik.",
-    "menuTitle": "Menu — DAON Restauracja koreańska",
-    "reservationTitle": "Rezerwacja stolika — DAON Restauracja koreańska",
+    "title": "DAON — restauracja koreańska w Katowicach",
+    "description": "DAON to restauracja koreańska w Katowicach przy ul. Dworcowej 8: ramen domowej roboty, grill koreański, kociołki i kimbap. Zobacz menu i zarezerwuj stolik.",
+    "menuTitle": "Menu — DAON, restauracja koreańska w Katowicach",
+    "menuDescription": "Pełne menu DAON, restauracji koreańskiej w Katowicach: zestawy koreańskie, ramen domowej roboty, kimbap, grill koreański, kociołki i więcej. Ceny w PLN.",
+    "reservationTitle": "Rezerwacja stolika — DAON, restauracja koreańska w Katowicach",
+    "reservationDescription": "Zarezerwuj stolik w DAON przy ul. Dworcowej 8 w Katowicach: wybierz dzień, godzinę i stolik na planie sali.",
     "notFoundTitle": "Nie znaleziono strony — DAON"
   },
   "nav": {

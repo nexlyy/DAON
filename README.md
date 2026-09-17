@@ -4,19 +4,27 @@ Website for DAON, a Korean restaurant in Poland: the full menu, and a table
 reservation flow with an interactive floor plan. Korean, English and Polish,
 picked automatically from the visitor's device language.
 
-**Live:** https://nexlyy.github.io/DAON/
+**Live:** https://daon.pl
 
 ## Running it
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173/DAON/
-npm run build    # static output in dist/
+npm run dev      # http://localhost:5173/
+npm run build    # prerendered pages in dist/
 npm run preview
 ```
 
-The site is a static bundle — no server, no database. It deploys to GitHub
-Pages from `.github/workflows/deploy.yml` on every push to `main`.
+`npm run build` makes the client bundle, then a server build of the same app,
+then `scripts/prerender.mjs` renders `/`, `/menu`, `/reservation`, `/about`,
+`/contact` and a 404 page into real HTML — each with its own title,
+description and canonical address — and writes `sitemap.xml`. A search engine
+gets the whole menu as text without running any JavaScript. For a visitor the
+prerendered markup stays hidden until the app mounts and replaces it, because
+the app may speak another language or show a price the build could not know.
+
+It deploys to https://daon.pl with `deploy/publish.sh`. The old GitHub Pages
+address now only forwards to the domain.
 
 ## Stack
 
@@ -134,8 +142,7 @@ implement it, and the UI never learns which one it is talking to:
 Frontend → BookingApi → (mock | HTTP → server/ → Supabase + Telegram)
 ```
 
-The published site is built with `BOOKING_API_URL` as a repository variable, so
-Pages gets the real adapter.
+`deploy/publish.sh` builds with `VITE_BOOKING_API_URL=https://daon.pl/api`.
 
 ## Restaurant details
 

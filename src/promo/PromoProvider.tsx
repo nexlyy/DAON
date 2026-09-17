@@ -37,6 +37,7 @@ export const salePrice = (amount: number) =>
   Math.round((Math.round(amount * 100) * (100 - birthdayPromo.percent)) / 100) / 100
 
 function readPhase(): PromoPhase | null {
+  if (typeof window === 'undefined') return null
   if (import.meta.env.DEV) {
     const forced = new URLSearchParams(window.location.search).get('promo')
     if (forced === 'upcoming' || forced === 'active') return forced

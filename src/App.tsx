@@ -13,6 +13,10 @@ import styles from './App.module.css'
 export function App() {
   const { t, switching } = useI18n()
 
+  useEffect(() => {
+    document.documentElement.removeAttribute('data-boot')
+  }, [])
+
   return (
     <>
       <a className="skip-link" href="#main">

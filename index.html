@@ -1,15 +1,33 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-boot>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#fbf8f3" />
 
-    <title>DAON — Korean Restaurant</title>
+    <title>DAON — Korean Restaurant in Katowice</title>
     <meta
       name="description"
-      content="DAON is a Korean restaurant serving handmade ramen, Korean BBQ, hot pots and kimbap. Browse the menu and reserve your table."
+      content="DAON is a Korean restaurant in Katowice, Dworcowa 8: handmade ramen, Korean BBQ, hot pots and kimbap. See the menu and book a table."
     />
+
+    <style>
+      html[data-boot] #root {
+        visibility: hidden;
+      }
+    </style>
+    <noscript>
+      <style>
+        html[data-boot] #root {
+          visibility: visible;
+        }
+      </style>
+    </noscript>
+    <script>
+      setTimeout(function () {
+        document.documentElement.removeAttribute('data-boot')
+      }, 4000)
+    </script>
 
     <link rel="icon" type="image/png" sizes="192x192" href="%BASE_URL%favicon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="%BASE_URL%favicon-512.png" />
@@ -20,7 +38,7 @@
     <meta property="og:url" content="https://daon.pl/" />
     <meta property="og:type" content="restaurant" />
     <meta property="og:site_name" content="DAON" />
-    <meta property="og:title" content="DAON — Korean Restaurant" />
+    <meta property="og:title" content="DAON — Korean Restaurant in Katowice" />
     <meta
       property="og:description"
       content="Handmade ramen, Korean BBQ, hot pots and kimbap. Browse the menu and reserve your table."
@@ -33,7 +51,7 @@
     <meta property="og:locale:alternate" content="ko_KR" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="DAON — Korean Restaurant" />
+    <meta name="twitter:title" content="DAON — Korean Restaurant in Katowice" />
     <meta
       name="twitter:description"
       content="Handmade ramen, Korean BBQ, hot pots and kimbap. Browse the menu and reserve your table."
