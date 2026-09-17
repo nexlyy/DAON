@@ -51,6 +51,10 @@ function supabaseStore(url, key) {
   return {
     kind: 'supabase',
 
+    async ping() {
+      await call('/reservations?select=id&limit=1')
+    },
+
     async holdsOn(date) {
       const rows = await call(
         `/reservation_tables?select=booking_time,table_id&booking_date=eq.${date}`,
@@ -158,6 +162,10 @@ function fileStore() {
 
   return {
     kind: 'file',
+
+    async ping() {
+      read()
+    },
 
     async holdsOn(date) {
       const holds = []

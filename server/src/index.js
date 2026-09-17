@@ -26,6 +26,7 @@ import {
   helpMessage,
   privateMessage,
   releasedMessage,
+  scrubbedMessage,
   welcomeMessage,
 } from './message.js'
 import { isStaff, nameOf, parseStaff } from './staff.js'
@@ -53,6 +54,9 @@ const LISTEN = process.env.TELEGRAM_LISTEN !== '0'
 const STORE = resolve(root, 'data')
 const ALERTS_FILE = resolve(STORE, 'alerts.json')
 const ALERTS_KEPT_MS = 90 * 24 * 60 * 60 * 1000
+const SENT_FILE = resolve(STORE, 'sent.json')
+const RETENTION_DAYS = Number(rules.retentionDays ?? 30)
+const DAY_MS = 24 * 60 * 60 * 1000
 
 const STAFF = parseStaff(process.env.TELEGRAM_STAFF_IDS)
 
@@ -85,6 +89,61 @@ function rememberAlerts(ref, messages) {
   }
   alerts[ref] = { at: new Date().toISOString(), messages }
   writeFileSync(ALERTS_FILE, JSON.stringify(alerts))
+}
+
+function readSent() {
+  try {
+    return JSON.parse(readFileSync(SENT_FILE, 'utf8'))
+  } catch {
+    return []
+  }
+}
+
+function recordSent(messages, date) {
+  if (!date || messages.length === 0) return
+  const sent = readSent()
+  const known = new Set(sent.map((entry) => `${entry.chatId}:${entry.messageId}`))
+  for (const { chatId, messageId } of messages) {
+    if (!known.has(`${chatId}:${messageId}`)) sent.push({ chatId, messageId, date })
+  }
+  writeFileSync(SENT_FILE, JSON.stringify(sent))
+}
+
+async function scrubOldMessages() {
+  const cutoff = toISODate(new Date(Date.now() - RETENTION_DAYS * DAY_MS))
+  const keep = []
+  let scrubbed = 0
+  for (const entry of readSent()) {
+    if (entry.date >= cutoff) {
+      keep.push(entry)
+      continue
+    }
+    try {
+      await editMessage(TOKEN, entry.chatId, entry.messageId, scrubbedMessage(entry.date, RETENTION_DAYS))
+      scrubbed += 1
+    } catch (failure) {
+      const gone = /not found|can't be edited|not modified/i.test(failure.message)
+      if (!gone && (entry.attempts ?? 0) < 5) keep.push({ ...entry, attempts: (entry.attempts ?? 0) + 1 })
+    }
+  }
+  const latest = readSent().filter(
+    (entry) => !keep.some((kept) => kept.chatId === entry.chatId && kept.messageId === entry.messageId) &&
+      entry.date >= cutoff,
+  )
+  writeFileSync(SENT_FILE, JSON.stringify([...keep, ...latest]))
+  if (scrubbed > 0) console.log(`Removed guest details from ${scrubbed} old Telegram message(s).`)
+}
+
+async function adoptOlderAlerts() {
+  const known = new Set(readSent().map((entry) => `${entry.chatId}:${entry.messageId}`))
+  for (const [ref, entry] of Object.entries(readAlerts())) {
+    const messages = (entry.messages ?? []).filter(
+      (message) => !known.has(`${message.chatId}:${message.messageId}`),
+    )
+    if (messages.length === 0) continue
+    const booking = await store.find(ref).catch(() => null)
+    if (booking?.date) recordSent(messages, booking.date)
+  }
 }
 
 async function notifyStaff(text, keyboard) {
@@ -132,6 +191,9 @@ const RATE = { windowMs: 60 * 60 * 1000, max: 12 }
 const MAX_PER_PHONE = Number(process.env.MAX_BOOKINGS_PER_PHONE ?? 4)
 const hits = new Map()
 
+const clientIp = (request) =>
+  String(request.headers['x-real-ip'] ?? '').trim() || request.socket.remoteAddress || 'unknown'
+
 function overRate(ip) {
   const now = Date.now()
   const seen = (hits.get(ip) ?? []).filter((at) => now - at < RATE.windowMs)
@@ -139,6 +201,27 @@ function overRate(ip) {
   hits.set(ip, seen)
   return seen.length > RATE.max
 }
+
+setInterval(() => {
+  const now = Date.now()
+  for (const [ip, seen] of hits) {
+    if (now - seen[seen.length - 1] >= RATE.windowMs) hits.delete(ip)
+  }
+}, 10 * 60 * 1000).unref()
+
+let bookingQueue = Promise.resolve()
+
+function oneAtATime(task) {
+  const run = bookingQueue.then(task, task)
+  bookingQueue = run.catch(() => {})
+  return run
+}
+
+const withTimeout = (promise, ms) =>
+  Promise.race([
+    promise,
+    new Promise((_, fail) => setTimeout(() => fail(new Error(`no answer in ${ms} ms`)), ms)),
+  ])
 
 const MAX_BODY = 8 * 1024
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
@@ -189,11 +272,11 @@ function readBooking(raw) {
   }
 
   if (!slotsForDate(date).includes(time) || isClosed(date)) {
-    return { error: 'the restaurant is closed at that time' }
+    return { error: 'the restaurant is closed at that time', code: 'closed' }
   }
 
   const today = toISODate(new Date())
-  if (date < today) return { error: 'that date has passed' }
+  if (date < today) return { error: 'that date has passed', code: 'closed' }
 
   const seats = tableIds.reduce((total, id) => total + (tableById.get(id)?.seats ?? 0), 0)
   if (seats < partySize) return { error: 'those tables do not seat that party' }
@@ -249,9 +332,18 @@ async function handle(request, response, url) {
   if (request.method === 'OPTIONS') return send(request, response, 204, {})
 
   if (request.method === 'GET' && url.pathname === '/health') {
-    return send(request, response, 200, {
-      ok: true,
+    let database = 'ok'
+    try {
+      await withTimeout(store.ping(), 8000)
+    } catch (failure) {
+      database = 'unreachable'
+      console.error('Health check: the database did not answer:', failure.message)
+    }
+    const ok = database === 'ok'
+    return send(request, response, ok ? 200 : 503, {
+      ok,
       store: store.kind,
+      database,
       staff: STAFF.size,
     })
   }
@@ -357,13 +449,15 @@ async function handle(request, response, url) {
     const notice = cancelledMessage(toStaff(booking), 'the guest')
     updateAlerts(ref, notice)
       .then(() => notifyStaff(notice))
+      .then((sent) => recordSent(sent, booking.date))
       .catch((failure) => console.error('Could not tell the staff:', failure.message))
     return send(request, response, 200, { ok: true })
   }
 
   if (request.method === 'POST' && url.pathname === '/bookings') {
-    const ip = request.headers['x-forwarded-for']?.split(',')[0].trim() ?? request.socket.remoteAddress
-    if (overRate(ip ?? 'unknown')) return send(request, response, 429, { error: 'too many requests' })
+    if (overRate(clientIp(request))) {
+      return send(request, response, 429, { error: 'too many requests', code: 'rateLimit' })
+    }
 
     let raw
     try {
@@ -372,42 +466,49 @@ async function handle(request, response, url) {
       return send(request, response, 400, { error: 'invalid JSON' })
     }
 
-    const { booking, error } = readBooking(raw)
-    if (error) return send(request, response, 400, { error })
+    const { booking, error, code } = readBooking(raw)
+    if (error) return send(request, response, 400, { error, code })
 
-    const held = await store.upcomingForPhone(booking.phone, toISODate(new Date()))
-    if (held >= MAX_PER_PHONE) {
-      return send(request, response, 429, { error: 'too many bookings on that number' })
-    }
-
-    const taken = takenAt(booking.time, await store.holdsOn(booking.date))
-    if (booking.tableIds.some((id) => taken.has(id))) {
-      return send(request, response, 409, { error: 'table is no longer available' })
-    }
-    const isFree = (id) => !taken.has(id) && !tableById.get(id)?.disabled
-    const group = resolveTableGroup(booking.tableIds[0], booking.partySize, isFree)
-    if (!group || group.join() !== [...booking.tableIds].join()) {
-      return send(request, response, 409, { error: 'those tables cannot be put together' })
-    }
-
-    const record = {
-      ...booking,
-      id: `bk_${Date.now().toString(36)}`,
-      reference: reference(),
-      createdAt: new Date().toISOString(),
-      status: 'confirmed',
-    }
-
-    let stored
-    try {
-      stored = await store.create(record)
-    } catch (failure) {
-      if (failure instanceof TablesTaken) {
-        return send(request, response, 409, { error: 'table is no longer available' })
+    const outcome = await oneAtATime(async () => {
+      const held = await store.upcomingForPhone(booking.phone, toISODate(new Date()))
+      if (held >= MAX_PER_PHONE) {
+        return { status: 429, body: { error: 'too many bookings on that number', code: 'phoneLimit' } }
       }
-      console.error('Could not store the booking:', failure.message)
-      return send(request, response, 500, { error: 'could not store the booking' })
-    }
+
+      const taken = takenAt(booking.time, await store.holdsOn(booking.date))
+      if (booking.tableIds.some((id) => taken.has(id))) {
+        return { status: 409, body: { error: 'table is no longer available', code: 'unavailable' } }
+      }
+      const isFree = (id) => !taken.has(id) && !tableById.get(id)?.disabled
+      const group = resolveTableGroup(booking.tableIds[0], booking.partySize, isFree)
+      if (!group || group.join() !== [...booking.tableIds].join()) {
+        return {
+          status: 409,
+          body: { error: 'those tables cannot be put together', code: 'unavailable' },
+        }
+      }
+
+      const record = {
+        ...booking,
+        id: `bk_${Date.now().toString(36)}`,
+        reference: reference(),
+        createdAt: new Date().toISOString(),
+        status: 'confirmed',
+      }
+
+      try {
+        return { record, stored: await store.create(record) }
+      } catch (failure) {
+        if (failure instanceof TablesTaken) {
+          return { status: 409, body: { error: 'table is no longer available', code: 'unavailable' } }
+        }
+        console.error('Could not store the booking:', failure.message)
+        return { status: 500, body: { error: 'could not store the booking' } }
+      }
+    })
+
+    if (!outcome.record) return send(request, response, outcome.status, outcome.body)
+    const { record, stored } = outcome
 
     const id = stored?.id ?? record.id
     notifyStaff(buildMessage(toStaff(record)), [
@@ -416,7 +517,10 @@ async function handle(request, response, url) {
         { text: '❌ Cancel', callback_data: `cancel:${record.reference}` },
       ],
     ])
-      .then((sent) => rememberAlerts(record.reference, sent))
+      .then((sent) => {
+        rememberAlerts(record.reference, sent)
+        recordSent(sent, record.date)
+      })
       .catch((failure) => console.error('Could not tell the staff:', failure.message))
 
     return send(request, response, 200, {
@@ -445,6 +549,17 @@ const me = await getMe(TOKEN).catch((failure) => {
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`DAON API on :${PORT} — store: ${store.kind}, bot @${me.username}`)
   console.log(`Staff: ${STAFF.size} account(s).`)
+
+  setTimeout(() => {
+    adoptOlderAlerts()
+      .then(scrubOldMessages)
+      .catch((failure) => console.error('Could not tidy old messages:', failure.message))
+  }, Number(process.env.TIDY_DELAY_MS ?? 60_000))
+  setInterval(() => {
+    scrubOldMessages().catch((failure) =>
+      console.error('Could not tidy old messages:', failure.message),
+    )
+  }, 6 * 60 * 60 * 1000)
 
   for (const id of STAFF) {
     getChat(TOKEN, id).catch(() =>
@@ -487,6 +602,10 @@ async function handleCommand(message) {
   const [raw, ...rest] = (message.text ?? '').trim().split(/\s+/)
   const command = raw.split('@')[0].toLowerCase()
   const say = (text, keyboard) => sendMessage(TOKEN, chatId, text, keyboard).catch(() => {})
+  const sayAbout = (date, text) =>
+    sendMessage(TOKEN, chatId, text)
+      .then((message) => recordSent([{ chatId, messageId: message.message_id }], date))
+      .catch(() => {})
 
   if (!isStaff(STAFF, message.from, message.chat)) {
     noteStranger(message.from, message.chat)
@@ -510,7 +629,7 @@ async function handleCommand(message) {
     const notice = releasedMessage(toStaff(booking), nameOf(message.from))
     await store.release(ref)
     await updateAlerts(ref, notice)
-    return say(notice)
+    return sayAbout(booking.date, notice)
   }
 
   if (action === 'day' || action === 'tomorrow' || action === 'onDate') {
@@ -518,7 +637,7 @@ async function handleCommand(message) {
     if (action === 'tomorrow') day.setDate(day.getDate() + 1)
     const date = action === 'onDate' ? readDayFirstDate(rest.join(' ')) : toISODate(day)
     if (!date) return say('Write the date like this: /day 24-12-2026')
-    return say(dayList(date, await store.onDate(date)))
+    return sayAbout(date, dayList(date, await store.onDate(date)))
   }
 
   const [first, ...note] = rest

@@ -113,6 +113,13 @@ export function welcomeMessage() {
   ].join(NL)
 }
 
+export function scrubbedMessage(date, days) {
+  return [
+    `<b>${escapeHtml(formatDate(date))}</b>`,
+    `Guest details removed ${days} days after the booking date, as the privacy policy on daon.pl says.`,
+  ].join(NL)
+}
+
 export function privateMessage() {
   return 'This bot is private to the DAON staff.'
 }

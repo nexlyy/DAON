@@ -44,3 +44,13 @@ mv "$FILE.tmp" "$FILE"
 chmod 600 "$FILE"
 
 find "$OUT_DIR" -name 'reservations-*.json' -mtime +$KEEP_DAYS -delete
+
+# The privacy policy promises that a guest's name, phone and notes are wiped a
+# set number of days after the visit. The reservation itself stays — date, time,
+# party size and tables are not personal — and the copies above age out on their
+# own. It runs after the copy so a failed wipe never costs a backup. The number
+# of days comes from src/data/restaurant.ts, the same place the policy reads it.
+RETENTION_DAYS=$(node -p "require('/opt/daon-api/reservation-data.json').reservation.retentionDays ?? 30")
+CUTOFF=$(date -d "-$RETENTION_DAYS days" +%F)
+
+curl -sf -o /dev/null -X PATCH "$SUPABASE_URL/rest/v1/reservations?booking_date=lt.$CUTOFF"   -H "apikey: $SUPABASE_SERVICE_KEY"   -H "Authorization: Bearer $SUPABASE_SERVICE_KEY"   -H "Content-Type: application/json"   -H "Prefer: return=minimal"   --data '{"guest_name":"","phone":"","notes":""}'
