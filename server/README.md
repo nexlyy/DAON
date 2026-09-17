@@ -13,13 +13,16 @@ site → POST /bookings → Supabase
                      └→ Telegram → the restaurant's phone
 ```
 
-## The four calls
+## The calls
 
 ```
 GET  /closed-dates?from&to          dates the kitchen is shut
 GET  /slots?date&partySize          seating times, and what is still free
 GET  /tables?date&time&partySize    per-table availability
 POST /bookings                      take a booking, then tell the staff
+POST /bookings/move                 the guest changes day, time, size or table
+POST /bookings/lookup               a guest's own booking, by code and token
+POST /bookings/cancel               the guest cancels
 GET  /health                        liveness, which store, whether a chat is set
 ```
 
@@ -65,18 +68,37 @@ nothing else: it is a single file on one machine.
 
 ## What the staff can do from Telegram
 
-Every booking arrives with a cancel button under it. Pressing it frees the table
-and rewrites the message, so it cannot be pressed twice.
+Every booking arrives as a card with three buttons: guests left, cancel, change.
+A button pressed by one person rewrites the card for everyone.
 
 ```
-/dzisiaj              bookings for today
-/jutro                for tomorrow
-/dzien 24-12-2026     for a given day
-/zamknij 24-12-2026 Wigilia
-/otworz 24-12-2026
-/zamkniete            the days currently closed
-/pomoc                this list
+/book                   take a phone booking or seat a walk-in, step by step
+/book friday 19:00 4 Anna +48 600 123 456 - nut allergy
+/all                    every upcoming reservation, grouped by day
+/all past               the last 30 days
+/today  /tomorrow  /day saturday
+/find Anna              by name, phone digits or DAON code
+/move DAON-XXXXX        new day, time, party size or table
+/cancel DAON-XXXXX      asks once, then cancels
+/free DAON-XXXXX        the guests have left
+/close 24.12 Christmas Eve
+/open 24.12
+/help
 ```
+
+`/book` takes whatever it is given on one line and asks for the rest: day,
+guests, time, table, name, phone, notes. It offers only the times and tables
+that are still free, lets staff type any time outside the usual slots, warns
+before booking outside opening hours, and shows a card to confirm. Once the
+booking is made, the messages staff typed with the guest's name and phone are
+deleted, so the only copy in the chat is the card, which is scrubbed with the
+rest after the retention period.
+
+Dates are read in any common form: `20.09`, `20/09/2026`, `2026-09-20`,
+`20 września`, `20 sep`, `20 сентября`, `9월 20일`, `today`, `jutro`,
+`завтра`, `friday`, `w piątek`, `в пятницу`, `za 3 dni`. A date without a year
+is the next one to come; for `/day` it is the nearest, so last Saturday can
+still be looked up. The bot always writes the date back with its weekday.
 
 Closing a day takes it out of the calendar on the site and refuses any booking
 for it. If the day already has bookings the bot says so, with the count — it

@@ -3,7 +3,6 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import {
-  labelsOf,
   parseISODate,
   resolveTableGroup,
   rules,
@@ -13,32 +12,16 @@ import {
   tableById,
   tables,
   toISODate,
-  zoneOf,
 } from './availability.js'
+import { toStaff } from './bookings.js'
+import { cardKeyboard, createBot } from './bot.js'
 import { cancelToken, tokenMatches } from './cancel.js'
-import { addClosure, isClosed, listClosures, removeClosure } from './closures.js'
+import { isClosed } from './closures.js'
 import { loadEnv, root } from './env.js'
-import {
-  buildMessage,
-  cancelledMessage,
-  dayList,
-  formatDate,
-  helpMessage,
-  privateMessage,
-  releasedMessage,
-  scrubbedMessage,
-  welcomeMessage,
-} from './message.js'
-import { isStaff, nameOf, parseStaff } from './staff.js'
+import { buildMessage, cancelledMessage, scrubbedMessage } from './message.js'
+import { parseStaff } from './staff.js'
 import { createStore, reference, TablesTaken } from './store.js'
-import {
-  answerCallback,
-  editMessage,
-  getChat,
-  getMe,
-  pollUpdates,
-  sendMessage,
-} from './telegram.js'
+import { editMessage, getChat, getMe, pollUpdates, sendMessage } from './telegram.js'
 
 loadEnv()
 
@@ -81,13 +64,18 @@ function readAlerts() {
   }
 }
 
-function rememberAlerts(ref, messages) {
+function addAlerts(ref, messages) {
   const alerts = readAlerts()
   const cutoff = Date.now() - ALERTS_KEPT_MS
   for (const [key, entry] of Object.entries(alerts)) {
     if (!(Date.parse(entry.at) >= cutoff)) delete alerts[key]
   }
-  alerts[ref] = { at: new Date().toISOString(), messages }
+  const known = alerts[ref]?.messages ?? []
+  const seen = new Set(known.map((message) => `${message.chatId}:${message.messageId}`))
+  alerts[ref] = {
+    at: new Date().toISOString(),
+    messages: [...known, ...messages.filter((message) => !seen.has(`${message.chatId}:${message.messageId}`))],
+  }
   writeFileSync(ALERTS_FILE, JSON.stringify(alerts))
 }
 
@@ -102,9 +90,10 @@ function readSent() {
 function recordSent(messages, date) {
   if (!date || messages.length === 0) return
   const sent = readSent()
-  const known = new Set(sent.map((entry) => `${entry.chatId}:${entry.messageId}`))
   for (const { chatId, messageId } of messages) {
-    if (!known.has(`${chatId}:${messageId}`)) sent.push({ chatId, messageId, date })
+    const entry = sent.find((known) => known.chatId === chatId && known.messageId === messageId)
+    if (entry) entry.date = date
+    else sent.push({ chatId, messageId, date })
   }
   writeFileSync(SENT_FILE, JSON.stringify(sent))
 }
@@ -127,7 +116,8 @@ async function scrubOldMessages() {
     }
   }
   const latest = readSent().filter(
-    (entry) => !keep.some((kept) => kept.chatId === entry.chatId && kept.messageId === entry.messageId) &&
+    (entry) =>
+      !keep.some((kept) => kept.chatId === entry.chatId && kept.messageId === entry.messageId) &&
       entry.date >= cutoff,
   )
   writeFileSync(SENT_FILE, JSON.stringify([...keep, ...latest]))
@@ -146,12 +136,13 @@ async function adoptOlderAlerts() {
   }
 }
 
-async function notifyStaff(text, keyboard) {
+async function notifyStaff(text, keyboard, { except } = {}) {
   const sent = []
   for (const id of STAFF) {
+    if (except !== undefined && String(except) === String(id)) continue
     try {
       const message = await sendMessage(TOKEN, id, text, keyboard)
-      sent.push({ chatId: id, messageId: message.message_id })
+      sent.push({ chatId: Number(id), messageId: message.message_id })
     } catch (failure) {
       console.error(`Telegram refused the message for ${id}:`, failure.message)
     }
@@ -159,14 +150,14 @@ async function notifyStaff(text, keyboard) {
   return sent
 }
 
-async function updateAlerts(ref, text, pressed) {
+async function updateAlerts(ref, text, pressed, keyboard) {
   const targets = [...(readAlerts()[ref]?.messages ?? []), ...(pressed ? [pressed] : [])]
   const seen = new Set()
   for (const { chatId, messageId } of targets) {
     const key = `${chatId}:${messageId}`
     if (seen.has(key)) continue
     seen.add(key)
-    await editMessage(TOKEN, chatId, messageId, text).catch(() => {})
+    await editMessage(TOKEN, chatId, messageId, text, keyboard).catch(() => {})
   }
 }
 
@@ -250,20 +241,22 @@ function readBody(request) {
   })
 }
 
-function readBooking(raw) {
-  if (!raw || typeof raw !== 'object') return { error: 'body must be an object' }
+async function readJson(request) {
+  try {
+    return JSON.parse(await readBody(request))
+  } catch {
+    return null
+  }
+}
 
+function readSeating(raw) {
   const date = text(raw.date, 10)
   const time = text(raw.time, 5)
-  const name = text(raw.name, 80)
-  const phone = text(raw.phone, 40)
   const partySize = Number(raw.partySize)
   const tableIds = Array.isArray(raw.tableIds) ? raw.tableIds.map((id) => text(id, 12)) : []
 
   if (!ISO_DATE.test(date)) return { error: 'date must be YYYY-MM-DD' }
   if (!TIME.test(time)) return { error: 'time must be HH:mm' }
-  if (!name) return { error: 'name is required' }
-  if (!phone) return { error: 'phone is required' }
   if (!Number.isInteger(partySize) || partySize < 1 || partySize > rules.maxPartySize) {
     return { error: 'partySize is out of range' }
   }
@@ -281,12 +274,22 @@ function readBooking(raw) {
   const seats = tableIds.reduce((total, id) => total + (tableById.get(id)?.seats ?? 0), 0)
   if (seats < partySize) return { error: 'those tables do not seat that party' }
 
+  return { seating: { date, time, partySize, tableIds } }
+}
+
+function readBooking(raw) {
+  if (!raw || typeof raw !== 'object') return { error: 'body must be an object' }
+  const { seating, error, code } = readSeating(raw)
+  if (error) return { error, code }
+
+  const name = text(raw.name, 80)
+  const phone = text(raw.phone, 40)
+  if (!name) return { error: 'name is required' }
+  if (!phone) return { error: 'phone is required' }
+
   return {
     booking: {
-      date,
-      time,
-      partySize,
-      tableIds,
+      ...seating,
       name,
       phone,
       notes: text(raw.notes, 400),
@@ -295,17 +298,21 @@ function readBooking(raw) {
   }
 }
 
-const toStaff = (booking) => ({
-  reference: booking.reference,
-  date: booking.date,
-  time: booking.time,
-  partySize: booking.partySize,
-  tables: labelsOf(booking.tableIds),
-  zone: zoneOf(booking.tableIds),
-  name: booking.name,
-  phone: booking.phone,
-  notes: booking.notes,
-})
+async function seatingConflict(seating, reservationId) {
+  const holds = (await store.holdsOn(seating.date)).filter(
+    (hold) => !reservationId || hold.reservationId !== reservationId,
+  )
+  const taken = takenAt(seating.time, holds)
+  if (seating.tableIds.some((id) => taken.has(id))) {
+    return { status: 409, body: { error: 'table is no longer available', code: 'unavailable' } }
+  }
+  const isFree = (id) => !taken.has(id) && !tableById.get(id)?.disabled
+  const group = resolveTableGroup(seating.tableIds[0], seating.partySize, isFree)
+  if (!group || group.join() !== [...seating.tableIds].join()) {
+    return { status: 409, body: { error: 'those tables cannot be put together', code: 'unavailable' } }
+  }
+  return null
+}
 
 function allowOrigin(request) {
   const origin = request.headers.origin
@@ -327,6 +334,17 @@ function send(request, response, status, body) {
   })
   response.end(payload)
 }
+
+const publicBooking = (booking) => ({
+  reference: booking.reference,
+  status: booking.status,
+  date: booking.date,
+  time: booking.time,
+  partySize: booking.partySize,
+  tableIds: booking.tableIds,
+})
+
+let bot
 
 async function handle(request, response, url) {
   if (request.method === 'OPTIONS') return send(request, response, 204, {})
@@ -373,7 +391,10 @@ async function handle(request, response, url) {
 
     if (isClosed(date)) return send(request, response, 200, [])
 
-    const holds = await store.holdsOn(date)
+    const reservationId = await ownReservation(url)
+    const holds = (await store.holdsOn(date)).filter(
+      (hold) => !reservationId || hold.reservationId !== reservationId,
+    )
     const now = new Date()
     const isToday = toISODate(now) === date
     const nowMinutes = now.getHours() * 60 + now.getMinutes()
@@ -394,7 +415,11 @@ async function handle(request, response, url) {
       return send(request, response, 400, { error: 'date and time are required' })
     }
 
-    const taken = takenAt(time, await store.holdsOn(date))
+    const reservationId = await ownReservation(url)
+    const holds = (await store.holdsOn(date)).filter(
+      (hold) => !reservationId || hold.reservationId !== reservationId,
+    )
+    const taken = takenAt(time, holds)
     const status = Object.fromEntries(
       tables.map((table) => [
         table.id,
@@ -405,35 +430,20 @@ async function handle(request, response, url) {
   }
 
   if (request.method === 'POST' && url.pathname === '/bookings/lookup') {
-    let raw
-    try {
-      raw = JSON.parse(await readBody(request))
-    } catch {
-      return send(request, response, 400, { error: 'invalid JSON' })
-    }
+    const raw = await readJson(request)
+    if (!raw) return send(request, response, 400, { error: 'invalid JSON' })
 
     const ref = text(raw.reference, 24).toUpperCase()
     const booking = ref ? await store.find(ref) : null
     if (!booking || !tokenMatches(booking.id, raw.token)) {
       return send(request, response, 404, { error: 'no such booking' })
     }
-    return send(request, response, 200, {
-      reference: booking.reference,
-      status: booking.status,
-      date: booking.date,
-      time: booking.time,
-      partySize: booking.partySize,
-      tableIds: booking.tableIds,
-    })
+    return send(request, response, 200, publicBooking(booking))
   }
 
   if (request.method === 'POST' && url.pathname === '/bookings/cancel') {
-    let raw
-    try {
-      raw = JSON.parse(await readBody(request))
-    } catch {
-      return send(request, response, 400, { error: 'invalid JSON' })
-    }
+    const raw = await readJson(request)
+    if (!raw) return send(request, response, 400, { error: 'invalid JSON' })
 
     const ref = text(raw.reference, 24).toUpperCase()
     const booking = ref ? await store.find(ref) : null
@@ -454,17 +464,53 @@ async function handle(request, response, url) {
     return send(request, response, 200, { ok: true })
   }
 
+  if (request.method === 'POST' && url.pathname === '/bookings/move') {
+    if (overRate(clientIp(request))) {
+      return send(request, response, 429, { error: 'too many requests', code: 'rateLimit' })
+    }
+    const raw = await readJson(request)
+    if (!raw) return send(request, response, 400, { error: 'invalid JSON' })
+
+    const ref = text(raw.reference, 24).toUpperCase()
+    const booking = ref ? await store.find(ref) : null
+    if (!booking || !tokenMatches(booking.id, raw.token)) {
+      return send(request, response, 404, { error: 'no such booking' })
+    }
+    if (booking.status !== 'confirmed' || booking.date < toISODate(new Date())) {
+      return send(request, response, 409, { error: 'that booking can no longer be changed', code: 'closed' })
+    }
+
+    const { seating, error, code } = readSeating(raw)
+    if (error) return send(request, response, 400, { error, code })
+
+    const outcome = await oneAtATime(async () => {
+      const conflict = await seatingConflict(seating, booking.id)
+      if (conflict) return conflict
+      try {
+        return { after: await store.move(ref, seating) }
+      } catch (failure) {
+        if (failure instanceof TablesTaken) {
+          return { status: 409, body: { error: 'table is no longer available', code: 'unavailable' } }
+        }
+        console.error('Could not move the booking:', failure.message)
+        return { status: 500, body: { error: 'could not change the booking' } }
+      }
+    })
+    if (!outcome.after) return send(request, response, outcome.status, outcome.body)
+
+    bot
+      .announceMove(booking, outcome.after, 'the guest, on the website')
+      .catch((failure) => console.error('Could not tell the staff:', failure.message))
+    return send(request, response, 200, publicBooking({ ...booking, ...outcome.after }))
+  }
+
   if (request.method === 'POST' && url.pathname === '/bookings') {
     if (overRate(clientIp(request))) {
       return send(request, response, 429, { error: 'too many requests', code: 'rateLimit' })
     }
 
-    let raw
-    try {
-      raw = JSON.parse(await readBody(request))
-    } catch {
-      return send(request, response, 400, { error: 'invalid JSON' })
-    }
+    const raw = await readJson(request)
+    if (!raw) return send(request, response, 400, { error: 'invalid JSON' })
 
     const { booking, error, code } = readBooking(raw)
     if (error) return send(request, response, 400, { error, code })
@@ -475,18 +521,8 @@ async function handle(request, response, url) {
         return { status: 429, body: { error: 'too many bookings on that number', code: 'phoneLimit' } }
       }
 
-      const taken = takenAt(booking.time, await store.holdsOn(booking.date))
-      if (booking.tableIds.some((id) => taken.has(id))) {
-        return { status: 409, body: { error: 'table is no longer available', code: 'unavailable' } }
-      }
-      const isFree = (id) => !taken.has(id) && !tableById.get(id)?.disabled
-      const group = resolveTableGroup(booking.tableIds[0], booking.partySize, isFree)
-      if (!group || group.join() !== [...booking.tableIds].join()) {
-        return {
-          status: 409,
-          body: { error: 'those tables cannot be put together', code: 'unavailable' },
-        }
-      }
+      const conflict = await seatingConflict(booking)
+      if (conflict) return conflict
 
       const record = {
         ...booking,
@@ -511,14 +547,9 @@ async function handle(request, response, url) {
     const { record, stored } = outcome
 
     const id = stored?.id ?? record.id
-    notifyStaff(buildMessage(toStaff(record)), [
-      [
-        { text: '✅ Guests left', callback_data: `free:${record.reference}` },
-        { text: '❌ Cancel', callback_data: `cancel:${record.reference}` },
-      ],
-    ])
+    notifyStaff(buildMessage(toStaff(record)), cardKeyboard(record.reference))
       .then((sent) => {
-        rememberAlerts(record.reference, sent)
+        addAlerts(record.reference, sent)
         recordSent(sent, record.date)
       })
       .catch((failure) => console.error('Could not tell the staff:', failure.message))
@@ -532,6 +563,26 @@ async function handle(request, response, url) {
 
   return send(request, response, 404, { error: 'not found' })
 }
+
+async function ownReservation(url) {
+  const ref = text(url.searchParams.get('reference'), 24).toUpperCase()
+  const token = url.searchParams.get('token')
+  if (!ref || !token) return null
+  const booking = await store.find(ref).catch(() => null)
+  return booking && tokenMatches(booking.id, token) ? booking.id : null
+}
+
+bot = createBot({
+  token: TOKEN,
+  staff: STAFF,
+  store,
+  notifyStaff,
+  recordSent,
+  addAlerts,
+  updateAlerts,
+  oneAtATime,
+  retentionDays: RETENTION_DAYS,
+})
 
 const server = createServer((request, response) => {
   const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`)
@@ -561,6 +612,8 @@ server.listen(PORT, '127.0.0.1', () => {
     )
   }, 6 * 60 * 60 * 1000)
 
+  bot.setup().catch(() => {})
+
   for (const id of STAFF) {
     getChat(TOKEN, id).catch(() =>
       console.warn(
@@ -571,162 +624,25 @@ server.listen(PORT, '127.0.0.1', () => {
   }
 })
 
-function readDayFirstDate(value) {
-  const match = /^(\d{1,2})[-.\/](\d{1,2})[-.\/](\d{4})$/.exec(String(value ?? '').trim())
-  if (!match) return null
-  const [, day, month, year] = match
-  const iso = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-  return ISO_DATE.test(iso) ? iso : null
-}
-
-const COMMANDS = {
-  '/help': 'help',
-  '/pomoc': 'help',
-  '/today': 'day',
-  '/dzisiaj': 'day',
-  '/tomorrow': 'tomorrow',
-  '/jutro': 'tomorrow',
-  '/day': 'onDate',
-  '/dzien': 'onDate',
-  '/close': 'close',
-  '/zamknij': 'close',
-  '/open': 'open',
-  '/otworz': 'open',
-  '/closed': 'help',
-  '/zamkniete': 'help',
-  '/free': 'free',
-}
-
-async function handleCommand(message) {
-  const chatId = message.chat.id
-  const [raw, ...rest] = (message.text ?? '').trim().split(/\s+/)
-  const command = raw.split('@')[0].toLowerCase()
-  const say = (text, keyboard) => sendMessage(TOKEN, chatId, text, keyboard).catch(() => {})
-  const sayAbout = (date, text) =>
-    sendMessage(TOKEN, chatId, text)
-      .then((message) => recordSent([{ chatId, messageId: message.message_id }], date))
-      .catch(() => {})
-
-  if (!isStaff(STAFF, message.from, message.chat)) {
-    noteStranger(message.from, message.chat)
-    if (command === '/start' && message.chat.type === 'private') return say(privateMessage())
-    return
-  }
-
-  if (command === '/start') return say(welcomeMessage())
-
-  const action = COMMANDS[command]
-  if (!action) return
-
-  if (action === 'help') return say(helpMessage(listClosures(toISODate(new Date()))))
-
-  if (action === 'free') {
-    const ref = (rest[0] ?? '').toUpperCase()
-    if (!ref) return say('Which one? /free DAON-XXXXX')
-    const booking = await store.find(ref)
-    if (!booking) return say(`No reservation ${ref}.`)
-    if (booking.tableIds.length === 0) return say(`${ref} is not holding a table.`)
-    const notice = releasedMessage(toStaff(booking), nameOf(message.from))
-    await store.release(ref)
-    await updateAlerts(ref, notice)
-    return sayAbout(booking.date, notice)
-  }
-
-  if (action === 'day' || action === 'tomorrow' || action === 'onDate') {
-    const day = new Date()
-    if (action === 'tomorrow') day.setDate(day.getDate() + 1)
-    const date = action === 'onDate' ? readDayFirstDate(rest.join(' ')) : toISODate(day)
-    if (!date) return say('Write the date like this: /day 24-12-2026')
-    return sayAbout(date, dayList(date, await store.onDate(date)))
-  }
-
-  const [first, ...note] = rest
-  const date = readDayFirstDate(first)
-  if (!date) return say(`Write the date like this: ${command} 24-12-2026`)
-
-  if (action === 'close') {
-    const booked = await store.onDate(date)
-    const added = addClosure(date, note.join(' '))
-    return say(
-      [
-        added
-          ? `${formatDate(date)} is closed — no new bookings, and the website shows DAON as closed that day.`
-          : `${formatDate(date)} was already closed.`,
-        booked.length > 0
-          ? `\nCareful: ${booked.length} guest(s) already booked that day. Call them — /day ${formatDate(date)}`
-          : '',
-      ]
-        .filter(Boolean)
-        .join('\n'),
-    )
-  }
-
-  return say(
-    removeClosure(date)
-      ? `${formatDate(date)} is open again — bookings are back and the website shows the usual hours.`
-      : `${formatDate(date)} was not closed.`,
-  )
-}
-
-async function handleFreeButton(query) {
-  const chatId = query.message?.chat?.id
-  const reference = String(query.data ?? '').split(':')[1] ?? ''
-
-  if (!isStaff(STAFF, query.from, query.message?.chat)) {
-    return answerCallback(TOKEN, query.id, 'Not allowed.').catch(() => {})
-  }
-
-  const booking = await store.find(reference)
-  if (!booking) {
-    return answerCallback(TOKEN, query.id, 'That reservation is gone.').catch(() => {})
-  }
-  if (booking.status === 'cancelled' || booking.tableIds.length === 0) {
-    return answerCallback(TOKEN, query.id, 'That table is already free.').catch(() => {})
-  }
-
-  const notice = releasedMessage(toStaff(booking), nameOf(query.from))
-  await store.release(reference)
-  await answerCallback(TOKEN, query.id, 'Table is free again.').catch(() => {})
-  await updateAlerts(reference, notice, { chatId, messageId: query.message.message_id })
-}
-
-async function handleCancelButton(query) {
-  const chatId = query.message?.chat?.id
-  const reference = String(query.data ?? '').split(':')[1] ?? ''
-
-  if (!isStaff(STAFF, query.from, query.message?.chat)) {
-    return answerCallback(TOKEN, query.id, 'Not allowed.').catch(() => {})
-  }
-
-  const booking = await store.find(reference)
-  if (!booking) {
-    return answerCallback(TOKEN, query.id, 'That reservation is gone.').catch(() => {})
-  }
-  if (booking.status === 'cancelled') {
-    return answerCallback(TOKEN, query.id, 'Already cancelled.').catch(() => {})
-  }
-
-  await store.cancel(reference)
-  await answerCallback(TOKEN, query.id, 'Cancelled. The table is free again.').catch(() => {})
-
-  const notice = cancelledMessage(toStaff(booking), `the restaurant (${nameOf(query.from)})`)
-  await updateAlerts(reference, notice, { chatId, messageId: query.message.message_id })
-}
-
 if (LISTEN) {
   let offset
   const loop = async () => {
     try {
       offset = await pollUpdates(TOKEN, offset, {
         async onMessage(message) {
-          if (!message.chat?.id) return
-          if (!(message.text ?? '').trim().startsWith('/')) return
-          await handleCommand(message)
+          try {
+            if ((await bot.onMessage(message)) === 'stranger') noteStranger(message.from, message.chat)
+          } catch (failure) {
+            console.error('Bot command failed:', failure)
+            sendMessage(TOKEN, message.chat.id, 'Something went wrong. Try again, or /help.').catch(() => {})
+          }
         },
         async onCallback(query) {
-          const data = String(query.data ?? '')
-          if (data.startsWith('cancel:')) await handleCancelButton(query)
-          if (data.startsWith('free:')) await handleFreeButton(query)
+          try {
+            await bot.onCallback(query)
+          } catch (failure) {
+            console.error('Bot button failed:', failure)
+          }
         },
       })
     } catch (failure) {

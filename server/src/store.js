@@ -24,16 +24,27 @@ function supabaseStore(url, key) {
   }
 
   async function call(path, init) {
-    const response = await fetch(`${base}${path}`, { ...init, headers })
+    const response = await fetch(`${base}${path}`, { ...init, headers: { ...headers, ...init?.headers } })
     const text = await response.text()
     const body = text ? JSON.parse(text) : null
 
     if (!response.ok) {
-
-      if (body?.message?.includes('tables_taken')) throw new TablesTaken()
+      if (body?.message?.includes('tables_taken') || body?.code === '23505') throw new TablesTaken()
       throw new Error(body?.message ?? `Supabase said ${response.status}`)
     }
     return body
+  }
+
+  async function withTables(rows) {
+    if (rows.length === 0) return []
+    const ids = rows.map((row) => row.id).join(',')
+    const tables = await call(`/reservation_tables?select=reservation_id,table_id&reservation_id=in.(${ids})`)
+    return rows.map((row) =>
+      fromRow(
+        row,
+        tables.filter((table) => table.reservation_id === row.id).map((table) => table.table_id),
+      ),
+    )
   }
 
   async function find(reference) {
@@ -57,9 +68,13 @@ function supabaseStore(url, key) {
 
     async holdsOn(date) {
       const rows = await call(
-        `/reservation_tables?select=booking_time,table_id&booking_date=eq.${date}`,
+        `/reservation_tables?select=booking_time,table_id,reservation_id&booking_date=eq.${date}`,
       )
-      return rows.map((row) => ({ time: row.booking_time, tableId: row.table_id }))
+      return rows.map((row) => ({
+        time: row.booking_time,
+        tableId: row.table_id,
+        reservationId: row.reservation_id,
+      }))
     },
 
     async release(reference) {
@@ -85,6 +100,74 @@ function supabaseStore(url, key) {
           tables.filter((t) => t.reservation_id === row.id).map((t) => t.table_id),
         ),
       )
+    },
+
+    async between(from, to) {
+      const rows = await call(
+        `/reservations?select=*&status=eq.confirmed&booking_date=gte.${from}&booking_date=lte.${to}` +
+          '&order=booking_date,booking_time',
+      )
+      return withTables(rows)
+    },
+
+    async search(query, from) {
+      const needle = query.replace(/[^\p{L}\p{N}+\- ]/gu, ' ').replace(/\s+/g, ' ').trim()
+      if (!needle) return []
+      const digits = needle.replace(/\D/g, '')
+      const filters = [
+        `guest_name.ilike."*${needle}*"`,
+        `reference.ilike."*${needle}*"`,
+        ...(digits.length >= 3 ? [`phone.ilike."*${digits.split('').join('*')}*"`] : []),
+      ]
+      const rows = await call(
+        `/reservations?select=*&booking_date=gte.${from}` +
+          `&or=${encodeURIComponent(`(${filters.join(',')})`)}` +
+          '&order=booking_date,booking_time&limit=30',
+      )
+      return withTables(rows)
+    },
+
+    async move(reference, change) {
+      const found = await find(reference)
+      if (!found) return null
+
+      await call(`/reservation_tables?reservation_id=eq.${found.id}`, { method: 'DELETE' })
+      const rows = (tableIds, date, time) =>
+        JSON.stringify(
+          tableIds.map((tableId) => ({
+            reservation_id: found.id,
+            table_id: tableId,
+            booking_date: date,
+            booking_time: time,
+          })),
+        )
+
+      try {
+        if (change.tableIds.length > 0) {
+          await call('/reservation_tables', {
+            method: 'POST',
+            body: rows(change.tableIds, change.date, change.time),
+          })
+        }
+      } catch (failure) {
+        if (found.tableIds.length > 0) {
+          await call('/reservation_tables', {
+            method: 'POST',
+            body: rows(found.tableIds, found.date, found.time),
+          }).catch((again) => console.error(`Could not put ${reference} back on its tables:`, again.message))
+        }
+        throw failure
+      }
+
+      await call(`/reservations?id=eq.${found.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          booking_date: change.date,
+          booking_time: change.time,
+          party_size: change.partySize,
+        }),
+      })
+      return { ...found, ...change }
     },
 
     async upcomingForPhone(phone, fromDate) {
@@ -171,7 +254,7 @@ function fileStore() {
       const holds = []
       for (const row of read()) {
         if (row.status === 'cancelled' || row.date !== date) continue
-        for (const tableId of row.tableIds) holds.push({ time: row.time, tableId })
+        for (const tableId of row.tableIds) holds.push({ time: row.time, tableId, reservationId: row.id })
       }
       return holds
     },
@@ -194,6 +277,45 @@ function fileStore() {
       return read()
         .filter((row) => row.date === date && row.status !== 'cancelled')
         .sort((a, b) => a.time.localeCompare(b.time))
+    },
+
+    async between(from, to) {
+      return read()
+        .filter((row) => row.status === 'confirmed' && row.date >= from && row.date <= to)
+        .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+    },
+
+    async search(query, from) {
+      const needle = query.toLowerCase().trim()
+      const digits = needle.replace(/\D/g, '')
+      if (!needle) return []
+      return read()
+        .filter((row) => row.date >= from)
+        .filter(
+          (row) =>
+            row.name.toLowerCase().includes(needle) ||
+            row.reference.toLowerCase().includes(needle) ||
+            (digits.length >= 3 && row.phone.replace(/\D/g, '').includes(digits)),
+        )
+        .slice(0, 30)
+    },
+
+    async move(reference, change) {
+      const rows = read()
+      const found = rows.find((row) => row.reference === reference)
+      if (!found) return null
+      const clash = rows.some(
+        (row) =>
+          row !== found &&
+          row.status !== 'cancelled' &&
+          row.date === change.date &&
+          row.time === change.time &&
+          row.tableIds.some((id) => change.tableIds.includes(id)),
+      )
+      if (clash) throw new TablesTaken()
+      Object.assign(found, change)
+      write(rows)
+      return found
     },
 
     async upcomingForPhone(phone, fromDate) {

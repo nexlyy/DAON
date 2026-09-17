@@ -1,4 +1,4 @@
-const API = 'https://api.telegram.org'
+const API = (process.env.TELEGRAM_API ?? 'https://api.telegram.org').replace(/\/$/, '')
 
 class TelegramError extends Error {}
 
@@ -29,14 +29,21 @@ export const sendMessage = (token, chatId, text, keyboard) =>
     ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
   })
 
-export const editMessage = (token, chatId, messageId, text) =>
+export const editMessage = (token, chatId, messageId, text, keyboard) =>
   call(token, 'editMessageText', {
     chat_id: chatId,
     message_id: messageId,
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
+    ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
   })
+
+export const deleteMessage = (token, chatId, messageId) =>
+  call(token, 'deleteMessage', { chat_id: chatId, message_id: messageId })
+
+export const setCommands = (token, chatId, commands) =>
+  call(token, 'setMyCommands', { commands, scope: { type: 'chat', chat_id: chatId } })
 
 export const answerCallback = (token, id, text) =>
   call(token, 'answerCallbackQuery', { callback_query_id: id, text, show_alert: false })
