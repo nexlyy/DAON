@@ -72,7 +72,13 @@ export function Categories({ editing }: { editing: Editing }) {
       </div>
 
       {failure && <Message kind="bad">{failure}</Message>}
-      <Save dirty={dirty} saving={editing.saving} onSave={commit} onUndo={undo} />
+      <Save
+          dirty={dirty}
+          saving={editing.saving}
+          onSave={commit}
+          onUndo={undo}
+          pending={editing.pending.includes('categories')}
+        />
 
       {copy.categories.map((category) => (
         <div key={category.id} className={styles.card}>

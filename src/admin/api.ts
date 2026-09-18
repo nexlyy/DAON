@@ -98,7 +98,14 @@ let csrf = ''
 
 export const token = () => csrf
 
-async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
+async function call<T>(method: string, path: string, body?: unknown, again = true): Promise<T> {
+  // A write has to carry the session's token, and a page that has just been
+  // loaded holds the cookie but no token yet. Asking for one first turns what
+  // would be a refused save into a save.
+  if (method !== 'GET' && !csrf && path !== '/session') {
+    await call<State>('GET', '/session', undefined, false).catch(() => null)
+  }
+
   let response: Response
   try {
     response = await fetch(`${BASE}${path}`, {
@@ -124,6 +131,12 @@ async function call<T>(method: string, path: string, body?: unknown): Promise<T>
   if (typeof payload.csrf === 'string') csrf = payload.csrf
 
   if (!response.ok) {
+    // A token that has gone stale is worth one quiet retry; anything else is
+    // the person's to see.
+    if (response.status === 403 && again && /token/i.test(String(payload.error ?? ''))) {
+      await call<State>('GET', '/session', undefined, false)
+      return call<T>(method, path, body, false)
+    }
     throw new ApiError(
       typeof payload.error === 'string' ? payload.error : `The server answered ${response.status}.`,
       response.status,
@@ -144,7 +157,11 @@ export const api = {
 
   session: () => call<State>('GET', '/session'),
 
-  signOut: () => call<{ ok: true }>('DELETE', '/session'),
+  signOut: async () => {
+    const out = await call<{ ok: true }>('DELETE', '/session')
+    csrf = ''
+    return out
+  },
 
   changePassword: (current: string, next: string) =>
     call<State>('PUT', '/password', { current, next }),

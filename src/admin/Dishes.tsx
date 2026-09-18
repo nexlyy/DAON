@@ -143,7 +143,13 @@ export function Dishes({ editing }: { editing: Editing }) {
         <Button onClick={add}>Add a dish</Button>
       </div>
 
-      <Save dirty={dirty} saving={editing.saving} onSave={commit} onUndo={undo} />
+      <Save
+          dirty={dirty}
+          saving={editing.saving}
+          onSave={commit}
+          onUndo={undo}
+          pending={editing.pending.includes('menu')}
+        />
 
       <table className={styles.table}>
         <thead>
@@ -373,7 +379,14 @@ export function Dishes({ editing }: { editing: Editing }) {
             />
           </Field>
 
-          <Save dirty={dirty} saving={editing.saving} onSave={commit} onUndo={undo} />
+          {failure && <Message kind="bad">{failure}</Message>}
+          <Save
+            dirty={dirty}
+            saving={editing.saving}
+            onSave={commit}
+            onUndo={undo}
+            pending={editing.pending.includes('menu')}
+          />
         </div>
       )}
     </>

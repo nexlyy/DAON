@@ -291,12 +291,16 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
     }
   }
 
-  const state = () => ({
+  const state = (session) => ({
     user: credentials()?.user ?? null,
     mustChange: credentials()?.mustChange === true,
     meta: content.meta(),
     pending: content.pending(),
     canRender: render.ready(),
+    // The token every write has to carry. It travels with each answer, so a
+    // page that has been reloaded — or left open overnight — always holds a
+    // current one instead of failing on the next save.
+    ...(session ? { csrf: session.csrf } : {}),
   })
 
   async function handle(request, response, url) {
@@ -357,7 +361,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
         request,
         response,
         200,
-        { csrf: session.csrf, ...state() },
+        state(session),
         cookieFor(request, session.token),
       )
     }
@@ -371,11 +375,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
 
     if (path === '/session' && request.method === 'GET') {
       saveSessions()
-      return json(request, response, 200, {
-        csrf: session.csrf,
-        since: session.created,
-        ...state(),
-      })
+      return json(request, response, 200, { since: session.created, ...state(session) })
     }
 
     if (path === '/session' && request.method === 'DELETE') {
@@ -427,7 +427,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       saveSessions()
       note({ what: 'password changed', user: stored.user, ip })
       notifyStaff?.('Admin panel: the password was changed.')
-      return json(request, response, 200, state())
+      return json(request, response, 200, state(session))
     }
 
     // Nothing about the site can change while the first password still stands.
@@ -442,7 +442,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
 
     if (path === '/content' && request.method === 'GET') {
       return json(request, response, 200, {
-        ...state(),
+        ...state(session),
         draft: content.readDraft(),
         live: content.readLive(),
       })
@@ -459,13 +459,13 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       if (sent.revision !== undefined && sent.revision !== meta.revision) {
         return json(request, response, 409, {
           error: 'someone else saved a change while this page was open',
-          ...state(),
+          ...state(session),
         })
       }
       try {
         const saved = content.save(name, sent.value, session.user)
         note({ what: `saved ${name}`, user: session.user, ip })
-        return json(request, response, 200, { ...state(), value: saved.value })
+        return json(request, response, 200, { ...state(session), value: saved.value })
       } catch (failure) {
         if (failure instanceof Invalid) {
           return json(request, response, 400, { error: failure.message })
@@ -478,7 +478,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       try {
         content.verify()
         const drawn = await render.check()
-        return json(request, response, 200, { ...state(), ...drawn })
+        return json(request, response, 200, { ...state(session), ...drawn })
       } catch (failure) {
         return json(request, response, 400, { error: failure.message })
       }
@@ -504,7 +504,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
         notifyStaff?.(
           `Admin panel: the site was published. ${written.pages} pages rewritten in ${(written.ms / 1000).toFixed(1)}s.`,
         )
-        return json(request, response, 200, { ...state(), version: promoted.version, ...written })
+        return json(request, response, 200, { ...state(session), version: promoted.version, ...written })
       } catch (failure) {
         note({ what: 'publish failed', user: session.user, ip, why: shorten(failure.message, 300) })
         return json(request, response, 400, { error: failure.message })
@@ -527,7 +527,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       try {
         const written = await photos.save(dishId, bytes)
         note({ what: 'photograph uploaded', user: session.user, ip, dish: dishId })
-        return json(request, response, 200, { ...state(), ...written })
+        return json(request, response, 200, { ...state(session), ...written })
       } catch (failure) {
         return json(request, response, 400, { error: failure.message })
       }
@@ -546,7 +546,7 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       try {
         content.restore(shorten(sent.version, 40), session.user)
         note({ what: 'restored', user: session.user, ip, version: shorten(sent.version, 40) })
-        return json(request, response, 200, { ...state(), draft: content.readDraft() })
+        return json(request, response, 200, { ...state(session), draft: content.readDraft() })
       } catch (failure) {
         if (failure instanceof Invalid) {
           return json(request, response, 400, { error: failure.message })

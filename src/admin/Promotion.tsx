@@ -29,7 +29,13 @@ export function Promotion({ editing }: { editing: Editing }) {
       </div>
 
       {failure && <Message kind="bad">{failure}</Message>}
-      <Save dirty={dirty} saving={editing.saving} onSave={commit} onUndo={undo} />
+      <Save
+          dirty={dirty}
+          saving={editing.saving}
+          onSave={commit}
+          onUndo={undo}
+          pending={editing.pending.includes('promo')}
+        />
 
       {!promo && (
         <div className={styles.card}>

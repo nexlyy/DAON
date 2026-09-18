@@ -130,7 +130,13 @@ export function Texts({ editing }: { editing: Editing }) {
       </p>
 
       {failure && <Message kind="bad">{failure}</Message>}
-      <Save dirty={dirty} saving={editing.saving} onSave={commit} onUndo={undo} />
+      <Save
+          dirty={dirty}
+          saving={editing.saving}
+          onSave={commit}
+          onUndo={undo}
+          pending={editing.pending.includes('texts')}
+        />
 
       {GROUPS.map((group) => (
         <div key={group.title} className={styles.card}>

@@ -132,17 +132,23 @@ export function Message({ kind, children }: { kind: 'bad' | 'good' | 'info'; chi
   )
 }
 
-/** A save button that says what it is doing and goes quiet when there is nothing to do. */
+/**
+ * The save row. Saving writes a draft and nothing else, so when there is a
+ * draft waiting this says so plainly: the one mistake worth designing against
+ * is someone saving, seeing no change on the site, and assuming it broke.
+ */
 export function Save({
   dirty,
   saving,
   onSave,
   onUndo,
+  pending = false,
 }: {
   dirty: boolean
   saving: boolean
   onSave: () => void
   onUndo: () => void
+  pending?: boolean
 }) {
   return (
     <div className={styles.tools}>
@@ -152,6 +158,12 @@ export function Save({
       <Button onClick={onUndo} disabled={!dirty || saving}>
         Undo changes
       </Button>
+      {dirty && !saving && <span className={styles.rowSub}>not saved yet</span>}
+      {!dirty && pending && (
+        <span className={styles.waiting}>
+          saved as a draft — press Publish, at the top, to put it on daon.pl
+        </span>
+      )}
     </div>
   )
 }

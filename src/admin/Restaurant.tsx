@@ -43,7 +43,13 @@ export function Restaurant({ editing }: { editing: Editing }) {
       </div>
 
       {failure && <Message kind="bad">{failure}</Message>}
-      <Save dirty={dirty} saving={editing.saving} onSave={commit} onUndo={undo} />
+      <Save
+          dirty={dirty}
+          saving={editing.saving}
+          onSave={commit}
+          onUndo={undo}
+          pending={editing.pending.includes('restaurant')}
+        />
 
       <div className={styles.card}>
         <div className={styles.cardHead}>

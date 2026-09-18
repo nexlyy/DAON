@@ -77,10 +77,18 @@ export default function AdminPage() {
         const next = await api.save(file, value, state.meta.revision)
         setState((was) => (was ? { ...was, ...next } : next))
         setContent((was) => (was ? { ...was, [file]: next.value } : was))
+        setDone('Saved. It is a draft until you press Publish — the site still shows the old one.')
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
         setFailure(message)
         if (error instanceof ApiError && error.status === 409) await load()
+        // A session that has ended cannot be saved through. Better to ask for
+        // the password again than to let someone type into a page that is no
+        // longer signed in.
+        if (error instanceof ApiError && error.status === 401) {
+          setFailure('The session ended. Sign in again — nothing you saved before is lost.')
+          setState(null)
+        }
         throw error
       } finally {
         setSaving(false)
@@ -105,7 +113,7 @@ export default function AdminPage() {
 
   return (
     <div className={styles.shell}>
-      <header className={styles.bar}>
+      <header className={styles.bar} data-waiting={state.pending.length > 0 || undefined}>
         <span className={styles.mark}>DAON</span>
         {state.pending.length > 0 ? (
           <span className={styles.pending}>

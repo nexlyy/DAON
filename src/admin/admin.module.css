@@ -477,3 +477,15 @@
   color: #a3352c;
   font-weight: 500;
 }
+
+.waiting {
+  padding: 0.3em 0.7em;
+  border-radius: var(--radius-pill);
+  background: var(--gold-wash);
+  color: var(--gold-text);
+  font-size: 0.78rem;
+}
+
+.bar[data-waiting] .primary {
+  box-shadow: 0 0 0 3px var(--gold-wash);
+}
