@@ -97,6 +97,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = readStoredLocale()
     const { locale: shown, page: current, search, hash } = where.current
+    // The admin panel has one address and no language of its own; sending it
+    // to /en/admin would land on a page that does not exist.
+    if (current === '/admin' || current.startsWith('/admin/')) return
     if (stored && stored !== ROOT_LOCALE && shown === ROOT_LOCALE) {
       navigate(`${localePath(stored, current)}${search}${hash}`, { replace: true })
     }

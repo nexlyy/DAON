@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar/Navbar'
 import { Footer } from '@/components/Footer/Footer'
 import { LanguageHint } from '@/components/LanguageSwitcher/LanguageHint'
@@ -32,18 +32,29 @@ const PAGES: [string, ReactNode][] = [
   ['/privacy', <PrivacyPage />],
 ]
 
+const ADMIN = /^(?:\/(?:en|ko))?\/admin(?:\/|$)/
+
 export function App() {
   const { pathname } = useLocation()
 
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
-    return (
-      <Suspense fallback={null}>
-        <AdminPage />
-      </Suspense>
-    )
-  }
+  if (ADMIN.test(pathname)) return <Admin />
 
   return <Site />
+}
+
+function Admin() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (pathname !== '/admin') navigate('/admin', { replace: true })
+  }, [pathname, navigate])
+
+  return (
+    <Suspense fallback={null}>
+      <AdminPage />
+    </Suspense>
+  )
 }
 
 function Site() {
