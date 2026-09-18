@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import type { Editing } from './AdminPage'
 import { useLocalCopy } from './AdminPage'
 import type { Dish } from './api'
@@ -103,6 +103,200 @@ export function Dishes({ editing }: { editing: Editing }) {
 
   const open = menu.dishes.find((dish) => dish.id === openId) ?? null
 
+  // Opening the last dish on a screenful puts the editor just below the fold,
+  // so it is brought up far enough to be seen and no further.
+  const editorRow = useRef<HTMLTableRowElement>(null)
+  useEffect(() => {
+    if (openId) editorRow.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, [openId])
+
+  // The editor sits inside the table, right under the dish that was
+  // clicked. Below ninety-eight rows it would open off the screen, which
+  // looks exactly like nothing happening.
+  const editor = open ? (
+    <div className={styles.card}>
+      <div className={styles.cardHead}>
+        <h2 className={styles.cardTitle}>
+          {open.number} · {open.name.en || 'New dish'}
+        </h2>
+        <Button kind="danger" onClick={() => remove(open)}>
+          Remove
+        </Button>
+      </div>
+
+      <div className={styles.row}>
+        <Text
+          label="Number"
+          value={open.number}
+          onChange={(value) => change(open.id, { number: value.trim() })}
+          hint="As printed on the menu."
+        />
+        <Field label="Category">
+          <select
+            className={styles.select}
+            value={open.categoryId}
+            onChange={(event) => change(open.id, { categoryId: event.target.value })}
+          >
+            {categories.map((one) => (
+              <option key={one.id} value={one.id}>
+                {one.name.en}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Text
+          label={`Price in ${editing.content.restaurant.place.currency}`}
+          value={String(open.price)}
+          onChange={(value) => change(open.id, { price: Number(value.replace(',', '.')) || 0 })}
+        />
+        <Text
+          label="Portion"
+          value={open.portion ?? ''}
+          onChange={(value) => change(open.id, { portion: value || undefined })}
+          hint="For example 150g. Leave empty if the menu does not say."
+        />
+        <Text
+          label="Serves"
+          value={open.serves ?? ''}
+          onChange={(value) => change(open.id, { serves: value || undefined })}
+          hint="For example 2-3 people."
+        />
+      </div>
+
+      <PhotoPicker
+        dishId={open.id}
+        photo={open.photo}
+        onPhoto={(photo) => change(open.id, { photo: photo || undefined })}
+      />
+
+      <div className={styles.langs}>
+        <Text
+          label="Name — English"
+          value={open.name.en}
+          onChange={(value) => change(open.id, { name: { ...open.name, en: value } })}
+        />
+        <Text
+          label="Name — Polish"
+          value={open.name.pl ?? ''}
+          lang="pl"
+          onChange={(value) => change(open.id, { name: { ...open.name, pl: value } })}
+        />
+        <Text
+          label="Name — Korean"
+          value={open.name.ko ?? ''}
+          lang="ko"
+          onChange={(value) => change(open.id, { name: { ...open.name, ko: value } })}
+        />
+      </div>
+
+      <div className={styles.langs}>
+        <Lines
+          label="Description — English"
+          value={open.description?.en ?? ''}
+          onChange={(value) =>
+            change(open.id, { description: { ...open.description, en: value } })
+          }
+        />
+        <Lines
+          label="Description — Polish"
+          value={open.description?.pl ?? ''}
+          lang="pl"
+          onChange={(value) =>
+            change(open.id, { description: { ...open.description, pl: value } })
+          }
+        />
+        <Lines
+          label="Description — Korean"
+          value={open.description?.ko ?? ''}
+          lang="ko"
+          onChange={(value) =>
+            change(open.id, { description: { ...open.description, ko: value } })
+          }
+        />
+      </div>
+
+      <div>
+        <p className={styles.label}>On the plate</p>
+        <div className={styles.checks}>
+          {TAGS.map(([tag, label]) => (
+            <Check
+              key={tag}
+              label={label}
+              checked={(open.tags ?? []).includes(tag)}
+              onChange={(on) =>
+                change(open.id, {
+                  tags: on
+                    ? [...(open.tags ?? []), tag]
+                    : (open.tags ?? []).filter((one) => one !== tag),
+                })
+              }
+            />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className={styles.label}>Allergens the kitchen marks for this dish</p>
+        <div className={styles.checks}>
+          {tracked.map((one) => (
+            <Check
+              key={one}
+              label={one}
+              checked={(open.allergens ?? []).includes(one)}
+              onChange={(on) =>
+                change(open.id, {
+                  allergens: on
+                    ? [...(open.allergens ?? []), one]
+                    : (open.allergens ?? []).filter((each) => each !== one),
+                })
+              }
+            />
+          ))}
+        </div>
+        <p className={styles.note}>
+          {editing.content.allergens.widespread.join(', ')} are in nearly every dish, so the
+          menu says that once instead of on each card.
+        </p>
+      </div>
+
+      <div className={styles.checks}>
+        <Check
+          label="Show on the home page"
+          checked={open.featured === true}
+          onChange={(on) => change(open.id, { featured: on || undefined })}
+        />
+        <Check
+          label="Hidden from the menu"
+          checked={open.hidden === true}
+          onChange={(on) => change(open.id, { hidden: on || undefined })}
+        />
+      </div>
+
+      <Field label="Address on the site" hint="Changing this changes the link to the dish.">
+        <input
+          className={styles.input}
+          value={open.id}
+          onChange={(event) => {
+            const id = slug(event.target.value)
+            setMenu({
+              dishes: menu.dishes.map((dish) => (dish.id === open.id ? { ...dish, id } : dish)),
+            })
+            setOpenId(id)
+          }}
+        />
+      </Field>
+
+      {failure && <Message kind="bad">{failure}</Message>}
+      <Save
+        dirty={dirty}
+        saving={editing.saving}
+        onSave={commit}
+        onUndo={undo}
+        pending={editing.pending.includes('menu')}
+      />
+    </div>
+  ) : null
+
   return (
     <>
       <div className={styles.head}>
@@ -164,7 +358,8 @@ export function Dishes({ editing }: { editing: Editing }) {
         </thead>
         <tbody>
           {shown.map((dish) => (
-            <tr key={dish.id} data-open={dish.id === openId}>
+            <Fragment key={dish.id}>
+            <tr data-open={dish.id === openId || undefined}>
               <td className={styles.num}>{dish.number}</td>
               <td>
                 <button
@@ -202,193 +397,19 @@ export function Dishes({ editing }: { editing: Editing }) {
                 </div>
               </td>
             </tr>
+
+            {dish.id === openId && (
+              <tr ref={editorRow}>
+                <td className={styles.editorCell} colSpan={6}>
+                  {editor}
+                </td>
+              </tr>
+            )}
+            </Fragment>
           ))}
         </tbody>
       </table>
 
-      {open && (
-        <div className={styles.card}>
-          <div className={styles.cardHead}>
-            <h2 className={styles.cardTitle}>
-              {open.number} · {open.name.en || 'New dish'}
-            </h2>
-            <Button kind="danger" onClick={() => remove(open)}>
-              Remove
-            </Button>
-          </div>
-
-          <div className={styles.row}>
-            <Text
-              label="Number"
-              value={open.number}
-              onChange={(value) => change(open.id, { number: value.trim() })}
-              hint="As printed on the menu."
-            />
-            <Field label="Category">
-              <select
-                className={styles.select}
-                value={open.categoryId}
-                onChange={(event) => change(open.id, { categoryId: event.target.value })}
-              >
-                {categories.map((one) => (
-                  <option key={one.id} value={one.id}>
-                    {one.name.en}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Text
-              label={`Price in ${editing.content.restaurant.place.currency}`}
-              value={String(open.price)}
-              onChange={(value) => change(open.id, { price: Number(value.replace(',', '.')) || 0 })}
-            />
-            <Text
-              label="Portion"
-              value={open.portion ?? ''}
-              onChange={(value) => change(open.id, { portion: value || undefined })}
-              hint="For example 150g. Leave empty if the menu does not say."
-            />
-            <Text
-              label="Serves"
-              value={open.serves ?? ''}
-              onChange={(value) => change(open.id, { serves: value || undefined })}
-              hint="For example 2-3 people."
-            />
-          </div>
-
-          <PhotoPicker
-            dishId={open.id}
-            photo={open.photo}
-            onPhoto={(photo) => change(open.id, { photo: photo || undefined })}
-          />
-
-          <div className={styles.langs}>
-            <Text
-              label="Name — English"
-              value={open.name.en}
-              onChange={(value) => change(open.id, { name: { ...open.name, en: value } })}
-            />
-            <Text
-              label="Name — Polish"
-              value={open.name.pl ?? ''}
-              lang="pl"
-              onChange={(value) => change(open.id, { name: { ...open.name, pl: value } })}
-            />
-            <Text
-              label="Name — Korean"
-              value={open.name.ko ?? ''}
-              lang="ko"
-              onChange={(value) => change(open.id, { name: { ...open.name, ko: value } })}
-            />
-          </div>
-
-          <div className={styles.langs}>
-            <Lines
-              label="Description — English"
-              value={open.description?.en ?? ''}
-              onChange={(value) =>
-                change(open.id, { description: { ...open.description, en: value } })
-              }
-            />
-            <Lines
-              label="Description — Polish"
-              value={open.description?.pl ?? ''}
-              lang="pl"
-              onChange={(value) =>
-                change(open.id, { description: { ...open.description, pl: value } })
-              }
-            />
-            <Lines
-              label="Description — Korean"
-              value={open.description?.ko ?? ''}
-              lang="ko"
-              onChange={(value) =>
-                change(open.id, { description: { ...open.description, ko: value } })
-              }
-            />
-          </div>
-
-          <div>
-            <p className={styles.label}>On the plate</p>
-            <div className={styles.checks}>
-              {TAGS.map(([tag, label]) => (
-                <Check
-                  key={tag}
-                  label={label}
-                  checked={(open.tags ?? []).includes(tag)}
-                  onChange={(on) =>
-                    change(open.id, {
-                      tags: on
-                        ? [...(open.tags ?? []), tag]
-                        : (open.tags ?? []).filter((one) => one !== tag),
-                    })
-                  }
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className={styles.label}>Allergens the kitchen marks for this dish</p>
-            <div className={styles.checks}>
-              {tracked.map((one) => (
-                <Check
-                  key={one}
-                  label={one}
-                  checked={(open.allergens ?? []).includes(one)}
-                  onChange={(on) =>
-                    change(open.id, {
-                      allergens: on
-                        ? [...(open.allergens ?? []), one]
-                        : (open.allergens ?? []).filter((each) => each !== one),
-                    })
-                  }
-                />
-              ))}
-            </div>
-            <p className={styles.note}>
-              {editing.content.allergens.widespread.join(', ')} are in nearly every dish, so the
-              menu says that once instead of on each card.
-            </p>
-          </div>
-
-          <div className={styles.checks}>
-            <Check
-              label="Show on the home page"
-              checked={open.featured === true}
-              onChange={(on) => change(open.id, { featured: on || undefined })}
-            />
-            <Check
-              label="Hidden from the menu"
-              checked={open.hidden === true}
-              onChange={(on) => change(open.id, { hidden: on || undefined })}
-            />
-          </div>
-
-          <Field label="Address on the site" hint="Changing this changes the link to the dish.">
-            <input
-              className={styles.input}
-              value={open.id}
-              onChange={(event) => {
-                const id = slug(event.target.value)
-                setMenu({
-                  dishes: menu.dishes.map((dish) => (dish.id === open.id ? { ...dish, id } : dish)),
-                })
-                setOpenId(id)
-              }}
-            />
-          </Field>
-
-          {failure && <Message kind="bad">{failure}</Message>}
-          <Save
-            dirty={dirty}
-            saving={editing.saving}
-            onSave={commit}
-            onUndo={undo}
-            pending={editing.pending.includes('menu')}
-          />
-        </div>
-      )}
     </>
   )
 }

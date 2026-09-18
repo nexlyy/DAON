@@ -489,3 +489,8 @@
 .bar[data-waiting] .primary {
   box-shadow: 0 0 0 3px var(--gold-wash);
 }
+
+.editorCell {
+  padding: 0 0 1rem !important;
+  background: var(--paper);
+}
