@@ -51,6 +51,10 @@ const DAY_MS = 24 * 60 * 60 * 1000
 
 const STAFF = parseStaff(process.env.TELEGRAM_STAFF_IDS)
 
+// Who is not told about the admin panel — signing in, publishing, a locked
+// address. They still get everything about the bookings.
+const ADMIN_QUIET = parseStaff(process.env.ADMIN_QUIET_IDS)
+
 if (!TOKEN) {
   console.error('TELEGRAM_BOT_TOKEN is not set. Copy .env.example to .env and fill it in.')
   process.exit(1)
@@ -148,8 +152,13 @@ async function adoptOlderAlerts() {
 
 async function notifyStaff(text, keyboard, { except } = {}) {
   const sent = []
+  const skip = new Set(
+    (except === undefined ? [] : Array.isArray(except) || except instanceof Set ? [...except] : [except]).map(
+      String,
+    ),
+  )
   for (const id of STAFF) {
-    if (except !== undefined && String(except) === String(id)) continue
+    if (skip.has(String(id))) continue
     try {
       const message = await sendMessage(TOKEN, id, text, keyboard)
       sent.push({ chatId: Number(id), messageId: message.message_id })
@@ -617,7 +626,7 @@ const admin = createAdmin({
   content,
   render,
   photos,
-  notifyStaff: (text) => notifyStaff(text).catch(() => {}),
+  notifyStaff: (text) => notifyStaff(text, undefined, { except: ADMIN_QUIET }).catch(() => {}),
   // The hours and the reservation rules are the restaurant's to change too, so
   // a publish has to reach the booking side of the API, not only the pages.
   onPublished: (published) => {
@@ -666,7 +675,8 @@ server.listen(PORT, '127.0.0.1', () => {
   console.log(`DAON API on :${PORT} — store: ${store.kind}, bot @${me.username}`)
   console.log(
     admin.configured()
-      ? `Admin panel: on, pending changes: ${content.pending().length}.`
+      ? `Admin panel: on, pending changes: ${content.pending().length}.` +
+          (ADMIN_QUIET.size > 0 ? ` Not reported to ${ADMIN_QUIET.size} staff account(s).` : '')
       : 'Admin panel: off (ADMIN_USER and ADMIN_PASSWORD are not set).',
   )
   console.log(`Staff: ${STAFF.size} account(s).`)

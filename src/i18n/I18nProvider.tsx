@@ -127,7 +127,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
     const list = (key: string) => {
       const found = lookup(dictionary, key) ?? lookup(dictionaries[DEFAULT_LOCALE], key)
-      return Array.isArray(found) ? (found as string[]) : []
+      if (!Array.isArray(found)) return []
+      return (found as string[]).map((one, at) => overridden(locale, `${key}.${at}`) ?? one)
     }
 
     const resolve = (text: Translatable | undefined) => {
