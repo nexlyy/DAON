@@ -2,7 +2,9 @@ import { createServer } from 'node:http'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import { createAdmin } from './admin.js'
 import {
+  applyContent,
   parseISODate,
   resolveTableGroup,
   rules,
@@ -17,6 +19,9 @@ import { toStaff } from './bookings.js'
 import { cardKeyboard, createBot } from './bot.js'
 import { cancelToken, tokenMatches } from './cancel.js'
 import { isClosed } from './closures.js'
+import { createContent } from './content.js'
+import { createPhotos } from './photos.js'
+import { createRender } from './render.js'
 import { loadEnv, root } from './env.js'
 import { createGuestMail, readEmail } from './guestmail.js'
 import { createMailer } from './mailer.js'
@@ -354,6 +359,10 @@ let bot
 async function handle(request, response, url) {
   if (request.method === 'OPTIONS') return send(request, response, 204, {})
 
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    return admin.handle(request, response, url)
+  }
+
   if (request.method === 'GET' && url.pathname === '/health') {
     let database = 'ok'
     try {
@@ -601,6 +610,26 @@ async function ownReservation(url) {
   return booking && tokenMatches(booking.id, token) ? booking.id : null
 }
 
+const content = createContent()
+const render = createRender({ content })
+const photos = createPhotos()
+const admin = createAdmin({
+  content,
+  render,
+  photos,
+  notifyStaff: (text) => notifyStaff(text).catch(() => {}),
+  // The hours and the reservation rules are the restaurant's to change too, so
+  // a publish has to reach the booking side of the API, not only the pages.
+  onPublished: (published) => {
+    try {
+      applyContent(published.restaurant)
+    } catch (failure) {
+      console.error('Published content did not reach the booking rules:', failure.message)
+    }
+  },
+  clientIp,
+})
+
 bot = createBot({
   token: TOKEN,
   staff: STAFF,
@@ -630,8 +659,16 @@ const me = await getMe(TOKEN).catch((failure) => {
   process.exit(1)
 })
 
+await admin.bootstrap()
+render.tidy()
+
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`DAON API on :${PORT} — store: ${store.kind}, bot @${me.username}`)
+  console.log(
+    admin.configured()
+      ? `Admin panel: on, pending changes: ${content.pending().length}.`
+      : 'Admin panel: off (ADMIN_USER and ADMIN_PASSWORD are not set).',
+  )
   console.log(`Staff: ${STAFF.size} account(s).`)
 
   setTimeout(() => {

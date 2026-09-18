@@ -13,9 +13,20 @@ interface Props {
 const LARGE = 640
 const SMALL = 320
 
+/**
+ * A photograph is either one of the ones that ship with the site or one
+ * uploaded from the admin panel, which live outside the published directory so
+ * a deploy cannot take them down. The name says which: "u:" is an upload.
+ */
+const file = (photo: string, ext: string, small = false) => {
+  const uploaded = photo.startsWith('u:')
+  const name = uploaded ? photo.slice(2) : photo
+  const dir = uploaded ? 'u/dishes' : 'images/dishes'
+  return asset(`${dir}/${small ? 'sm/' : ''}${name}.${ext}`)
+}
+
 const set = (photo: string, ext: string) =>
-  `${asset(`images/dishes/sm/${photo}.${ext}`)} ${SMALL}w, ` +
-  `${asset(`images/dishes/${photo}.${ext}`)} ${LARGE}w`
+  `${file(photo, ext, true)} ${SMALL}w, ${file(photo, ext)} ${LARGE}w`
 
 export function DishPhoto({
   photo,
@@ -30,7 +41,7 @@ export function DishPhoto({
       <source type="image/webp" srcSet={set(photo, 'webp')} sizes={sizes} />
       <img
         className={className}
-        src={asset(`images/dishes/${photo}.webp`)}
+        src={file(photo, 'webp')}
         alt={alt}
         width={LARGE}
         height={LARGE}

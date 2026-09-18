@@ -22,7 +22,7 @@ LIVE="${DAON_CONTENT_DIR:-/opt/daon-api/content/live}"
 
 cd "$(dirname "$0")/.."
 LOCAL=src/content
-FILES='menu.json categories.json allergens.json restaurant.json promo.json'
+FILES='menu.json categories.json allergens.json restaurant.json promo.json texts.json'
 
 local_sum() {
   for file in $FILES; do

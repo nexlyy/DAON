@@ -77,6 +77,56 @@ move. The previous build stays as `/var/www/daon.old`, so a bad deploy is one
 It does not use rsync. The rsync on the machine this is built from is a
 zero-byte stub that exits successfully having copied nothing.
 
+## The menu is content, not code
+
+The dishes, the categories, the hours, the promotion and a short list of site
+wording live in `src/content/*.json`. Each page carries the current copy inline,
+which is why a price shows up in the HTML a crawler reads and not only after
+JavaScript has run.
+
+The live copy of that content is the one on the server, in
+`/opt/daon-api/content/live`, because the admin panel writes it. Publishing from
+here stops if the two have drifted rather than building pages from an older
+menu:
+
+```bash
+sh deploy/content.sh check     # do they differ?
+sh deploy/content.sh pull      # keep the live one, bring it here to commit
+sh deploy/content.sh push      # keep this one, send it to the server
+```
+
+`publish.sh` also uploads what the server needs to write the pages by itself:
+the server bundle (which carries react inside it), the page it renders into, the
+three dictionaries and the two scripts. They go to `/opt/daon-site`, outside the
+web root. Nothing there is served to anyone.
+
+## The admin panel
+
+At `daon.pl/admin`: one page, served from the shell, `noindex`, not linked from
+anywhere. The API behind `/api/admin` decides what it can do.
+
+Editing writes a draft. **Publish** copies the draft over the live content, keeps
+the previous version in `content/history`, renders all twenty pages again from
+the server bundle and swaps them in one file at a time. Nothing is swapped until
+the whole set has rendered and every asset the new pages point at is still on
+disk, so a page can never name a script a later deploy deleted.
+
+Photographs uploaded there are resized by ffmpeg into 640 and 320 pixels in WebP
+and AVIF, and land in `/var/www/daon-uploads`, served from `/u/`. They sit
+outside `/var/www/daon` because publishing replaces that directory whole — a
+deploy would otherwise delete the restaurant's own pictures. Each name carries a
+hash of the file, so a replacement is a new address and browsers can keep them
+for a year. A picture nothing points at any more is removed a week after the
+publish that orphaned it.
+
+The first password comes from `ADMIN_USER` and `ADMIN_PASSWORD` in
+`/opt/daon-api/.env`. The panel is read-only until that password has been
+replaced from inside it; from then on the scrypt hash in
+`/opt/daon-api/data/admin.json` is what counts and the two variables are
+ignored. Five wrong passwords block that address for fifteen minutes, then
+longer, and the staff chat is told about every lock-out, every publish and every
+sign-in from an address no current session is using.
+
 ## The old address
 
 The GitHub Pages copy no longer carries the site. The workflow publishes a

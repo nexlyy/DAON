@@ -42,7 +42,22 @@ const template = readFileSync(templateFile, 'utf8')
 mkdirSync(ssr, { recursive: true })
 writeFileSync(resolve(ssr, 'template.html'), template)
 
-const metaOf = (code) => JSON.parse(readFileSync(resolve(locales, `${code}.json`), 'utf8')).meta
+/**
+ * The title and the description a search engine reads. They come from the
+ * dictionaries, and whatever the restaurant has rewritten in the admin panel
+ * is laid over the top: `meta.title` there replaces `title` here.
+ */
+const metaOf = (code) => {
+  const built = JSON.parse(readFileSync(resolve(locales, `${code}.json`), 'utf8')).meta
+  const changed = snapshot.texts?.[code] ?? {}
+  const out = { ...built }
+  for (const [key, value] of Object.entries(changed)) {
+    if (key.startsWith('meta.') && typeof value === 'string' && value !== '') {
+      out[key.slice('meta.'.length)] = value
+    }
+  }
+  return out
+}
 
 const localized = (locale, path) => (locale.prefix ? (path === '/' ? locale.prefix : `${locale.prefix}${path}`) : path)
 const fileFor = (locale, file) => (locale.prefix ? `${locale.prefix.slice(1)}/${file}` : file)

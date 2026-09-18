@@ -1,27 +1,39 @@
+/**
+ * Writes reservation-data.json: what the API needs to know about the place
+ * without reading the site's source.
+ *
+ * The hours, the reservation rules and the address come from the site's content
+ * files, which the admin panel also edits — the API rewrites these three
+ * sections itself when something is published, so the two never drift. The
+ * tables and the zones come from the floor plan, which is still code.
+ */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..', '..')
 
-const load = (relative) => import(pathToFileURL(resolve(root, relative)).href)
+const json = (relative) => JSON.parse(readFileSync(resolve(root, relative), 'utf8'))
 
-const { legal, openingHours, reservation, restaurant } = await load('src/data/restaurant.ts')
-const { floorPlan } = await load('src/data/tables/floorPlan.ts')
+const { floorPlan } = await import(
+  pathToFileURL(resolve(root, 'src/data/tables/floorPlan.ts')).href
+)
 
-const strings = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/en.json'), 'utf8'))
+const content = json('src/content/restaurant.json')
+const strings = json('src/i18n/locales/en.json')
+
+const { place, hours, reservation, legal } = content
 
 const data = {
-  generatedFrom: 'src/data/restaurant.ts, src/data/tables/floorPlan.ts',
-  openingHours,
+  generatedFrom: 'src/content/restaurant.json, src/data/tables/floorPlan.ts',
+  openingHours: hours,
   reservation,
   restaurant: {
-    name: restaurant.name,
-    phone: restaurant.phone,
-    email: restaurant.email,
-    address: `${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`,
+    name: place.name,
+    phone: place.phone,
+    email: place.email,
+    address: `${place.address.street}, ${place.address.postalCode} ${place.address.city}`,
     site: 'https://daon.pl',
     company: legal.companyName,
   },

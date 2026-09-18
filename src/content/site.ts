@@ -12,6 +12,7 @@ import allergenMeta from './allergens.json'
 import categoriesJson from './categories.json'
 import promoJson from './promo.json'
 import restaurantJson from './restaurant.json'
+import textsJson from './texts.json'
 
 export interface RawText {
   en: string
@@ -49,6 +50,12 @@ export interface RawSnapshot {
   allergens: { tracked: string[]; widespread: string[] }
   restaurant: typeof restaurantJson
   promo: typeof promoJson
+
+  /**
+   * Site wording the restaurant has changed itself, by locale and by the key
+   * the page asks for. Anything not in here reads as the site was built.
+   */
+  texts: Record<string, Record<string, string>>
 }
 
 declare global {
@@ -69,10 +76,5 @@ export const site: RawSnapshot = {
   allergens: injected?.allergens ?? allergenMeta,
   restaurant: injected?.restaurant ?? restaurantJson,
   promo: injected?.promo ?? promoJson,
-}
-
-if (import.meta.env.SSR && site.dishes.length === 0) {
-  throw new Error(
-    'no content snapshot: set globalThis.__DAON__ before importing the server bundle',
-  )
+  texts: injected?.texts ?? textsJson,
 }

@@ -164,6 +164,43 @@ falls back to the in-browser demo adapter, which forgets everything on reload.
 The service has to be reachable over HTTPS from the published site: a browser on
 `https://` will not call an `http://` endpoint.
 
+## The admin panel
+
+The restaurant edits its own site at `daon.pl/admin`; this is the half of it that
+holds the keys. Three things live behind `/api/admin`:
+
+- `content.js` — the menu, the categories, the hours, the promotion and the site
+  wording, in three copies: `live` (what the pages are rendered from), `draft`
+  (what the panel writes) and `history` (the last sixty live copies). Everything
+  the panel sends is checked first: a price that is not a number, a dish in a
+  category that does not exist or a piece of wording that lost its `{percent}`
+  is refused with a sentence saying which dish and which field.
+- `render.js` — runs the prerender from `/opt/daon-site` and swaps the twenty
+  pages in one at a time, but only once the whole set has rendered and every
+  asset the new pages name is still on disk.
+- `photos.js` — writes an uploaded picture at 640 and 320 pixels in WebP and
+  AVIF with ffmpeg, into `/var/www/daon-uploads`, named after a hash of the
+  file.
+
+What guards it:
+
+- the password is a scrypt hash in `data/admin.json`, never in the repository,
+  and `ADMIN_USER` / `ADMIN_PASSWORD` in `.env` only set the first one;
+- until that first password is replaced from inside the panel, every write
+  answers 423 — a password that has been typed into a chat cannot change what a
+  guest reads;
+- five wrong guesses from one address block it for fifteen minutes, then thirty,
+  then an hour, then four;
+- the session is an HttpOnly, SameSite=Strict cookie confined to `/api/admin`,
+  and every write also has to carry that session's own token in a header;
+- the staff chat is told about every lock-out, every publish, every password
+  change and every sign-in from an address none of the current sessions use;
+- `data/admin-log.jsonl` keeps who did what, and the panel shows it.
+
+A publish also rewrites the hours and the reservation rules inside
+`reservation-data.json`, so the booking form and the page can never disagree
+about when the kitchen closes.
+
 ## Deployment
 
 It runs on the VPS as `daon-api.service`, in `/opt/daon-api`, behind nginx at

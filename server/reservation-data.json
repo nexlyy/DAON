@@ -1,5 +1,5 @@
 {
-  "generatedFrom": "src/data/restaurant.ts, src/data/tables/floorPlan.ts",
+  "generatedFrom": "src/content/restaurant.json, src/data/tables/floorPlan.ts",
   "openingHours": {
     "0": [
       "12:00",

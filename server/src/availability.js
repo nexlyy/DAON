@@ -1,12 +1,46 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { root } from './env.js'
 
-const data = JSON.parse(readFileSync(resolve(root, 'reservation-data.json'), 'utf8'))
+const FILE = resolve(root, 'reservation-data.json')
+
+const data = JSON.parse(readFileSync(FILE, 'utf8'))
 
 export const { openingHours, reservation: rules, restaurant, tables, zones } = data
 export const tableById = new Map(tables.map((table) => [table.id, table]))
+
+/**
+ * The hours and the reservation rules are also part of what the restaurant can
+ * change on the site, so a publish has to reach this file too — otherwise the
+ * page would say the kitchen closes at 23:00 while the booking form still
+ * stopped at 22:00. The objects are filled in place, because everything that
+ * reads them holds the same reference.
+ */
+export function applyContent(content) {
+  const next = {
+    openingHours: content.hours,
+    reservation: content.reservation,
+    restaurant: {
+      name: content.place.name,
+      phone: content.place.phone,
+      email: content.place.email,
+      address: `${content.place.address.street}, ${content.place.address.postalCode} ${content.place.address.city}`,
+      site: 'https://daon.pl',
+      company: content.legal.companyName,
+    },
+  }
+
+  const current = JSON.parse(readFileSync(FILE, 'utf8'))
+  const temporary = `${FILE}.writing`
+  writeFileSync(temporary, `${JSON.stringify({ ...current, ...next }, null, 2)}\n`)
+  renameSync(temporary, FILE)
+
+  for (const key of Object.keys(openingHours)) delete openingHours[key]
+  Object.assign(openingHours, next.openingHours)
+  Object.assign(rules, next.reservation)
+  Object.assign(restaurant, next.restaurant)
+}
 
 const pad = (value) => String(value).padStart(2, '0')
 const toMinutes = (time) => {

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar/Navbar'
@@ -17,6 +17,11 @@ import styles from './App.module.css'
 
 const LOCALE_ROUTES = Object.values(LOCALE_PREFIX)
 
+// The panel the restaurant edits its own content from. It is a chunk of its
+// own, so a guest loading the menu never downloads any of it, and it has none
+// of the site's own frame around it.
+const AdminPage = lazy(() => import('@/admin/AdminPage'))
+
 const PAGES: [string, ReactNode][] = [
   ['/', <HomePage />],
   ['/about', <HomePage />],
@@ -28,6 +33,20 @@ const PAGES: [string, ReactNode][] = [
 ]
 
 export function App() {
+  const { pathname } = useLocation()
+
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return (
+      <Suspense fallback={null}>
+        <AdminPage />
+      </Suspense>
+    )
+  }
+
+  return <Site />
+}
+
+function Site() {
   const { t, switching, page, locale } = useI18n()
 
   useEffect(() => {

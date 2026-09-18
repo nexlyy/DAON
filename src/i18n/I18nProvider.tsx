@@ -13,6 +13,7 @@ import {
   type Locale,
 } from './config'
 import { readStoredLocale, storeLocale } from './detect'
+import { site } from '@/content/site'
 
 type Dictionary = typeof en
 type Params = Record<string, string | number>
@@ -61,8 +62,22 @@ function interpolate(template: string, params?: Params): string {
   )
 }
 
+/**
+ * Wording the restaurant has changed in the admin panel wins over the wording
+ * the site was built with. Only whole strings can be overridden, so a key with
+ * a count or a name in it keeps working the way the page expects.
+ */
+const overridden = (locale: Locale, key: string): string | undefined => {
+  const value = site.texts?.[locale]?.[key]
+  return typeof value === 'string' && value !== '' ? value : undefined
+}
+
 export function translate(locale: Locale, key: string, params?: Params): string {
-  const found = lookup(dictionaries[locale], key) ?? lookup(dictionaries[DEFAULT_LOCALE], key)
+  const found =
+    overridden(locale, key) ??
+    lookup(dictionaries[locale], key) ??
+    overridden(DEFAULT_LOCALE, key) ??
+    lookup(dictionaries[DEFAULT_LOCALE], key)
   return typeof found === 'string' ? interpolate(found, params) : key
 }
 

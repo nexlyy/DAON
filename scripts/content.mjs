@@ -17,20 +17,37 @@ const FILES = {
   allergens: 'allergens.json',
   restaurant: 'restaurant.json',
   promo: 'promo.json',
+  texts: 'texts.json',
 }
 
 const read = (dir, file) => JSON.parse(readFileSync(resolve(dir, file), 'utf8'))
+
+const readIfThere = (dir, file, fallback) => {
+  try {
+    return read(dir, file)
+  } catch {
+    return fallback
+  }
+}
 
 /** The snapshot as the page will carry it. */
 export function readContent(dir) {
   const menu = read(dir, FILES.dishes)
   const categories = read(dir, FILES.categories)
+
+  // A page rendered without dishes would be a menu with nothing on it, which
+  // is worse than a build that stops here.
+  if (!Array.isArray(menu.dishes) || menu.dishes.length === 0) {
+    throw new Error(`${resolve(dir, FILES.dishes)} holds no dishes`)
+  }
+
   return {
     dishes: menu.dishes,
     categories: categories.categories,
     allergens: read(dir, FILES.allergens),
     restaurant: read(dir, FILES.restaurant),
     promo: read(dir, FILES.promo),
+    texts: readIfThere(dir, FILES.texts, { pl: {}, en: {}, ko: {} }),
   }
 }
 

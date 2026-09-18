@@ -61,6 +61,18 @@ export default defineConfig({
   resolve: {
     alias: { '@': resolve(__dirname, 'src') },
   },
+  // The reservation form and the admin panel both talk to the API on the same
+  // origin as the page, so the dev server has to look like the real one: a
+  // cookie for /api/admin is not sent to a different port.
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.DAON_API ?? 'http://127.0.0.1:8787',
+        rewrite: (path: string) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+
   build: {
     outDir: 'dist',
     assetsInlineLimit: 2048,
