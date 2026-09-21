@@ -28,19 +28,60 @@ export function Navbar() {
 
   useLockBodyScroll(drawerOpen)
 
+  /**
+   * The bar gets out of the way going down the page and comes back on the way
+   * up. On a phone that reads as flickering unless it is deliberate about it:
+   * the address bar collapsing, the rubber band at the end of a list and a
+   * finger that wobbles all arrive as small scrolls in the wrong direction. So
+   * it only moves once the page has travelled a real distance one way, and
+   * near the top it is always there.
+   */
   useEffect(() => {
-    let previous = window.scrollY
+    const TRAVEL = 64
+    // Always there at the top of a page; between here and a full screen down
+    // it simply stays as it is, so hovering around that line does not blink.
+    const ALWAYS_SHOWN_BELOW = 200
+    const CAN_HIDE_BELOW = 320
 
-    const onScroll = () => {
-      const current = window.scrollY
-      setScrolled(current > 24)
-      setHidden(current > 320 && current > previous + 4)
-      previous = current
+    let last = Math.max(0, window.scrollY)
+    let turned = last
+    let goingDown = true
+    let frame = 0
+
+    const measure = () => {
+      frame = 0
+      const y = Math.max(0, window.scrollY)
+      setScrolled(y > 24)
+
+      if (y !== last) {
+        const down = y > last
+        if (down !== goingDown) {
+          goingDown = down
+          turned = last
+        }
+        last = y
+      }
+
+      if (y <= ALWAYS_SHOWN_BELOW) {
+        turned = y
+        setHidden(false)
+        return
+      }
+
+      if (y < CAN_HIDE_BELOW && goingDown) return
+      if (Math.abs(y - turned) >= TRAVEL) setHidden(goingDown)
     }
 
-    onScroll()
+    const onScroll = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(measure)
+    }
+
+    measure()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.cancelAnimationFrame(frame)
+    }
   }, [])
 
   useEffect(() => {

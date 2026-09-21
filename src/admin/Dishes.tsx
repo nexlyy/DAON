@@ -359,7 +359,15 @@ export function Dishes({ editing }: { editing: Editing }) {
         <tbody>
           {shown.map((dish) => (
             <Fragment key={dish.id}>
-            <tr data-open={dish.id === openId || undefined}>
+            <tr
+              data-open={dish.id === openId || undefined}
+              // A name is a small thing to hit with a thumb, so the whole row
+              // opens the dish; the arrows keep their own job.
+              onClick={(event) => {
+                if ((event.target as Element).closest('button')) return
+                setOpenId(dish.id === openId ? null : dish.id)
+              }}
+            >
               <td className={styles.num}>{dish.number}</td>
               <td>
                 <button
@@ -399,7 +407,7 @@ export function Dishes({ editing }: { editing: Editing }) {
             </tr>
 
             {dish.id === openId && (
-              <tr ref={editorRow}>
+              <tr ref={editorRow} className={styles.editorRow}>
                 <td className={styles.editorCell} colSpan={6}>
                   {editor}
                 </td>

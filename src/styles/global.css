@@ -343,3 +343,17 @@ p {
     opacity: 1;
   }
 }
+
+/* Safari on an iPhone zooms the whole page in when it focuses a field whose
+   text is smaller than 16px, and leaves it zoomed and sliding sideways
+   afterwards. Nothing else on a phone is worth a field smaller than that. */
+@media (max-width: 860px) {
+  /* The components set their own sizes with class names, which outrank a plain
+     element rule, so this one insists: on a phone the browser's own behaviour
+     is at stake, not a matter of taste. */
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em) !important;
+  }
+}
