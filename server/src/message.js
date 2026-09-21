@@ -163,6 +163,7 @@ export function helpMessage(closures) {
     '/today, /tomorrow, /day saturday',
     '/find Anna — by name, phone or DAON code',
     '/stats — website visits and bookings; /stats 30 for a month',
+    '/waitlist — guests waiting for a table that was full',
     '',
     '<b>Change a booking</b>',
     '/move DAON-XXXXX — new day, time, guests or table',

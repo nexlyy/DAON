@@ -13,6 +13,7 @@
  * being slow about.
  */
 import { execFile } from 'node:child_process'
+import { randomBytes } from 'node:crypto'
 import {
   copyFileSync,
   existsSync,
@@ -22,6 +23,7 @@ import {
   renameSync,
   rmSync,
   statSync,
+  writeFileSync,
 } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 
@@ -31,6 +33,7 @@ const KIT = process.env.DAON_SITE_KIT ?? '/opt/daon-site'
 const WEB = process.env.DAON_WEB_ROOT ?? '/var/www/daon'
 const UPLOADS = process.env.DAON_UPLOADS ?? '/var/www/daon-uploads'
 const WORK = resolve(root, 'data', 'render')
+const PREVIEWS = resolve(root, 'data', 'previews')
 const TIMEOUT_MS = 120_000
 
 const run = (command, args, options) =>
@@ -179,8 +182,77 @@ export function createRender({ content }) {
       }
     },
 
-    /** Clears out anything a crash left behind. */
+    /**
+     * Renders the draft and keeps it, under a name nobody can guess, so it can
+     * be looked at — or sent to someone — before anything is published.
+     */
+    async preview({ by, hours = 24 } = {}) {
+      const { into } = await draw(content.draft)
+      try {
+        inspect(into)
+      } catch (failure) {
+        rmSync(into, { recursive: true, force: true })
+        throw failure
+      }
+
+      const token = randomBytes(18).toString('base64url')
+      const home = resolve(PREVIEWS, token)
+      mkdirSync(PREVIEWS, { recursive: true })
+      renameSync(into, home)
+
+      const created = new Date()
+      const expires = new Date(created.getTime() + hours * 60 * 60 * 1000)
+      writeFileSync(
+        resolve(home, '.about.json'),
+        JSON.stringify({ created: created.toISOString(), expires: expires.toISOString(), by }),
+      )
+
+      // Five at a time is plenty; the oldest goes first.
+      const kept = readdirSync(PREVIEWS)
+        .map((name) => ({ name, at: statSync(resolve(PREVIEWS, name)).mtimeMs }))
+        .sort((a, b) => b.at - a.at)
+      for (const old of kept.slice(5)) rmSync(resolve(PREVIEWS, old.name), { recursive: true, force: true })
+
+      return { token, created: created.toISOString(), expires: expires.toISOString() }
+    },
+
+    /** One page of a preview, or null if the link is unknown or has run out. */
+    previewPage(token, page) {
+      if (!/^[A-Za-z0-9_-]{16,40}$/.test(token)) return null
+      const home = resolve(PREVIEWS, token)
+      let about
+      try {
+        about = JSON.parse(readFileSync(resolve(home, '.about.json'), 'utf8'))
+      } catch {
+        return null
+      }
+      if (Date.parse(about.expires) < Date.now()) {
+        rmSync(home, { recursive: true, force: true })
+        return null
+      }
+
+      const parts = page.split('/').filter(Boolean)
+      if (parts.some((part) => !/^[a-z0-9-]+$/.test(part))) return null
+      const file = resolve(home, ...parts, 'index.html')
+      if (!file.startsWith(home) || !existsSync(file)) return null
+      return { html: readFileSync(file, 'utf8'), about, path: `/${parts.join('/')}` }
+    },
+
+    /** Clears out anything a crash left behind, and previews that have run out. */
     tidy() {
+      if (existsSync(PREVIEWS)) {
+        for (const name of readdirSync(PREVIEWS)) {
+          try {
+            const about = JSON.parse(readFileSync(resolve(PREVIEWS, name, '.about.json'), 'utf8'))
+            if (Date.parse(about.expires) < Date.now()) {
+              rmSync(resolve(PREVIEWS, name), { recursive: true, force: true })
+            }
+          } catch {
+            rmSync(resolve(PREVIEWS, name), { recursive: true, force: true })
+          }
+        }
+      }
+
       const parent = dirname(WORK)
       if (!existsSync(parent)) return
       const cutoff = Date.now() - 6 * 60 * 60 * 1000

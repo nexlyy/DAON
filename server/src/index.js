@@ -21,6 +21,7 @@ import { cancelToken, tokenMatches } from './cancel.js'
 import { isClosed } from './closures.js'
 import { createContent } from './content.js'
 import { createPhotos } from './photos.js'
+import { createWaitlist, readWaiting, waitingKeyboard, waitingMessage } from './waitlist.js'
 import { createRender } from './render.js'
 import { loadEnv, root } from './env.js'
 import { createGuestMail, readEmail } from './guestmail.js'
@@ -29,7 +30,7 @@ import { createStats } from './stats.js'
 import { buildMessage, cancelledMessage, scrubbedMessage } from './message.js'
 import { parseStaff } from './staff.js'
 import { createStore, reference, TablesTaken } from './store.js'
-import { editMessage, getChat, getMe, pollUpdates, sendMessage } from './telegram.js'
+import { deleteMessage, editMessage, getChat, getMe, pollUpdates, sendMessage } from './telegram.js'
 
 loadEnv()
 
@@ -69,6 +70,7 @@ mkdirSync(STORE, { recursive: true })
 const store = createStore()
 const guestMail = createGuestMail({ mailer: createMailer(), store })
 const stats = createStats()
+const waitlist = createWaitlist()
 
 function readAlerts() {
   try {
@@ -546,6 +548,34 @@ async function handle(request, response, url) {
     return send(request, response, 200, publicBooking({ ...booking, ...outcome.after }))
   }
 
+  // Somebody wanted a time that was full. Nothing is held for them: the staff
+  // get a card, and call if a table frees up.
+  if (request.method === 'POST' && url.pathname === '/waitlist') {
+    if (overRate(clientIp(request))) {
+      return send(request, response, 429, { error: 'too many requests', code: 'rateLimit' })
+    }
+
+    const raw = await readJson(request)
+    if (!raw) return send(request, response, 400, { error: 'invalid JSON' })
+
+    const { entry, error, code } = readWaiting(raw)
+    if (error) return send(request, response, 400, { error, code })
+
+    const added = waitlist.add(entry)
+    if (added.error) return send(request, response, 429, { error: added.error, code: added.code })
+
+    notifyStaff(waitingMessage(added.entry), waitingKeyboard(added.entry))
+      .then((sent) => addAlerts(added.entry.id, sent))
+      .catch((failure) => console.error('Could not tell the staff about the waiting list:', failure.message))
+
+    return send(request, response, 200, {
+      reference: added.entry.id,
+      date: added.entry.date,
+      time: added.entry.time,
+      partySize: added.entry.partySize,
+    })
+  }
+
   if (request.method === 'POST' && url.pathname === '/bookings') {
     if (overRate(clientIp(request))) {
       return send(request, response, 429, { error: 'too many requests', code: 'rateLimit' })
@@ -653,6 +683,7 @@ bot = createBot({
   onCancelled: (booking) => guestMail.cancelled(booking),
   onBooked: () => stats.booked('staff'),
   stats,
+  waitlist,
 })
 
 const server = createServer((request, response) => {
@@ -691,6 +722,28 @@ server.listen(PORT, '127.0.0.1', () => {
       console.error('Could not tidy old messages:', failure.message),
     )
   }, 6 * 60 * 60 * 1000)
+
+  // The waiting list keeps a name and a number only until the day it was for
+  // has passed.
+  const forgetWaiting = async () => {
+    try {
+      const gone = waitlist.tidy()
+      if (gone.length === 0) return
+      const alerts = readAlerts()
+      for (const entry of gone) {
+        for (const { chatId, messageId } of alerts[entry.id]?.messages ?? []) {
+          await deleteMessage(TOKEN, chatId, messageId).catch(() => {})
+        }
+        delete alerts[entry.id]
+      }
+      writeFileSync(ALERTS_FILE, JSON.stringify(alerts))
+      console.log(`Waiting list: forgot ${gone.length} from past days, with their cards.`)
+    } catch (failure) {
+      console.error('Could not tidy the waiting list:', failure.message)
+    }
+  }
+  void forgetWaiting()
+  setInterval(() => void forgetWaiting(), 6 * 60 * 60 * 1000)
 
   bot.setup().catch(() => {})
 

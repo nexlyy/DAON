@@ -31,6 +31,7 @@ import {
 import { parseBookingLine, readGuests, readTables } from './parse.js'
 import { isStaff, nameOf } from './staff.js'
 import { reference as newReference, TablesTaken } from './store.js'
+import { waitingKeyboard, waitingList, waitingMessage } from './waitlist.js'
 import {
   answerCallback,
   deleteMessage,
@@ -78,6 +79,10 @@ const COMMANDS = {
   '/otworz': 'open',
   '/stats': 'stats',
   '/statystyki': 'stats',
+  '/waitlist': 'waitlist',
+  '/waiting': 'waitlist',
+  '/oczekujacy': 'waitlist',
+  '/lista': 'waitlist',
   '/closed': 'help',
   '/zamkniete': 'help',
 }
@@ -95,6 +100,7 @@ const MENU = [
   ['close', 'Close a day: /close 24.12'],
   ['open', 'Open a closed day: /open 24.12'],
   ['stats', 'Website visits and bookings: /stats 30'],
+  ['waitlist', 'Guests waiting for a table'],
   ['help', 'Everything the bot can do'],
 ]
 
@@ -128,6 +134,7 @@ export function createBot({
   onCancelled = async () => {},
   onBooked = () => {},
   stats,
+  waitlist,
 }) {
   const drafts = new Map()
   const today = () => toISODate(new Date())
@@ -688,6 +695,8 @@ export function createBot({
         const count = Math.min(Math.max(Number.parseInt(argText, 10) || 7, 1), 90)
         return say(chatId, statsMessage(stats.days(count)))
       }
+      case 'waitlist':
+        return say(chatId, waitingList(waitlist ? waitlist.active(today()) : []))
       case 'move': {
         const reference = (args[0] ?? '').toUpperCase()
         if (!/^DAON-/.test(reference)) return say(chatId, 'Which one? /move DAON-XXXXX (the code is on every booking card, or use /find).')
@@ -779,6 +788,30 @@ export function createBot({
     if (text) return say(chatId, 'To take a booking send /book. Everything else: /help')
   }
 
+  /**
+   * Found a table, or taken off the list. The first press decides; every copy
+   * of the card, in every staff chat, says what happened and who pressed it.
+   */
+  async function pressWaiting(query, data) {
+    const [, id, status] = data.split(':')
+    const ack = (text) => answerCallback(token, query.id, text).catch(() => {})
+    if (!waitlist || !['seated', 'dropped'].includes(status)) return ack('')
+
+    const by = nameOf(query.from)
+    const result = waitlist.set(id, status, by)
+    if (!result) return ack('That entry is gone - the day has passed.')
+
+    const pressed = { chatId: query.message.chat.id, messageId: query.message.message_id }
+    await updateAlerts(
+      id,
+      waitingMessage(result.entry, { by: result.entry.by }),
+      pressed,
+      waitingKeyboard(result.entry),
+    )
+    if (result.already) return ack('Somebody already marked this one.')
+    return ack(status === 'seated' ? 'Marked: found a table.' : 'Taken off the list.')
+  }
+
   async function onCallback(query) {
     const chatId = query.message?.chat?.id
     const data = String(query.data ?? '')
@@ -791,6 +824,7 @@ export function createBot({
       return deleteMessage(token, chatId, query.message.message_id).catch(() => {})
     }
 
+    if (data.startsWith('wl:')) return pressWaiting(query, data)
     if (data.startsWith('free:')) return pressFree(query, data.slice(5))
     if (data.startsWith('cancel:')) return pressCancel(query, data.slice(7))
     if (data.startsWith('move:')) {

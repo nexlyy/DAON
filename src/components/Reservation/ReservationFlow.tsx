@@ -23,6 +23,7 @@ import { RestaurantFloorPlan, tableState } from '@/components/RestaurantFloorPla
 import type { FloorPlanHandle } from '@/components/RestaurantFloorPlan/RestaurantFloorPlan'
 import { DatePicker } from './DatePicker'
 import { TimePicker } from './TimePicker'
+import { WaitingList } from './WaitingList'
 import { GuestSelector } from './GuestSelector'
 import { StepIndicator } from './StepIndicator'
 import { BookingSuccess } from './BookingSuccess'
@@ -547,6 +548,18 @@ export function ReservationFlow() {
             </div>
           )}
 
+          {/* The time they wanted has no table for this many: that is exactly
+              what the waiting list is for. */}
+          {timeLost && !time && step !== 'date' && date && !changing && (
+            <WaitingList
+              date={date}
+              times={slots.map((slot) => slot.time)}
+              time={timeLost}
+              partySize={partySize}
+              urgent
+            />
+          )}
+
           {step === 'date' && submitError && (
             <p className={styles.error} role="alert">
               {submitError}
@@ -570,6 +583,16 @@ export function ReservationFlow() {
                 </p>
               ) : (
                 <TimePicker slots={slots} value={time} loading={slotsLoading} onChange={pickTime} />
+              )}
+
+              {!offline && !slotsLoading && date && !changing && slots.some((slot) => !slot.available) && (
+                <WaitingList
+                  date={date}
+                  times={slots.map((slot) => slot.time)}
+                  time={slots.find((slot) => !slot.available)?.time ?? null}
+                  partySize={partySize}
+                  urgent={!slots.some((slot) => slot.available)}
+                />
               )}
             </>
           )}
@@ -650,6 +673,16 @@ export function ReservationFlow() {
                 <p className={styles.warning}>
                   {t('reservation.table.none', { guests: partySize ?? 1 })}
                 </p>
+              )}
+
+              {!statusLoading && fittingTables.length === 0 && tableIds.length === 0 && date && !changing && (
+                <WaitingList
+                  date={date}
+                  times={slots.map((slot) => slot.time)}
+                  time={time}
+                  partySize={partySize}
+                  urgent
+                />
               )}
 
               {primaryTable && (

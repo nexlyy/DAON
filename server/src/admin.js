@@ -129,6 +129,45 @@ const readBody = (request, limit = BODY_MAX) =>
 
 const shorten = (value, max = 120) => String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
 
+const html = (response, status, body) => {
+  response.writeHead(status, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive',
+    'Content-Length': Buffer.byteLength(body),
+  })
+  response.end(body)
+}
+
+const WARSAW_TIME = new Intl.DateTimeFormat('pl-PL', {
+  timeZone: 'Europe/Warsaw',
+  day: '2-digit',
+  month: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
+/**
+ * A rendered draft, made ready to be opened from its link. The address is put
+ * back to the page's own before the site starts, because the site finds its
+ * page from the address; from there it moves between pages without loading
+ * anything, so the whole draft can be walked through. A bar at the bottom says
+ * plainly that none of it is on the site yet.
+ */
+function previewed({ html: page, about, path }) {
+  const until = WARSAW_TIME.format(new Date(about.expires))
+  const head =
+    '<meta name="robots" content="noindex">' +
+    `<script>window.__DAON_PREVIEW__=true;history.replaceState(null,'',${JSON.stringify(path)}+location.search+location.hash)</script>`
+  const bar =
+    '<div role="status" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;' +
+    'padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:#2f4256;color:#fbf8f3;' +
+    'font:500 14px/1.4 system-ui,-apple-system,sans-serif;text-align:center;box-shadow:0 -6px 20px rgba(0,0,0,.18)">' +
+    'Preview — these changes are not on the site yet' +
+    `<span style="opacity:.7"> · the link works until ${until}</span></div>`
+  return page.replace('<head>', `<head>${head}`).replace('</body>', `${bar}</body>`)
+}
+
 // --- the panel ---------------------------------------------------------------
 
 export function createAdmin({ content, render, photos, notifyStaff, onPublished, clientIp }) {
@@ -311,6 +350,25 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       return json(request, response, 503, { error: 'the admin panel is not set up on this server' })
     }
 
+    // --- a preview, opened by its link ----------------------------------------
+    // The link is the key: it can be sent to someone who has no password, and
+    // it stops working after a day.
+
+    const viewing = /^\/preview\/([A-Za-z0-9_-]{16,40})(\/.*)?$/.exec(path)
+    if (viewing && (request.method === 'GET' || request.method === 'HEAD')) {
+      const found = render.previewPage(viewing[1], viewing[2] ?? '/')
+      if (!found) {
+        return html(
+          response,
+          404,
+          '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex">' +
+            '<title>DAON</title><p style="font:16px/1.5 system-ui;margin:3rem auto;max-width:32rem;padding:0 1rem">' +
+            'This preview has run out or never existed. Make a new one in the admin panel.</p>',
+        )
+      }
+      return html(response, 200, previewed(found))
+    }
+
     // --- getting in ----------------------------------------------------------
 
     if (path === '/session' && request.method === 'POST') {
@@ -471,6 +529,21 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
           return json(request, response, 400, { error: failure.message })
         }
         throw failure
+      }
+    }
+
+    if (path === '/preview' && request.method === 'POST') {
+      try {
+        content.verify()
+        const made = await render.preview({ by: session.user })
+        note({ what: 'preview made', user: session.user, ip })
+        return json(request, response, 200, {
+          ...state(session),
+          url: `/api/admin/preview/${made.token}/`,
+          expires: made.expires,
+        })
+      } catch (failure) {
+        return json(request, response, 400, { error: failure.message })
       }
     }
 

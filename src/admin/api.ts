@@ -173,6 +173,8 @@ export const api = {
 
   check: () => call<State & { pages: number; ms: number }>('POST', '/check'),
 
+  preview: () => call<State & { url: string; expires: string }>('POST', '/preview'),
+
   publish: () =>
     call<State & { version: string; files: number; pages: number; ms: number }>('POST', '/publish'),
 

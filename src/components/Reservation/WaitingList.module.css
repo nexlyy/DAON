@@ -1,0 +1,86 @@
+.invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.6rem;
+  width: 100%;
+  padding-top: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
+
+.link {
+  color: var(--ink);
+  border-bottom: 1px solid var(--gold-line);
+  font-size: 0.88rem;
+  padding: 0.2rem 0;
+}
+
+.link:hover {
+  border-bottom-color: var(--ink);
+}
+
+.box {
+  display: grid;
+  gap: 0.9rem;
+  width: 100%;
+  padding: clamp(1rem, 3vw, 1.4rem);
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius-m);
+  background: var(--paper-warm);
+}
+
+.box[data-urgent] {
+  border-color: var(--gold);
+  background: var(--gold-wash);
+}
+
+.box[data-done] {
+  border-color: rgba(51, 96, 58, 0.35);
+  background: #eef4ec;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--ink);
+}
+
+.lead {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.small {
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-faint);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.2rem;
+}
+
+/* The form's own fields style inputs and text areas; the two choices here are
+   selects, which have to look like their neighbours. */
+.box select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.8em 1em;
+  border: 1px solid rgba(198, 176, 150, 0.6);
+  border-radius: var(--radius-m);
+  background: var(--white);
+  font: inherit;
+  font-size: 0.94rem;
+  color: var(--text);
+}
+
+.box select:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(47, 66, 86, 0.09);
+}

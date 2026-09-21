@@ -151,7 +151,11 @@ function page({ locale, url, title, description, canonical, noindex }) {
   }
 
   html = injectContent(html, snapshot)
-  html = injectStructuredData(html, snapshot)
+  // The dishes themselves go on the menu pages; the rest point at them.
+  html = injectStructuredData(html, snapshot, {
+    locale: locale.code,
+    menuPage: url !== null && /(^|\/)menu$/.test(url),
+  })
 
   if (url) {
     const body = render(url)

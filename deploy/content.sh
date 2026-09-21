@@ -41,13 +41,41 @@ case "${1:-check}" in
     ;;
 
   push)
+    # The panel edits a draft beside the live copy. Writing only the live copy
+    # would leave the draft behind, and the next Publish from the panel would
+    # quietly put the old version back. So the push writes both - and refuses
+    # outright if the draft holds edits nobody has published yet, because those
+    # would be lost.
+    DRAFT="$(dirname "$LIVE")/draft"
+    ssh "$HOST" "
+      set -eu
+      for f in $FILES; do
+        if [ -f '$DRAFT'/\$f ] && [ -f '$LIVE'/\$f ] && ! cmp -s '$DRAFT'/\$f '$LIVE'/\$f; then
+          echo \"the admin panel has unpublished changes to \$f - publish or undo them there first\" >&2
+          exit 3
+        fi
+      done
+    "
     tar -czf - -C "$LOCAL" $FILES | ssh "$HOST" "
       set -eu
-      mkdir -p '$LIVE'
+      mkdir -p '$LIVE' '$DRAFT'
       tar -xzf - -C '$LIVE'
       chmod 644 '$LIVE'/*.json
-      ls '$LIVE' | wc -l | xargs printf 'the server now holds %s files\n'
+      for f in $FILES; do cp '$LIVE'/\$f '$DRAFT'/\$f; done
+      ls '$LIVE' | wc -l | xargs printf 'the server now holds %s files, draft included\n'
     "
+    # A panel page left open still holds the old revision, so its next save is
+    # refused instead of writing its stale copy over this one.
+    ssh "$HOST" "node -e \"
+      const fs = require('fs')
+      const file = '$DRAFT/meta.json'
+      let meta = { revision: 1 }
+      try { meta = JSON.parse(fs.readFileSync(file, 'utf8')) } catch {}
+      meta.revision = (meta.revision || 1) + 1
+      meta.updatedAt = new Date().toISOString()
+      meta.updatedBy = 'deploy'
+      fs.writeFileSync(file, JSON.stringify(meta, null, 2) + String.fromCharCode(10))
+    \""
     ;;
 
   check)

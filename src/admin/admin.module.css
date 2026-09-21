@@ -664,3 +664,14 @@
     width: 100%;
   }
 }
+
+.preview {
+  display: grid;
+  gap: 0.6rem;
+}
+
+a.button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}

@@ -71,6 +71,17 @@ export class BookingError extends Error {
   }
 }
 
+/** A guest who wanted a time that was full. Nothing is held for them. */
+export interface WaitlistRequest {
+  date: string
+  time: string
+  partySize: number
+  name: string
+  phone: string
+  notes?: string
+  locale: string
+}
+
 export interface BookingApi {
   
   getClosedDates(fromISO: string, toISO: string): Promise<string[]>
@@ -85,4 +96,6 @@ export interface BookingApi {
   moveBooking(own: OwnBooking, seating: Seating): Promise<BookingState>
 
   getConfig(): Promise<{ email: boolean }>
+
+  joinWaitlist(request: WaitlistRequest): Promise<{ reference: string }>
 }

@@ -151,10 +151,75 @@ export function structuredData(snapshot) {
   }
 }
 
-export function injectStructuredData(html, snapshot) {
+const PHOTO_URL = (photo) =>
+  photo.startsWith('u:')
+    ? `${SITE}/u/dishes/${photo.slice(2)}.webp`
+    : `${SITE}/images/dishes/${photo}.webp`
+
+const PREFIX = { pl: '', en: '/en', ko: '/ko' }
+const MENU_WORD = { pl: 'Menu', en: 'Menu', ko: '메뉴' }
+
+/**
+ * The menu itself, in the language of the page it sits on: every dish that is
+ * on the menu, under its category, with its price. It goes only on the three
+ * menu pages and the rest point at it — ninety-eight dishes in the head of
+ * every page would be weight for nothing.
+ */
+export function menuData(snapshot, locale) {
+  const say = (text) => (text ? text[locale] || text.en || '' : '')
+  const url = `${SITE}${PREFIX[locale] ?? ''}/menu`
+  const currency = snapshot.restaurant.place.currency
+
+  const sections = snapshot.categories
+    .map((category) => {
+      const dishes = snapshot.dishes.filter(
+        (dish) => dish.categoryId === category.id && !dish.hidden,
+      )
+      if (dishes.length === 0) return null
+      return {
+        '@type': 'MenuSection',
+        name: say(category.name),
+        hasMenuItem: dishes.map((dish) => ({
+          '@type': 'MenuItem',
+          name: say(dish.name),
+          ...(say(dish.description) ? { description: say(dish.description) } : {}),
+          ...(dish.photo ? { image: PHOTO_URL(dish.photo) } : {}),
+          ...(dish.tags?.includes('vegetarian')
+            ? { suitableForDiet: 'https://schema.org/VegetarianDiet' }
+            : {}),
+          offers: {
+            '@type': 'Offer',
+            price: String(dish.price),
+            priceCurrency: currency,
+          },
+        })),
+      }
+    })
+    .filter(Boolean)
+
+  return {
+    '@type': 'Menu',
+    '@id': `${url}#menu`,
+    url,
+    name: `${snapshot.restaurant.place.name} — ${MENU_WORD[locale] ?? 'Menu'}`,
+    inLanguage: locale,
+    hasMenuSection: sections,
+  }
+}
+
+export function injectStructuredData(html, snapshot, { locale, menuPage = false } = {}) {
+  const data = structuredData(snapshot)
+  if (menuPage && locale) {
+    const menu = menuData(snapshot, locale)
+    const [place] = data['@graph']
+    place.hasMenu = { '@id': menu['@id'] }
+    data['@graph'].push(menu)
+  }
+  // A dish description is written in the admin panel, so whatever it holds must
+  // not be able to end this script element: the same escaping the snapshot gets.
+  const json = JSON.stringify(data, null, 2).replace(/</g, () => '\\' + 'u003c')
   return html.replace(
     /<script type="application\/ld\+json">[\s\S]*?<\/script>/,
-    () =>
-      `<script type="application/ld+json">\n${JSON.stringify(structuredData(snapshot), null, 2)}\n    </script>`,
+    () => `<script type="application/ld+json">\n${json}\n    </script>`,
   )
 }

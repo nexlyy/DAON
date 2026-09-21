@@ -41,6 +41,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false)
   const [failure, setFailure] = useState('')
   const [done, setDone] = useState('')
+  const [preview, setPreview] = useState<Preview | null>(null)
 
   useEffect(() => {
     document.title = 'DAON admin'
@@ -125,7 +126,13 @@ export default function AdminPage() {
           <span className={styles.clean}>the site shows everything saved here</span>
         )}
         <span className={styles.spacer} />
-        <PublishBar state={state} onChanged={load} onFailure={setFailure} onDone={setDone} />
+        <PublishBar
+          state={state}
+          onChanged={load}
+          onFailure={setFailure}
+          onDone={setDone}
+          onPreview={setPreview}
+        />
         <span className={styles.who}>{state.user}</span>
         <Button
           onClick={() => {
@@ -168,6 +175,7 @@ export default function AdminPage() {
         <div className={styles.panel}>
           {failure && <Message kind="bad">{failure}</Message>}
           {done && <Message kind="good">{done}</Message>}
+          {preview && <PreviewReady preview={preview} onClose={() => setPreview(null)} />}
 
           {editing && section === 'dishes' && <Dishes editing={editing} />}
           {editing && section === 'categories' && <Categories editing={editing} />}
@@ -284,27 +292,35 @@ function FirstPassword({ state, onDone }: { state: State; onDone: () => Promise<
   )
 }
 
+export interface Preview {
+  url: string
+  expires: string
+}
+
 function PublishBar({
   state,
   onChanged,
   onFailure,
   onDone,
+  onPreview,
 }: {
   state: State
   onChanged: () => Promise<void>
   onFailure: (message: string) => void
   onDone: (message: string) => void
+  onPreview: (preview: Preview | null) => void
 }) {
   const [busy, setBusy] = useState('')
 
-  const run = async (what: 'check' | 'publish') => {
+  const run = async (what: 'preview' | 'publish') => {
     setBusy(what)
     onFailure('')
     onDone('')
+    onPreview(null)
     try {
-      if (what === 'check') {
-        const report = await api.check()
-        onDone(`Everything holds together — ${report.pages} pages render in ${(report.ms / 1000).toFixed(1)}s.`)
+      if (what === 'preview') {
+        const made = await api.preview()
+        onPreview({ url: `${window.location.origin}${made.url}`, expires: made.expires })
       } else {
         const report = await api.publish()
         onDone(
@@ -323,8 +339,12 @@ function PublishBar({
 
   return (
     <div className={styles.tools}>
-      <Button onClick={() => void run('check')} disabled={busy !== '' || !state.canRender}>
-        {busy === 'check' ? 'Checking…' : 'Check'}
+      <Button
+        onClick={() => void run('preview')}
+        disabled={busy !== '' || !state.canRender}
+        title="See the site with the saved draft, before anyone else does"
+      >
+        {busy === 'preview' ? 'Preparing…' : 'Preview'}
       </Button>
       <Button
         kind="primary"
@@ -338,6 +358,47 @@ function PublishBar({
       >
         {busy === 'publish' ? 'Publishing…' : 'Publish'}
       </Button>
+    </div>
+  )
+}
+
+/**
+ * The link to a rendered draft. It can be opened here or sent to someone — the
+ * chef, a partner — who has no password; it stops working after a day.
+ */
+function PreviewReady({ preview, onClose }: { preview: Preview; onClose: () => void }) {
+  const [copied, setCopied] = useState(false)
+  const until = new Date(preview.expires).toLocaleString([], {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  return (
+    <div className={`${styles.message} ${styles.info} ${styles.preview}`}>
+      <span>
+        The draft is ready to look at. Nothing on the site has changed — the link works until{' '}
+        {until}.
+      </span>
+      <div className={styles.tools}>
+        <a
+          className={`${styles.button} ${styles.primary}`}
+          href={preview.url}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Open the preview
+        </a>
+        <Button
+          onClick={() => {
+            void navigator.clipboard?.writeText(preview.url).then(() => setCopied(true))
+          }}
+        >
+          {copied ? 'Copied' : 'Copy the link'}
+        </Button>
+        <Button onClick={onClose}>Close</Button>
+      </div>
     </div>
   )
 }

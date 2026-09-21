@@ -25,6 +25,7 @@
         "after": [
           "Razem z nimi zapisujemy datę, godzinę, liczbę osób, wybrany stolik i język strony.",
           "Jeśli rezerwujesz telefonicznie albo na miejscu, obsługa wpisuje te same dane do naszego systemu rezerwacji.",
+          "Jeśli wszystkie stoliki o wybranej porze są zajęte, możesz zapisać się na listę oczekujących — podajesz wtedy imię, numer telefonu, godzinę, liczbę osób i ewentualne uwagi.",
           "Serwer strony, jak każdy serwer WWW, zapisuje w dziennikach adres IP, czas i adres odwiedzonej podstrony oraz informacje o przeglądarce."
         ]
       },
@@ -32,6 +33,7 @@
         "heading": "Po co i na jakiej podstawie",
         "items": [
           "Przyjęcie i obsługa rezerwacji, w tym kontakt w jej sprawie oraz e-maile z potwierdzeniem, przypomnieniem i informacją o zmianie lub odwołaniu — art. 6 ust. 1 lit. b RODO (działania podejmowane na Twoje żądanie przed zawarciem umowy).",
+          "Lista oczekujących, czyli telefon do Ciebie, gdy zwolni się stolik, o który prosisz — art. 6 ust. 1 lit. b RODO (działania podejmowane na Twoje żądanie przed zawarciem umowy).",
           "Informacje o alergiach lub zdrowiu wpisane w uwagach — art. 9 ust. 2 lit. a RODO (Twoja wyraźna zgoda, której udzielasz, wpisując je). Wykorzystujemy je wyłącznie do przygotowania Twojej wizyty. Zgodę możesz w każdej chwili wycofać, pisząc na {email}.",
           "Bezpieczeństwo strony i ochrona przed nadużyciami, na przykład masowym składaniem fałszywych rezerwacji — art. 6 ust. 1 lit. f RODO (nasz prawnie uzasadniony interes).",
           "Zbiorcze statystyki odwiedzin, dzięki którym wiemy, czy strona pomaga gościom znaleźć menu i zarezerwować stolik — art. 6 ust. 1 lit. f RODO (nasz prawnie uzasadniony interes)."
@@ -45,7 +47,7 @@
         "items": [
           "Supabase — baza danych, w której przechowywane są rezerwacje,",
           "Hetzner Online GmbH — serwer, na którym działa strona i przechowywany jest adres e-mail do czasu wizyty (centrum danych w Helsinkach, Finlandia),",
-          "Telegram — komunikator, przez który personel dostaje powiadomienie o rezerwacji z imieniem, numerem telefonu i uwagami,",
+          "Telegram — komunikator, przez który personel dostaje powiadomienie o rezerwacji i o wpisie na listę oczekujących z imieniem, numerem telefonu i uwagami,",
           "Google — poczta Gmail, przez którą wysyłamy e-maile z potwierdzeniem i przypomnieniem, jeśli podasz adres e-mail."
         ],
         "after": [
@@ -59,6 +61,7 @@
         "items": [
           "Imię, numer telefonu i uwagi usuwamy automatycznie {retentionDays} dni po dacie rezerwacji — z bazy danych i z powiadomień wysłanych personelowi przez Telegram. Zostaje sama rezerwacja bez danych osobowych: data, godzina, liczba osób i stolik.",
           "Adres e-mail usuwamy dzień po dacie rezerwacji, a jeśli rezerwacja zostanie odwołana — od razu.",
+          "Wpis na liście oczekujących — imię, numer telefonu i uwagi — usuwamy dzień po wybranej dacie, razem z powiadomieniem wysłanym personelowi przez Telegram.",
           "Kopie zapasowe bazy przechowujemy nie dłużej niż {backupDays} dni.",
           "Dzienniki serwera usuwamy po {logDays} dniach.",
           "Statystyki odwiedzin to same liczby, bez danych osobowych; przechowujemy je do 400 dni."
@@ -137,6 +140,7 @@
         "after": [
           "Along with these we store the date, time, number of guests, the table you chose and the language of the site.",
           "If you book by phone or in person, the staff enter the same details into our reservation system.",
+          "If every table at the time you want is taken, you can join the waiting list — you then give a name, a phone number, the time, the number of guests and any notes.",
           "Like any web server, ours logs the IP address, the time and the page requested, and details of the browser."
         ]
       },
@@ -144,6 +148,7 @@
         "heading": "Why, and on what legal basis",
         "items": [
           "Taking and handling your reservation, including contacting you about it and emailing the confirmation, the reminder and any change or cancellation — Art. 6(1)(b) GDPR (steps taken at your request before entering into a contract).",
+          "The waiting list, that is, calling you if the table you asked for frees up — Art. 6(1)(b) GDPR (steps taken at your request before entering into a contract).",
           "Allergy or health information you write in the notes — Art. 9(2)(a) GDPR (your explicit consent, given by writing it). We use it only to prepare for your visit. You can withdraw consent at any time by writing to {email}.",
           "Keeping the website secure and preventing abuse, such as mass fake bookings — Art. 6(1)(f) GDPR (our legitimate interest).",
           "Aggregate visit statistics that tell us whether the site helps guests find the menu and book a table — Art. 6(1)(f) GDPR (our legitimate interest)."
@@ -157,7 +162,7 @@
         "items": [
           "Supabase — the database where reservations are stored,",
           "Hetzner Online GmbH — the server the website runs on, which also holds your email address until your visit (data centre in Helsinki, Finland),",
-          "Telegram — the messenger through which staff receive each reservation with the name, phone number and notes,",
+          "Telegram — the messenger through which staff receive each reservation and each waiting-list entry with the name, phone number and notes,",
           "Google — Gmail, which sends the confirmation and reminder emails if you give an email address."
         ],
         "after": [
@@ -171,6 +176,7 @@
         "items": [
           "Your name, phone number and notes are deleted automatically {retentionDays} days after the booking date — from the database and from the Telegram notifications sent to staff. What remains is the reservation without personal data: date, time, number of guests and table.",
           "Your email address is deleted the day after the booking date, or straight away if the reservation is cancelled.",
+          "A waiting-list entry — name, phone number and notes — is deleted the day after the date you chose, together with the Telegram notification sent to staff.",
           "Database backups are kept for no longer than {backupDays} days.",
           "Server logs are deleted after {logDays} days.",
           "Visit statistics are numbers only, with no personal data, and are kept for up to 400 days."
@@ -249,6 +255,7 @@
         "after": [
           "이와 함께 날짜, 시간, 인원 수, 선택하신 테이블과 사이트 언어를 저장합니다.",
           "전화나 매장에서 예약하시는 경우 직원이 같은 정보를 예약 시스템에 입력합니다.",
+          "원하시는 시간의 테이블이 모두 찬 경우 대기 명단에 등록하실 수 있으며, 이때 이름, 전화번호, 시간, 인원 수와 메모(선택)를 입력하십니다.",
           "다른 웹 서버와 마찬가지로 저희 서버도 IP 주소, 접속 시간, 방문한 페이지 주소와 브라우저 정보를 기록합니다."
         ]
       },
@@ -256,6 +263,7 @@
         "heading": "처리 목적과 법적 근거",
         "items": [
           "예약 접수와 처리, 예약 관련 연락, 확인·알림·변경·취소 이메일 발송 — GDPR 제6조 제1항 (b)호 (계약 체결 전 귀하의 요청에 따른 조치).",
+          "대기 명단, 즉 요청하신 자리가 나면 전화로 연락드리기 위한 처리 — GDPR 제6조 제1항 (b)호 (계약 체결 전 귀하의 요청에 따른 조치).",
           "메모에 적으신 알레르기 또는 건강 정보 — GDPR 제9조 제2항 (a)호 (정보를 입력하심으로써 주시는 명시적 동의). 이 정보는 방문 준비에만 사용합니다. 동의는 언제든지 {email}로 연락하여 철회하실 수 있습니다.",
           "웹사이트 보안 및 허위 예약 대량 접수 같은 악용 방지 — GDPR 제6조 제1항 (f)호 (저희의 정당한 이익).",
           "웹사이트가 메뉴 확인과 예약에 도움이 되는지 알기 위한 방문 통계(합계만 집계) — GDPR 제6조 제1항 (f)호 (저희의 정당한 이익)."
@@ -269,7 +277,7 @@
         "items": [
           "Supabase — 예약이 저장되는 데이터베이스,",
           "Hetzner Online GmbH — 웹사이트가 운영되고 방문일까지 이메일 주소가 보관되는 서버 (핀란드 헬싱키 데이터 센터),",
-          "Telegram — 직원이 이름, 전화번호, 메모가 포함된 예약 알림을 받는 메신저,",
+          "Telegram — 직원이 이름, 전화번호, 메모가 포함된 예약 및 대기 명단 알림을 받는 메신저,",
           "Google — 이메일 주소를 입력하신 경우 확인 메일과 알림을 보내는 Gmail."
         ],
         "after": [
@@ -283,6 +291,7 @@
         "items": [
           "이름, 전화번호, 메모는 예약일로부터 {retentionDays}일 후 데이터베이스와 직원에게 보낸 Telegram 알림에서 자동으로 삭제됩니다. 날짜, 시간, 인원 수, 테이블처럼 개인정보가 아닌 예약 기록만 남습니다.",
           "이메일 주소는 예약일 다음 날 삭제되며, 예약이 취소되면 즉시 삭제됩니다.",
+          "대기 명단 정보(이름, 전화번호, 메모)는 선택하신 날짜 다음 날, 직원에게 보낸 Telegram 알림과 함께 삭제됩니다.",
           "데이터베이스 백업은 {backupDays}일을 넘기지 않고 보관합니다.",
           "서버 기록은 {logDays}일 후 삭제됩니다.",
           "방문 통계는 개인정보가 없는 숫자로만 이루어져 있으며 최대 400일 보관합니다."

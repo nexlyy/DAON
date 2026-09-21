@@ -11,7 +11,10 @@ export type TrackEvent =
 
 function optedOut() {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean }
-  return nav.globalPrivacyControl === true || nav.doNotTrack === '1'
+  // A preview of unpublished changes is the restaurant looking at itself, not
+  // a guest, and would only muddy the numbers.
+  const preview = (window as Window & { __DAON_PREVIEW__?: boolean }).__DAON_PREVIEW__ === true
+  return preview || nav.globalPrivacyControl === true || nav.doNotTrack === '1'
 }
 
 let referrerSent = false

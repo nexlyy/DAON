@@ -216,6 +216,12 @@ export function createMockBookingApi(): BookingApi {
       return { email: false }
     },
 
+    // Without the API there is nobody to tell; the form still behaves.
+    async joinWaitlist() {
+      await wait(LATENCY_MS)
+      return { reference: 'WL-DEMO' }
+    },
+
     async cancelBooking(reference: string) {
       await wait(LATENCY_MS)
       

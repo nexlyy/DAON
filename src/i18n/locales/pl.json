@@ -275,6 +275,24 @@
     },
     "manage": {
       "missing": "Nie znaleźliśmy tej rezerwacji. Mogła zostać odwołana albo jej termin już minął."
+    },
+    "waitlist": {
+      "title": "Lista oczekujących",
+      "invite": "Nie ma wolnej godziny, która Ci pasuje?",
+      "open": "Zapisz się na listę oczekujących",
+      "full": "Na ten moment wszystko jest zajęte.",
+      "lead": "Zostaw imię i numer telefonu — jeśli zwolni się stolik, zadzwonimy.",
+      "time": "Godzina, o którą Ci chodzi",
+      "guests": "Liczba osób",
+      "notesPlaceholder": "Np. możemy przyjść pół godziny później",
+      "submit": "Zapisz mnie na listę",
+      "sending": "Zapisuję…",
+      "hide": "Zwiń",
+      "done": "Jesteś na liście na {date}, około {time}. Jeśli zwolni się stolik, zadzwonimy pod numer {phone}.",
+      "notBooking": "To nie jest rezerwacja: stolik jest Twój dopiero wtedy, gdy zadzwonimy i to potwierdzimy.",
+      "privacy": "Imię i numer telefonu służą tylko do tego jednego telefonu. Usuwamy je dzień po wybranej dacie.",
+      "phoneLimit": "Ten numer czeka już na kilka terminów. Zadzwoń do nas: {phone}.",
+      "failed": "Nie udało się zapisać na listę. Zadzwoń do nas: {phone}."
     }
   },
   "floorPlan": {

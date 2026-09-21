@@ -11,6 +11,7 @@ import type {
   TableAvailability,
   TableStatusQuery,
   TimeSlot,
+  WaitlistRequest,
 } from './types'
 
 const ownQuery = (own?: OwnBooking | null) =>
@@ -64,6 +65,9 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
 
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
+
+    joinWaitlist: (payload: WaitlistRequest) =>
+      request<{ reference: string }>('/waitlist', { method: 'POST', body: JSON.stringify(payload) }),
 
     lookupBooking: async (reference: string, token: string) => {
       let response: Response

@@ -275,6 +275,24 @@
     },
     "manage": {
       "missing": "We could not find that reservation. It may have been cancelled, or its date has passed."
+    },
+    "waitlist": {
+      "title": "Waiting list",
+      "invite": "No free time that suits you?",
+      "open": "Join the waiting list",
+      "full": "Everything is taken for now.",
+      "lead": "Leave your name and number — if a table frees up, we'll call you.",
+      "time": "The time you'd like",
+      "guests": "Guests",
+      "notesPlaceholder": "E.g. we could come half an hour later",
+      "submit": "Put me on the list",
+      "sending": "Sending…",
+      "hide": "Hide",
+      "done": "You're on the list for {date}, around {time}. If a table frees up, we'll call {phone}.",
+      "notBooking": "This is not a booking: the table is yours only once we call and confirm it.",
+      "privacy": "Your name and number are used for that one call only. We delete them the day after the date you chose.",
+      "phoneLimit": "This number is already waiting for a few dates. Call us: {phone}.",
+      "failed": "That did not go through. Call us: {phone}."
     }
   },
   "floorPlan": {
