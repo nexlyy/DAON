@@ -23,6 +23,7 @@ POST /bookings                      take a booking, then tell the staff
 POST /bookings/move                 the guest changes day, time, size or table
 POST /bookings/lookup               a guest's own booking, by code and token
 POST /bookings/cancel               the guest cancels
+POST /waitlist                      a guest waits for a full time; the staff get a card
 GET  /health                        liveness, which store, whether a chat is set
 ```
 
@@ -31,8 +32,19 @@ They are the same four the site's `BookingApi` interface describes, so pointing
 changes.
 
 Opening hours, the joining rules and the table numbers are not repeated here:
-`npm run sync:data` copies them out of `src/data/*.ts` into
-`reservation-data.json`. Run it after changing either file.
+`npm run sync:data` copies them out of `src/content/restaurant.json` and the
+floor plan into `reservation-data.json`, and a publish from the admin panel
+rewrites the hours and the rules in it by itself.
+
+## The waiting list
+
+When the form finds a time full, the guest can leave a name and a number
+instead (`waitlist.js`). Nothing is held: the staff get a card with two
+buttons, *Found a table* and *Take off the list*; the first press decides, and
+every copy of the card says who pressed it. `/waitlist` in the bot lists who is
+still waiting. One number can wait for three evenings at most. The entry is
+deleted the day after the date it was for, together with its cards in Telegram
+— the privacy policy says exactly that.
 
 ## Running it
 
@@ -196,6 +208,12 @@ What guards it:
 - the staff chat is told about every lock-out, every publish, every password
   change and every sign-in from an address none of the current sessions use;
 - `data/admin-log.jsonl` keeps who did what, and the panel shows it.
+
+**Preview** renders the saved draft the same way a publish would and keeps it
+in `data/previews` behind a random link that works for 24 hours, five at a
+time. The link needs no password — it is meant to be sent to whoever should
+look — and the page it opens says, in a bar at the bottom, that none of it is
+published.
 
 A publish also rewrites the hours and the reservation rules inside
 `reservation-data.json`, so the booking form and the page can never disagree
