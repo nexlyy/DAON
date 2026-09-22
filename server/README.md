@@ -241,9 +241,12 @@ Two cron jobs, in `/etc/cron.d/daon-api`:
   `/var/backups/daon/reservations-YYYYMMDD.json` and keeps a month. A free
   Supabase project is not backed up, and the bookings are the one thing here
   that cannot be rebuilt from the repository.
-- `scripts/watchdog.sh` — every ten minutes, asks `/health` the same question
-  the site asks and messages the restaurant when the answer changes. systemd
-  restarts a crashed process; it cannot see one that is running and broken.
+- `scripts/watchdog.sh` — every ten minutes, checks that the service answers
+  `/health` and that last night's copy exists, and messages the restaurant when
+  either changes. systemd restarts a crashed process; it cannot see one that is
+  running and not answering. It says nothing about the database: Supabase
+  misses the odd check at night and is back by the next one, so those only go
+  to `journalctl -u daon-api`.
 
 Both speak only on a change of state, so an outage over a night is two messages
 rather than fifty.

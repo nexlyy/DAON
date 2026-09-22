@@ -2,10 +2,14 @@
 # Tells the staff when online reservations stop working, and keeps telling them
 # every few hours until someone fixes it.
 #
-# Three things are watched. The service itself; the database behind it, which
-# /health now actually queries; and the nightly copy of the reservations, which
-# fails quietly otherwise. Each speaks up when it breaks, reminds while it stays
-# broken, and says so once when it recovers.
+# Two things are watched: the service itself, and the nightly copy of the
+# reservations, which fails quietly otherwise. Each speaks up when it breaks,
+# reminds while it stays broken, and says so once when it recovers.
+#
+# The database behind the service is not watched from here. Supabase misses a
+# check now and then at night and answers again by the next one, and a pair of
+# messages for every such blip woke the staff for nothing. A missed check still
+# shows in journalctl -u daon-api.
 
 set -eu
 
@@ -64,13 +68,6 @@ case "$(cat "$BODY")" in
   *'"database"'*)
     track service ok "" \
       "Online reservations are working again: the booking service answers."
-    case "$(cat "$BODY")" in
-      *'"database":"ok"'*) DB=ok ;;
-      *) DB=down ;;
-    esac
-    track database "$DB" \
-      "Needs fixing: the reservations database is not answering, so bookings from daon.pl cannot be saved. Guests can still call. Tell whoever looks after the website (server: journalctl -u daon-api; Supabase may be down or its key revoked)." \
-      "The reservations database answers again. Bookings from daon.pl are saved as usual."
     ;;
   *)
     track service down \
