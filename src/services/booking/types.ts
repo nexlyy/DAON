@@ -46,6 +46,40 @@ export interface Seating {
 export interface BookingState extends Seating {
   reference: string
   status: string
+  preorder?: Preorder | null
+}
+
+/** One dish and how many, as the guest picks it. */
+export interface PreorderItem {
+  id: string
+  quantity: number
+}
+
+/** A dish as the restaurant received it: name and price as they stood then. */
+export interface PreorderLine extends PreorderItem {
+  number: string
+  name: { en: string; pl: string; ko: string }
+  price: number
+}
+
+/** Dishes picked to go with a booking. Paid at the restaurant, not here. */
+export interface Preorder {
+  lines: PreorderLine[]
+  notes: string
+  total: number
+  updatedAt: string
+}
+
+export interface PreorderRequest {
+  items: PreorderItem[]
+  notes?: string
+  locale: string
+}
+
+export interface BookingConfig {
+  email: boolean
+  /** Null when the restaurant does not take dishes ahead online. */
+  preorder: { closesBefore: number } | null
 }
 
 export interface Booking extends BookingRequest {
@@ -58,7 +92,7 @@ export interface Booking extends BookingRequest {
   status: 'confirmed' | 'pending' | 'cancelled'
 }
 
-export type BookingErrorCode = 'unavailable' | 'phoneLimit' | 'rateLimit' | 'closed' | 'generic'
+export type BookingErrorCode = 'unavailable' | 'phoneLimit' | 'rateLimit' | 'closed' | 'menu' | 'generic'
 
 export class BookingError extends Error {
   constructor(
@@ -95,7 +129,10 @@ export interface BookingApi {
 
   moveBooking(own: OwnBooking, seating: Seating): Promise<BookingState>
 
-  getConfig(): Promise<{ email: boolean }>
+  getConfig(): Promise<BookingConfig>
+
+  /** Sends the dishes for a booking; an empty list takes them all back. */
+  savePreorder(own: OwnBooking, request: PreorderRequest): Promise<Preorder | null>
 
   joinWaitlist(request: WaitlistRequest): Promise<{ reference: string }>
 }

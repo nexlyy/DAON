@@ -1,5 +1,6 @@
 import { floorPlan, resolveTableGroup, tableById } from '@/data/tables/floorPlan'
 import { hoursFor, reservation as reservationConfig } from '@/data/restaurant'
+import { dishes } from '@/data/menu/dishes'
 import { BookingError } from './types'
 import type {
   AvailabilityQuery,
@@ -7,6 +8,8 @@ import type {
   BookingApi,
   BookingRequest,
   OwnBooking,
+  Preorder,
+  PreorderRequest,
   Seating,
   TableAvailability,
   TableStatusQuery,
@@ -14,6 +17,7 @@ import type {
 } from './types'
 
 const STORAGE_KEY = 'daon.bookings'
+const PREORDERS_KEY = 'daon.preorders'
 const LATENCY_MS = 260
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -31,6 +35,22 @@ function hash(input: string): number {
   h = Math.imul(h, 0xc2b2ae35)
   h ^= h >>> 16
   return (h >>> 0) / 0xffffffff
+}
+
+function readPreorders(): Record<string, Preorder> {
+  try {
+    const raw = window.localStorage.getItem(PREORDERS_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, Preorder>) : {}
+  } catch {
+    return {}
+  }
+}
+
+function writePreorders(rows: Record<string, Preorder>) {
+  try {
+    window.localStorage.setItem(PREORDERS_KEY, JSON.stringify(rows))
+  } catch {
+  }
 }
 
 function readStored(): Booking[] {
@@ -195,8 +215,37 @@ export function createMockBookingApi(): BookingApi {
             time: found.time,
             partySize: found.partySize,
             tableIds: found.tableIds,
+            preorder: readPreorders()[found.reference] ?? null,
           }
         : null
+    },
+
+    // The demo keeps the dishes in this browser, like its bookings.
+    async savePreorder(own: OwnBooking, request: PreorderRequest) {
+      await wait(LATENCY_MS * 2)
+      const rows = readPreorders()
+      const lines = dishes
+        .filter((dish) => request.items.some((item) => item.id === dish.id))
+        .map((dish) => ({
+          id: dish.id,
+          number: dish.number,
+          name: { en: dish.name.en, pl: dish.name.pl ?? dish.name.en, ko: dish.name.ko ?? dish.name.en },
+          price: dish.price,
+          quantity: request.items.find((item) => item.id === dish.id)?.quantity ?? 1,
+        }))
+      if (lines.length === 0) {
+        delete rows[own.reference]
+        writePreorders(rows)
+        return null
+      }
+      const preorder: Preorder = {
+        lines,
+        notes: request.notes ?? '',
+        total: lines.reduce((sum, line) => sum + line.price * line.quantity, 0),
+        updatedAt: new Date().toISOString(),
+      }
+      writePreorders({ ...rows, [own.reference]: preorder })
+      return preorder
     },
 
     async moveBooking(own: OwnBooking, seating: Seating) {
@@ -213,7 +262,7 @@ export function createMockBookingApi(): BookingApi {
     },
 
     async getConfig() {
-      return { email: false }
+      return { email: false, preorder: { closesBefore: 60 } }
     },
 
     // Without the API there is nobody to tell; the form still behaves.
@@ -226,6 +275,9 @@ export function createMockBookingApi(): BookingApi {
       await wait(LATENCY_MS)
       
       writeStored(readStored().filter((booking) => booking.reference !== reference))
+      const preorders = readPreorders()
+      delete preorders[reference]
+      writePreorders(preorders)
     },
   }
 

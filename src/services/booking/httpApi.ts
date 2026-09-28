@@ -4,6 +4,9 @@ import type {
   AvailabilityQuery,
   Booking,
   BookingApi,
+  BookingConfig,
+  Preorder,
+  PreorderRequest,
   BookingRequest,
   BookingState,
   OwnBooking,
@@ -19,6 +22,8 @@ const ownQuery = (own?: OwnBooking | null) =>
 
 export function createHttpBookingApi(baseUrl: string): BookingApi {
   const base = baseUrl.replace(/\/$/, '')
+  // Asked for by more than one part of the page; one request is enough.
+  let config: Promise<BookingConfig> | null = null
 
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
     let response: Response
@@ -33,10 +38,11 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
 
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { code?: string } | null
-      const known: BookingErrorCode[] = ['unavailable', 'phoneLimit', 'rateLimit', 'closed']
+      const known: BookingErrorCode[] = ['unavailable', 'phoneLimit', 'rateLimit', 'closed', 'menu']
       const code = known.find((candidate) => candidate === body?.code)
       if (code) throw new BookingError(`Request refused: ${code}`, code)
       if (response.status === 409) throw new BookingError('Table is no longer available', 'unavailable')
+      if (response.status === 404) throw new BookingError('No such booking', 'closed')
       throw new BookingError(`Request failed with ${response.status}`)
     }
     return (await response.json()) as T
@@ -60,8 +66,24 @@ export function createHttpBookingApi(baseUrl: string): BookingApi {
         body: JSON.stringify({ ...own, ...seating }),
       }),
 
-    getConfig: () =>
-      request<{ email: boolean }>('/config').catch(() => ({ email: false })),
+    getConfig: () => {
+      config ??= request<Partial<BookingConfig>>('/config').then(
+        (answer) => ({ email: Boolean(answer.email), preorder: answer.preorder ?? null }),
+        () => {
+          config = null
+          return { email: false, preorder: null }
+        },
+      )
+      return config
+    },
+
+    savePreorder: async (own: OwnBooking, payload: PreorderRequest) => {
+      const answer = await request<{ preorder: Preorder | null }>('/bookings/preorder', {
+        method: 'POST',
+        body: JSON.stringify({ ...own, ...payload }),
+      })
+      return answer.preorder
+    },
 
     createBooking: (payload: BookingRequest) =>
       request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(payload) }),

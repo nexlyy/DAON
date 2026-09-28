@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatTableLabels, tableById, zoneById } from '@/data/tables/floorPlan'
 import { restaurant } from '@/data/restaurant'
@@ -9,6 +9,7 @@ import { forgetBooking } from '@/services/booking/myBooking'
 import { useI18n } from '@/i18n/useI18n'
 import { RoofMark } from '@/components/Brand/Logo'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
+import { Preorder } from '@/components/Preorder/Preorder'
 import styles from './BookingSuccess.module.css'
 
 interface Props {
@@ -27,6 +28,17 @@ export function BookingSuccess({ booking, onReset, changed = false, emailSent = 
   const [cancelling, setCancelling] = useState(false)
   const [cancelled, setCancelled] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  // The form was longer than this card, so a phone would be left looking at
+  // the footer. Bring the confirmation up, under the header.
+  useEffect(() => {
+    const card = wrapRef.current
+    if (!card) return
+    const top = card.getBoundingClientRect().top + window.scrollY - 88
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: Math.max(0, top), behavior: still ? 'auto' : 'smooth' })
+  }, [])
 
   async function cancel() {
     if (!booking.cancelToken) return
@@ -46,7 +58,7 @@ export function BookingSuccess({ booking, onReset, changed = false, emailSent = 
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} ref={wrapRef}>
       <div className={styles.card}>
         <span className={styles.seal} aria-hidden="true">
           <RoofMark />
@@ -105,6 +117,20 @@ export function BookingSuccess({ booking, onReset, changed = false, emailSent = 
             </div>
           )}
         </dl>
+
+        {booking.cancelToken && !cancelled && (
+          <Preorder
+            booking={{
+              reference: booking.reference,
+              token: booking.cancelToken,
+              date: booking.date,
+              time: booking.time,
+              partySize: booking.partySize,
+            }}
+            variant="card"
+            fresh={!changed}
+          />
+        )}
 
         <p className={styles.reference}>
           {t('reservation.success.reference')} <strong>{booking.reference}</strong>

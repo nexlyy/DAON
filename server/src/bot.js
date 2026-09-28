@@ -135,6 +135,7 @@ export function createBot({
   onBooked = () => {},
   stats,
   waitlist,
+  reportAt = null,
 }) {
   const drafts = new Map()
   const today = () => toISODate(new Date())
@@ -660,7 +661,7 @@ export function createBot({
       case 'start':
         return say(chatId, welcomeMessage())
       case 'help':
-        return say(chatId, helpMessage(listClosures(today())))
+        return say(chatId, helpMessage(listClosures(today()), { reportAt }))
       case 'today':
       case 'tomorrow': {
         const date = action === 'today' ? today() : addDays(today(), 1)

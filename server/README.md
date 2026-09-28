@@ -23,6 +23,7 @@ POST /bookings                      take a booking, then tell the staff
 POST /bookings/move                 the guest changes day, time, size or table
 POST /bookings/lookup               a guest's own booking, by code and token
 POST /bookings/cancel               the guest cancels
+POST /bookings/preorder             the guest picks dishes for the booking
 POST /waitlist                      a guest waits for a full time; the staff get a card
 GET  /health                        liveness, which store, whether a chat is set
 ```
@@ -45,6 +46,37 @@ every copy of the card says who pressed it. `/waitlist` in the bot lists who is
 still waiting. One number can wait for three evenings at most. The entry is
 deleted the day after the date it was for, together with its cards in Telegram
 — the privacy policy says exactly that.
+
+## Dishes picked ahead
+
+Right after booking, the site asks once whether the guest already knows what
+they will order (`preorders.js`). It is not a payment: the staff get a card
+with the dishes by menu number, their Korean names, the total by menu prices and
+a note for the kitchen, and the guest pays at the table. The prices are read
+from the live menu here; whatever the browser sends as a price is ignored, and a
+dish that is not on the menu is refused.
+
+The guest can change the list, or take it back, from the confirmation or from
+"you already have a booking" on the reservation page, with the same token that
+cancels. The older cards then say *replaced* or *withdrawn* and a new one goes
+out, so a change is never silent. Online changes stop an hour before the
+booking (`PREORDER_CLOSES_MINUTES`); after that it is a phone call. A cancelled
+booking takes its dishes along. The list shows under the booking in `/today`,
+`/day` and `/all`, and the file with it is emptied the day after the visit.
+
+`PREORDER=off` switches the whole thing off; the site then never asks.
+
+## The list at noon
+
+Every day at `DAILY_REPORT_AT` (12:00 unless set; `off` turns it off) each staff
+account gets what is booked for today: every booking with its dishes, the
+dishes added up for the kitchen, and how many are on the waiting list. A day
+with nothing booked says so, so a quiet chat is never mistaken for a broken
+bot. The day it went out is written to `data/daily-report.json`: a restart does
+not send it twice, and a server that was down at noon sends it when it is back,
+up to four hours late. Switched on for the first time in the afternoon, it
+starts the next day. If the database misses the moment, it tries again every
+two minutes.
 
 ## Running it
 

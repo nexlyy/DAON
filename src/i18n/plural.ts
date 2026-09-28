@@ -5,3 +5,10 @@ export function guestsKey(locale: Locale, count: number) {
   const form = new Intl.PluralRules(LOCALE_META[locale].htmlLang).select(count)
   return form === 'few' ? 'reservation.guests.few' : 'reservation.guests.people'
 }
+
+/** "one", "few" or "many" under a key, for counts other than guests. */
+export function countKey(locale: Locale, count: number, base: string) {
+  if (count === 1) return `${base}.one`
+  const form = new Intl.PluralRules(LOCALE_META[locale].htmlLang).select(count)
+  return form === 'few' ? `${base}.few` : `${base}.many`
+}

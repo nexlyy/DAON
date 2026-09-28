@@ -15,19 +15,27 @@ import {
   tables,
   toISODate,
 } from './availability.js'
-import { toStaff } from './bookings.js'
+import { openingOn, toStaff } from './bookings.js'
 import { cardKeyboard, createBot } from './bot.js'
 import { cancelToken, tokenMatches } from './cancel.js'
 import { isClosed } from './closures.js'
 import { createContent } from './content.js'
 import { createPhotos } from './photos.js'
+import {
+  CLOSES_BEFORE,
+  createPreorders,
+  enabled as preorderEnabled,
+  publicPreorder,
+  readItems,
+  stillOpen,
+} from './preorders.js'
 import { createWaitlist, readWaiting, waitingKeyboard, waitingMessage } from './waitlist.js'
 import { createRender } from './render.js'
 import { loadEnv, root } from './env.js'
 import { createGuestMail, readEmail } from './guestmail.js'
 import { createMailer } from './mailer.js'
 import { createStats } from './stats.js'
-import { buildMessage, cancelledMessage, scrubbedMessage } from './message.js'
+import { buildMessage, cancelledMessage, dailyReport, preorderMessage, scrubbedMessage } from './message.js'
 import { parseStaff } from './staff.js'
 import { createStore, reference, TablesTaken } from './store.js'
 import { deleteMessage, editMessage, getChat, getMe, pollUpdates, sendMessage } from './telegram.js'
@@ -52,6 +60,15 @@ const DAY_MS = 24 * 60 * 60 * 1000
 
 const STAFF = parseStaff(process.env.TELEGRAM_STAFF_IDS)
 
+// The list for today that the staff get every day, at this Warsaw time (the
+// service runs with TZ=Europe/Warsaw). "off" turns it off.
+const REPORT_SETTING = (process.env.DAILY_REPORT_AT ?? '12:00').trim()
+const REPORT_AT = /^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(REPORT_SETTING) ? REPORT_SETTING.padStart(5, '0') : null
+const REPORT_FILE = resolve(STORE, 'daily-report.json')
+// A report missed because the server was down still goes out when it is back,
+// if that is within these hours; later in the evening it would only be noise.
+const REPORT_LATE_HOURS = 4
+
 // Who is not told about the admin panel — signing in, publishing, a locked
 // address. They still get everything about the bookings.
 const ADMIN_QUIET = parseStaff(process.env.ADMIN_QUIET_IDS)
@@ -71,6 +88,7 @@ const store = createStore()
 const guestMail = createGuestMail({ mailer: createMailer(), store })
 const stats = createStats()
 const waitlist = createWaitlist()
+const preorders = createPreorders()
 
 function readAlerts() {
   try {
@@ -169,6 +187,13 @@ async function notifyStaff(text, keyboard, { except } = {}) {
     }
   }
   return sent
+}
+
+function forgetAlerts(key) {
+  const alerts = readAlerts()
+  if (!alerts[key]) return
+  delete alerts[key]
+  writeFileSync(ALERTS_FILE, JSON.stringify(alerts))
 }
 
 async function updateAlerts(ref, text, pressed, keyboard) {
@@ -365,6 +390,54 @@ const publicBooking = (booking) => ({
   tableIds: booking.tableIds,
 })
 
+// Pre-orders: the older cards of one booking are edited and a new one goes
+// out, one save at a time, so two quick saves cannot reach the staff in the
+// wrong order.
+const preorderCards = (reference) => `${reference}:preorder`
+let preorderQueue = Promise.resolve()
+
+function inTurn(task) {
+  const run = preorderQueue.then(task, task)
+  preorderQueue = run.catch(() => {})
+  return run
+}
+
+const liveDishes = () => {
+  try {
+    return content.readLiveFile('menu').dishes ?? []
+  } catch {
+    return []
+  }
+}
+
+function tellPreorder(booking, before, after) {
+  const key = preorderCards(booking.reference)
+  const seen = toStaff(booking)
+  inTurn(async () => {
+    if (before) await updateAlerts(key, preorderMessage(seen, before, after ? 'replaced' : 'withdrawn'))
+    // Only the newest live card is kept for later edits; the older ones have
+    // already said what became of them.
+    forgetAlerts(key)
+    const sent = await notifyStaff(
+      after ? preorderMessage(seen, after, before ? 'changed' : 'new') : preorderMessage(seen, before, 'withdrawn'),
+    )
+    if (after) addAlerts(key, sent)
+    recordSent(sent, booking.date)
+  }).catch((failure) => console.error('Could not tell the staff about a pre-order:', failure.message))
+}
+
+/** A cancelled booking takes its dishes with it; the cards say so without a new message. */
+function dropPreorder(booking) {
+  const gone = preorders.remove(booking.reference)
+  if (!gone) return
+  const key = preorderCards(booking.reference)
+  const seen = toStaff(booking)
+  inTurn(async () => {
+    await updateAlerts(key, preorderMessage(seen, gone, 'cancelled'))
+    forgetAlerts(key)
+  }).catch((failure) => console.error('Could not update the pre-order cards:', failure.message))
+}
+
 let bot
 
 async function handle(request, response, url) {
@@ -405,7 +478,10 @@ async function handle(request, response, url) {
   }
 
   if (request.method === 'GET' && url.pathname === '/config') {
-    return send(request, response, 200, { email: guestMail.enabled })
+    return send(request, response, 200, {
+      email: guestMail.enabled,
+      preorder: preorderEnabled() && liveDishes().length > 0 ? { closesBefore: CLOSES_BEFORE } : null,
+    })
   }
 
   if (request.method === 'GET' && url.pathname === '/closed-dates') {
@@ -480,7 +556,50 @@ async function handle(request, response, url) {
     if (!booking || !tokenMatches(booking.id, raw.token)) {
       return send(request, response, 404, { error: 'no such booking' })
     }
-    return send(request, response, 200, publicBooking(booking))
+    return send(request, response, 200, {
+      ...publicBooking(booking),
+      preorder: booking.status === 'confirmed' ? publicPreorder(preorders.get(booking.reference)) : null,
+    })
+  }
+
+  // Dishes picked to go with a booking. The browser proves the booking is its
+  // own with the same token that cancels it; the prices come from the live
+  // menu, not from the request.
+  if (request.method === 'POST' && url.pathname === '/bookings/preorder') {
+    if (overRate(clientIp(request))) {
+      return send(request, response, 429, { error: 'too many requests', code: 'rateLimit' })
+    }
+    const raw = await readJson(request)
+    if (!raw) return send(request, response, 400, { error: 'invalid JSON' })
+    if (!preorderEnabled()) return send(request, response, 409, { error: 'pre-orders are off', code: 'closed' })
+
+    const ref = text(raw.reference, 24).toUpperCase()
+    const booking = ref ? await store.find(ref) : null
+    if (!booking || !tokenMatches(booking.id, raw.token)) {
+      return send(request, response, 404, { error: 'no such booking' })
+    }
+    if (!stillOpen(booking)) {
+      return send(request, response, 409, { error: 'too late to change the dishes online', code: 'closed' })
+    }
+
+    const { lines, error, code } = readItems(raw.items, liveDishes())
+    if (error) return send(request, response, 400, { error, code })
+    const notes = lines.length > 0 ? text(raw.notes, 300) : ''
+
+    const before = preorders.get(booking.reference)
+    const same =
+      before && JSON.stringify([before.lines, before.notes]) === JSON.stringify([lines, notes])
+    if (same || (!before && lines.length === 0)) {
+      return send(request, response, 200, { preorder: publicPreorder(before) })
+    }
+
+    const after =
+      lines.length > 0
+        ? preorders.put(booking.reference, { date: booking.date, lines, notes, locale: text(raw.locale, 5) })
+        : (preorders.remove(booking.reference), null)
+    if (!before) stats.booked('preorder')
+    tellPreorder(booking, before, after)
+    return send(request, response, 200, { preorder: publicPreorder(after) })
   }
 
   if (request.method === 'POST' && url.pathname === '/bookings/cancel') {
@@ -498,6 +617,7 @@ async function handle(request, response, url) {
     }
 
     await store.cancel(ref)
+    dropPreorder(booking)
     guestMail.cancelled(booking).catch(() => {})
     const notice = cancelledMessage(toStaff(booking), 'the guest')
     updateAlerts(ref, notice)
@@ -679,11 +799,18 @@ bot = createBot({
   updateAlerts,
   oneAtATime,
   retentionDays: RETENTION_DAYS,
-  onMoved: (before, after) => guestMail.moved({ ...before, ...after }),
-  onCancelled: (booking) => guestMail.cancelled(booking),
+  onMoved: (before, after) => {
+    preorders.moved(after.reference, after.date)
+    return guestMail.moved({ ...before, ...after })
+  },
+  onCancelled: (booking) => {
+    dropPreorder(booking)
+    return guestMail.cancelled(booking)
+  },
   onBooked: () => stats.booked('staff'),
   stats,
   waitlist,
+  reportAt: REPORT_AT,
 })
 
 const server = createServer((request, response) => {
@@ -745,6 +872,20 @@ server.listen(PORT, '127.0.0.1', () => {
   void forgetWaiting()
   setInterval(() => void forgetWaiting(), 6 * 60 * 60 * 1000)
 
+  // Dishes picked ahead are kept only until the visit.
+  const forgetPreorders = async () => {
+    try {
+      const gone = await preorders.tidy(toISODate(new Date()), (reference) => store.find(reference))
+      if (gone.length > 0) console.log(`Pre-orders: forgot ${gone.length} from past days.`)
+    } catch (failure) {
+      console.error('Could not tidy the pre-orders:', failure.message)
+    }
+  }
+  void forgetPreorders()
+  setInterval(() => void forgetPreorders(), 6 * 60 * 60 * 1000)
+
+  startDailyReport()
+
   bot.setup().catch(() => {})
 
   const mailTick = () =>
@@ -762,6 +903,75 @@ server.listen(PORT, '127.0.0.1', () => {
     )
   }
 })
+
+/**
+ * Once a day at REPORT_AT: what is booked for today. Checked every half
+ * minute rather than timed to the second, so a change of clocks in spring or
+ * autumn cannot move it and a restart cannot skip it; the day it went out is
+ * written down, so a restart cannot send it twice either.
+ */
+function startDailyReport() {
+  if (!REPORT_AT) {
+    console.log('Daily report: off.')
+    return
+  }
+  const readReport = () => {
+    try {
+      return JSON.parse(readFileSync(REPORT_FILE, 'utf8'))
+    } catch {
+      return null
+    }
+  }
+  const markReported = (date) =>
+    writeFileSync(REPORT_FILE, JSON.stringify({ date, at: new Date().toISOString() }))
+  const [hours, minutes] = REPORT_AT.split(':').map(Number)
+  const lateBy = (now) => now.getHours() * 60 + now.getMinutes() - (hours * 60 + minutes)
+
+  // Switched on for the first time in the afternoon: start with tomorrow
+  // rather than surprise everyone with a list in the middle of service.
+  if (!readReport() && lateBy(new Date()) >= 0) markReported(toISODate(new Date()))
+
+  let busy = false
+  let retryAt = 0
+  const tick = async () => {
+    const now = new Date()
+    const today = toISODate(now)
+    const late = lateBy(now)
+    if (busy || late < 0 || late >= REPORT_LATE_HOURS * 60) return
+    if (Date.now() < retryAt || readReport()?.date === today) return
+
+    busy = true
+    try {
+      const bookings = (await withTimeout(store.onDate(today), 15000))
+        .filter((booking) => booking.status !== 'cancelled')
+        .map(toStaff)
+      const day = openingOn(today)
+      const texts = dailyReport(today, bookings, {
+        closed: day.closed ? (day.reason === 'closure' ? 'closed from the bot' : 'the weekly day off') : null,
+        waiting: waitlist.active(today).filter((entry) => entry.date === today).length,
+      })
+      let delivered = 0
+      for (const text of texts) {
+        const sent = await notifyStaff(text)
+        delivered += sent.length
+        recordSent(sent, today)
+      }
+      if (delivered === 0) throw new Error('Telegram took none of the messages')
+      markReported(today)
+      console.log(`Daily report for ${today}: sent, ${bookings.length} reservation(s).`)
+    } catch (failure) {
+      // Most often the database missing one answer; it is back in a minute or two.
+      retryAt = Date.now() + 2 * 60 * 1000
+      console.error('Could not send the daily report, trying again in 2 minutes:', failure.message)
+    } finally {
+      busy = false
+    }
+  }
+
+  setTimeout(() => void tick(), 5000)
+  setInterval(() => void tick(), 30 * 1000)
+  console.log(`Daily report: every day at ${REPORT_AT}.`)
+}
 
 if (LISTEN) {
   let offset

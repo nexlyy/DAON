@@ -561,6 +561,7 @@ export function createContent() {
     draft: DRAFT,
     files: FILES,
     readLive: () => readAll(LIVE),
+    readLiveFile: (name) => read(LIVE, name),
     readDraft: () => readAll(DRAFT),
     meta: readMeta,
     pending,

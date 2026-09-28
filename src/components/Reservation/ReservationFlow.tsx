@@ -27,6 +27,7 @@ import { WaitingList } from './WaitingList'
 import { GuestSelector } from './GuestSelector'
 import { StepIndicator } from './StepIndicator'
 import { BookingSuccess } from './BookingSuccess'
+import { Preorder } from '@/components/Preorder/Preorder'
 import styles from './ReservationFlow.module.css'
 
 const STEPS = ['date', 'time', 'guests', 'table', 'confirm'] as const
@@ -500,6 +501,7 @@ export function ReservationFlow() {
                 <button type="button" className={styles.upcomingChange} onClick={() => startChange(saved)}>
                   {t('reservation.upcoming.change')}
                 </button>
+                <Preorder booking={saved} variant="banner" buttonClassName={styles.upcomingChange} />
                 <button
                   type="button"
                   className={styles.upcomingCancel}

@@ -13,6 +13,7 @@ import {
 } from './availability.js'
 import { isClosed } from './closures.js'
 import { addDays, weekdayOf } from './dates.js'
+import { preorderFor } from './preorders.js'
 
 export const STAFF_MAX_PARTY = 40
 
@@ -33,6 +34,7 @@ export const toStaff = (booking) => ({
   name: booking.name,
   phone: booking.phone,
   notes: booking.notes,
+  preorder: booking.status === 'cancelled' ? null : preorderFor(booking.reference),
 })
 
 export function openingOn(date) {
