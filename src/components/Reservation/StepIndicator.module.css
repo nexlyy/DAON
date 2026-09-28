@@ -107,14 +107,41 @@
     font-size: 0.66rem;
   }
 
+  /* Five labels do not fit in a phone's width: squeezed, "Potwierdzenie"
+     broke in the middle of the word. Only the step the guest is on is
+     named, in a size that can be read; the others keep their numbers, and
+     their names for screen readers. */
+  .button {
+    position: relative;
+    padding-bottom: 1.35rem;
+  }
+
   .label {
-    font-size: 0.55rem;
-    letter-spacing: 0.03em;
-    white-space: normal;
-    
-    overflow-wrap: anywhere;
-    hyphens: auto;
-    line-height: 1.25;
+    position: absolute;
+    top: 2.1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* The ends start at their dot and run inwards, so they stay on screen. */
+  .step:first-child .label {
+    left: calc(50% - 0.825rem);
+    transform: none;
+  }
+
+  .step:last-child .label {
+    left: auto;
+    right: calc(50% - 0.825rem);
+    transform: none;
+  }
+
+  .step:not([data-state='current']) .label {
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
 }
 

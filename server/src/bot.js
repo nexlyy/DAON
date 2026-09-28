@@ -194,7 +194,7 @@ export function createBot({
         return button(label, `w:${draft.id}:date:${date}`)
       })
       return {
-        text: `${intro}📅 <b>Which day?</b>${NL}Tap a day or type any date: 20.09, 20 września, friday, jutro, 9월 20일…${draft.problem ? `${NL}${NL}⚠️ ${draft.problem}` : ''}`,
+        text: `${intro}📅 <b>Which day?</b>${NL}Tap a day or type any date: 20.09, 20 września, friday, jutro…${draft.problem ? `${NL}${NL}⚠️ ${draft.problem}` : ''}`,
         keyboard: [
           ...(draft.mode === 'move' ? keep(shortDay(draft.before.date), 'date') : []),
           ...rowsOf(days, 3),

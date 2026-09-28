@@ -673,8 +673,11 @@
     text-align: left;
   }
 
+  /* Side by side, glass then bottle. The block rule above gives every cell
+     the full width, which with the margin pushed the page 22px sideways. */
   .wineTable td {
     display: inline-flex;
+    width: auto;
     gap: 0.4em;
     margin-top: 0.5rem;
     margin-right: 1.4rem;

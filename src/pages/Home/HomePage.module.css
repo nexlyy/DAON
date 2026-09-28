@@ -107,9 +107,15 @@
 }
 
 .signatureGrid {
+  --gap: clamp(1.1rem, 2.2vw, 1.8rem);
   display: grid;
-  gap: clamp(1.1rem, 2.2vw, 1.8rem);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+  gap: var(--gap);
+  /* Never more than three across: six dishes make two full rows instead of
+     four and a lonely two. */
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, max(17.5rem, (100% - 2 * var(--gap)) / 3)), 1fr)
+  );
 }
 
 .categories {
@@ -148,8 +154,12 @@
 }
 
 .categoryCard img {
-  width: clamp(46px, 5vw, 62px);
-  height: auto;
+  /* The same box for every title, so the names line up across a row and the
+     narrow "다온" stand-in is not twice the height of the others. */
+  --title-w: clamp(46px, 5vw, 62px);
+  width: var(--title-w);
+  height: calc(var(--title-w) * 1.85);
+  object-fit: contain;
   margin-bottom: 0.2rem;
 }
 
@@ -157,6 +167,20 @@
   font-family: var(--font-display);
   font-size: 1.02rem;
   color: var(--ink);
+}
+
+/* Thirteen chapters in rows of six leave one alone: the last row is centred. */
+@media (min-width: 641px) {
+  .categoryList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .categoryList > li {
+    flex: 0 1 calc((100% - 5 * 0.9rem) / 6);
+    min-width: 11rem;
+  }
 }
 
 .categoryMeta {
@@ -400,7 +424,7 @@
   }
 
   .categoryCard img {
-    width: 40px;
+    --title-w: 40px;
   }
 
   .categoryName {

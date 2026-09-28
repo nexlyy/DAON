@@ -83,7 +83,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className={styles.col}>
+          <div className={`${styles.col} ${styles.hoursCol}`}>
             <h2 className={styles.colTitle}>{t('footer.hours')}</h2>
             <OpenStatus variant="line" />
             <OpeningHours labels="short" />

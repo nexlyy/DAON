@@ -137,7 +137,9 @@ export function Navbar() {
 
           <div className={styles.actions}>
             <LanguageSwitcher />
-            <OrderLink kind="pickup" className={`${styles.cta} ${styles.pickup}`} />
+            {/* Pickup lives in the drawer, the contact block and the footer:
+                with it here the Polish row ran past the right edge and cut
+                the reservation button off on a 1366 or 1440 screen. */}
             <OrderLink kind="delivery" className={styles.cta} />
             <Link to={path('/reservation')} className={`btn ${styles.cta}`}>
               {t('nav.reservation')}

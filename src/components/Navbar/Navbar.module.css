@@ -224,13 +224,10 @@
   }
 }
 
-@media (max-width: 1180px) {
-  .actions .pickup {
-    display: none;
-  }
-}
-
-@media (max-width: 960px) {
+/* Polish labels are the longest: between 960 and 1100 the full row ran past
+   the right edge and cut the reservation button off, so the drawer takes over
+   earlier. */
+@media (max-width: 1100px) {
   .desktopNav {
     display: none;
   }
@@ -245,6 +242,15 @@
 
   .actions {
     margin-left: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  /* The header stays above the drawer for its close button; at 86% of a
+     phone the logo sat half on the dimmed page and half on the drawer. */
+  .drawer {
+    width: 100%;
+    border-left: 0;
   }
 }
 

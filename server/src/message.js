@@ -82,14 +82,11 @@ export function preorderMessage(booking, preorder, state = 'new') {
     filled(booking.name),
   ].join(' · ')
 
-  const lines = preorder.lines.map((line) => {
-    const korean = line.name.ko && line.name.ko !== line.name.en ? ` (${line.name.ko})` : ''
-    return strike(
-      `${line.quantity} × <b>#${escapeHtml(line.number)}</b> ${escapeHtml(line.name.en)}${escapeHtml(korean)} — ${money(
-        line.price * line.quantity,
-      )}`,
-    )
-  })
+  const lines = preorder.lines.map((line) =>
+    strike(
+      `${line.quantity} × <b>#${escapeHtml(line.number)}</b> ${escapeHtml(line.name.en)} — ${money(line.price * line.quantity)}`,
+    ),
+  )
 
   return [
     `${PREORDER_HEADS[state] ?? PREORDER_HEADS.new} · <code>${escapeHtml(booking.reference)}</code>`,
@@ -302,7 +299,7 @@ export function helpMessage(closures, { reportAt = null } = {}) {
     '/close 24.12 Christmas Eve — no bookings, the website shows DAON as closed',
     '/open 24.12 — open it again',
     '',
-    'Dates can be written any way: 20.09, 20/09/2026, 2026-09-20, 20 września, 20 sep, 20 сентября, 9월 20일, today, jutro, завтра, friday, w piątek, в пятницу, za 3 dni.',
+    'Dates can be written any way: 20.09, 20/09/2026, 2026-09-20, 20 września, 20 sep, 20 сентября, today, jutro, завтра, friday, w piątek, в пятницу, za 3 dni.',
     '',
     '<b>Closed days</b>',
     list,

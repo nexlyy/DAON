@@ -116,6 +116,13 @@
   .brandCol {
     grid-column: 1 / -1;
   }
+
+  /* In half a column the week wrapped and "open tomorrow at 13:00" broke in
+     two; across the whole width it reads as one list. */
+  .hoursCol {
+    grid-column: 1 / -1;
+    max-width: 24rem;
+  }
 }
 
 @media (max-width: 640px) {
