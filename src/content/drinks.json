@@ -1,0 +1,1289 @@
+{
+  "note": {
+    "en": "Images are for illustrative purposes only.",
+    "pl": "*Zdjęcia mają charakter poglądowy."
+  },
+  "sections": [
+    {
+      "id": "soju-cocktails",
+      "title": {
+        "en": "SOJU COCKTAILS"
+      },
+      "layout": "cards",
+      "items": [
+        {
+          "id": "seoul-kiss",
+          "name": {
+            "en": "SEOUL KISS"
+          },
+          "desc": {
+            "en": "Fresh Soju / Kinley Pink Aromatic Berry / blackcurrant juice / blueberry syrup / lime syrup / mint",
+            "pl": "Fresh Soju / Kinley Pink Aromatic Berry / sok z czarnej porzeczki / syrop jagodowy / syrop limonkowy / mięta"
+          },
+          "price": 38,
+          "photo": "seoul-kiss",
+          "ratio": 1.499
+        },
+        {
+          "id": "changwon-glow",
+          "name": {
+            "en": "CHANGWON GLOW"
+          },
+          "desc": {
+            "en": "Fresh Soju / Kinley Pink Aromatic Berry / orange juice / passion fruit syrup / mint syrup / lime syrup / mint",
+            "pl": "Fresh Soju / Kinley Pink Aromatic Berry / sok pomarańczowy / syrop z marakui / syrop miętowy / syrop limonkowy / mięta"
+          },
+          "price": 38,
+          "photo": "changwon-glow",
+          "ratio": 1.499
+        },
+        {
+          "id": "busan-wave",
+          "name": {
+            "en": "BUSAN WAVE"
+          },
+          "desc": {
+            "en": "Fresh Soju / Sprite / multifruit isotonic drink / passion fruit syrup / lime syrup / mint",
+            "pl": "Fresh Soju / Sprite / napój izotoniczny wieloowocowy / syrop z marakui / syrop limonkowy / mięta"
+          },
+          "price": 38,
+          "photo": "busan-wave",
+          "ratio": 1.499
+        },
+        {
+          "id": "r-o-k-marines",
+          "name": {
+            "en": "R.O.K. MARINES"
+          },
+          "desc": {
+            "en": "Fresh Soju / tonic water / strawberry syrup / passion fruit syrup / orange juice / lime syrup / mint",
+            "pl": "Fresh Soju / tonik / syrop truskawkowy / syrop z marakui / sok pomarańczowy / syrop limonkowy / mięta"
+          },
+          "price": 38,
+          "photo": "r-o-k-marines",
+          "ratio": 1.499
+        },
+        {
+          "id": "k-tricolor",
+          "name": {
+            "en": "K-TRICOLOR"
+          },
+          "desc": {
+            "en": "Fresh Soju / multifruit isotonic drink / orange juice / strawberry syrup",
+            "pl": "Fresh Soju / napój izotoniczny wieloowocowy / sok pomarańczowy / syrop truskawkowy"
+          },
+          "price": 38,
+          "photo": "k-tricolor",
+          "ratio": 1.499
+        },
+        {
+          "id": "sojito",
+          "name": {
+            "en": "SOJITO"
+          },
+          "desc": {
+            "en": "Fresh Soju / Sprite / tonic water / simple syrup / lime syrup / mint",
+            "pl": "Fresh Soju / Sprite / tonik / syrop cukrowy / syrop limonkowy / mięta"
+          },
+          "price": 38,
+          "photo": "sojito",
+          "ratio": 1.777
+        },
+        {
+          "id": "stardust-galaxy",
+          "name": {
+            "en": "STARDUST GALAXY"
+          },
+          "desc": {
+            "en": "Fresh Soju / multifruit isotonic drink / Kinley Pink Aromatic Berry / grenadine / edible glitter",
+            "pl": "Fresh Soju / napój izotoniczny wieloowocowy / Kinley Pink Aromatic Berry / grenadyna / grenadine syrup / jadalny brokat"
+          },
+          "price": 38,
+          "photo": "stardust-galaxy",
+          "ratio": 1.499
+        },
+        {
+          "id": "emerald-apple",
+          "name": {
+            "en": "EMERALD APPLE"
+          },
+          "desc": {
+            "en": "Fresh Soju / tonic water / green apple syrup / lime syrup",
+            "pl": "Fresh Soju / tonik / syrop z zielonego jabłka / syrop limonkowy"
+          },
+          "price": 38,
+          "photo": "emerald-apple",
+          "ratio": 1.499
+        },
+        {
+          "id": "kiwi-bliss",
+          "name": {
+            "en": "KIWI BLISS"
+          },
+          "desc": {
+            "en": "Fresh Soju / tonic water / kiwi syrup / strawberry syrup / lime syrup",
+            "pl": "Fresh Soju / tonik / syrop z kiwi / syrop truskawkowy / syrop limonkowy"
+          },
+          "price": 38,
+          "photo": "kiwi-bliss",
+          "ratio": 1.499
+        },
+        {
+          "id": "peach-blush",
+          "name": {
+            "en": "PEACH BLUSH"
+          },
+          "desc": {
+            "en": "Fresh Soju / orange juice / soda water / peach syrup / strawberry syrup / lime syrup",
+            "pl": "Fresh Soju / sok pomarańczowy / woda gazowana / syrop brzoskwiniowy / syrop truskawkowy / syrop limonkowy"
+          },
+          "price": 38,
+          "photo": "peach-blush",
+          "ratio": 1.498
+        },
+        {
+          "id": "pink-mirage",
+          "name": {
+            "en": "PINK MIRAGE"
+          },
+          "desc": {
+            "en": "Fresh Soju / tonic water / pink grapefruit juice / lime syrup",
+            "pl": "Fresh Soju / tonik / sok z różowego grejpfruta / syrop limonkowy"
+          },
+          "price": 38,
+          "photo": "pink-mirage",
+          "ratio": 1.499
+        },
+        {
+          "id": "moonlight-berry",
+          "name": {
+            "en": "MOONLIGHT BERRY"
+          },
+          "desc": {
+            "en": "Fresh Soju / blackcurrant juice / tonic water / green apple syrup",
+            "pl": "Fresh Soju / sok z czarnej porzeczki / tonik / syrop z zielonego jabłka"
+          },
+          "price": 38,
+          "photo": "moonlight-berry",
+          "ratio": 1.499
+        },
+        {
+          "id": "orions-kiss",
+          "name": {
+            "en": "ORION’S KISS"
+          },
+          "desc": {
+            "en": "Fresh Soju / Blue Curaçao syrup / Kinley Pink Aromatic Berry / green apple syrup / lime syrup / edible glitter",
+            "pl": "Fresh Soju / syrop Blue Curaçao / Kinley Pink Aromatic Berry / syrop zielone jabłko / syrop limonkowy / jadalny brokat"
+          },
+          "price": 38,
+          "photo": "orions-kiss",
+          "ratio": 1.5
+        },
+        {
+          "id": "ivory-hazelnut",
+          "name": {
+            "en": "IVORY HAZELNUT"
+          },
+          "desc": {
+            "en": "Fresh Soju / whole milk / evaporated milk / hazelnut syrup",
+            "pl": "Fresh Soju / mleko / mleko zagęszczone / syrop z orzechów laskowych"
+          },
+          "price": 38,
+          "photo": "ivory-hazelnut",
+          "ratio": 1.779
+        }
+      ]
+    },
+    {
+      "id": "aperol-cocktails",
+      "title": {
+        "en": "APEROL COCKTAILS"
+      },
+      "layout": "cards",
+      "items": [
+        {
+          "id": "aperol-spritz",
+          "name": {
+            "en": "APEROL SPRITZ"
+          },
+          "desc": {
+            "en": "Aperol / prosecco / soda water / orange",
+            "pl": "Aperol / prosecco / woda gazowana / pomarańcza"
+          },
+          "price": 35,
+          "photo": "aperol-spritz",
+          "ratio": 1.499
+        },
+        {
+          "id": "aperol-tonic",
+          "name": {
+            "en": "APEROL TONIC"
+          },
+          "desc": {
+            "en": "Aperol / tonic water / orange",
+            "pl": "Aperol / tonik / pomarańcza"
+          },
+          "price": 35,
+          "photo": "aperol-tonic",
+          "ratio": 1.499
+        },
+        {
+          "id": "aperol-peach-sunset",
+          "name": {
+            "en": "APEROL PEACH SUNSET"
+          },
+          "desc": {
+            "en": "Aperol / prosecco / peach juice / grenadine / orange / mint",
+            "pl": "Aperol / prosecco / sok brzoskwiniowy / grenadyna / pomarańcza / mięta"
+          },
+          "price": 37,
+          "photo": "aperol-peach-sunset",
+          "ratio": 1.499
+        }
+      ]
+    },
+    {
+      "id": "prosecco-cocktails",
+      "title": {
+        "en": "PROSECCO COCKTAILS"
+      },
+      "layout": "cards",
+      "items": [
+        {
+          "id": "bellini",
+          "name": {
+            "en": "BELLINI"
+          },
+          "desc": {
+            "en": "Prosecco / peach purée",
+            "pl": "Prosecco / purée brzoskwiniowe"
+          },
+          "price": 33,
+          "photo": "bellini",
+          "ratio": 1.498
+        },
+        {
+          "id": "rossini",
+          "name": {
+            "en": "ROSSINI"
+          },
+          "desc": {
+            "en": "Prosecco / strawberry purée",
+            "pl": "Prosecco / purée truskawkowe"
+          },
+          "price": 33,
+          "photo": "rossini",
+          "ratio": 1.499
+        },
+        {
+          "id": "mimosa",
+          "name": {
+            "en": "MIMOSA"
+          },
+          "desc": {
+            "en": "Prosecco / orange juice",
+            "pl": "Prosecco / sok pomarańczowy"
+          },
+          "price": 33,
+          "photo": "mimosa",
+          "ratio": 1.499
+        },
+        {
+          "id": "ether-bloom",
+          "name": {
+            "en": "ETHER BLOOM"
+          },
+          "desc": {
+            "en": "Prosecco / Blue Curaçao syrup / soda water / lemon juice",
+            "pl": "Prosecco / syrop Blue Curaçao / woda gazowana / sok z cytryny"
+          },
+          "price": 33,
+          "photo": "ether-bloom",
+          "ratio": 1.499
+        },
+        {
+          "id": "green-moonlight",
+          "name": {
+            "en": "GREEN MOONLIGHT"
+          },
+          "desc": {
+            "en": "Prosecco / tonic water / soda water / melon syrup / lime syrup/ edible glitter",
+            "pl": "Prosecco / tonik / woda gazowana / syrop melonowy / syrop limonkowy / jadalny brokat"
+          },
+          "price": 33,
+          "photo": "green-moonlight",
+          "ratio": 1.499
+        },
+        {
+          "id": "hugo-spritz",
+          "name": {
+            "en": "HUGO SPRITZ"
+          },
+          "desc": {
+            "en": "Prosecco / elderflower syrup / soda water / lime / mint",
+            "pl": "Prosecco / syrop z kwiatów czarnego bzu / woda gazowana / limonka / mięta"
+          },
+          "price": 37,
+          "photo": "hugo-spritz",
+          "ratio": 1.499
+        }
+      ]
+    },
+    {
+      "id": "malibu-cocktails",
+      "title": {
+        "en": "MALIBU COCKTAILS"
+      },
+      "layout": "cards",
+      "items": [
+        {
+          "id": "amethyst-cream",
+          "name": {
+            "en": "AMETHYST CREAM"
+          },
+          "desc": {
+            "en": "Malibu / evaporated milk / whole milk / blueberry syrup",
+            "pl": "Malibu / mleko zagęszczone / mleko / syrop jagodowy"
+          },
+          "price": 36,
+          "photo": "amethyst-cream",
+          "ratio": 1.499
+        },
+        {
+          "id": "ruby-cream",
+          "name": {
+            "en": "RUBY CREAM"
+          },
+          "desc": {
+            "en": "Malibu / evaporated milk / whole milk / strawberry syrup",
+            "pl": "Malibu / mleko zagęszczone / mleko / syrop truskawkowy"
+          },
+          "price": 36,
+          "photo": "ruby-cream",
+          "ratio": 1.499
+        },
+        {
+          "id": "twilight-dream",
+          "name": {
+            "en": "TWILIGHT DREAM"
+          },
+          "desc": {
+            "en": "Malibu / Kinley Pink Aromatic Berry / Blue Curaçao syrup / sgrenadine / lime syrup",
+            "pl": "Malibu / Kinley Pink Aromatic Berry / syrop Blue Curaçao / grenadyna / syrop z limonki"
+          },
+          "price": 36,
+          "photo": "twilight-dream",
+          "ratio": 1.499
+        },
+        {
+          "id": "pearl-lagoon",
+          "name": {
+            "en": "PEARL LAGOON"
+          },
+          "desc": {
+            "en": "Malibu / pineapple juice / coconut milk / Blue Curaçao syrup / lime syrup",
+            "pl": "Malibu / sok ananasowy / mleko kokosowe / syrop Blue Curaçao / syrop limonkowy"
+          },
+          "price": 36,
+          "photo": "pearl-lagoon",
+          "ratio": 1.499
+        },
+        {
+          "id": "coconut-reverie",
+          "name": {
+            "en": "COCONUT REVERIE"
+          },
+          "desc": {
+            "en": "Malibu / pineapple juice / coconut milk / lime syrup",
+            "pl": "Malibu / sok ananasowy / mleko kokosowe / syrop limonkowy"
+          },
+          "price": 36,
+          "photo": "coconut-reverie",
+          "ratio": 1.499
+        }
+      ]
+    },
+    {
+      "id": "cocktail-bowl",
+      "title": {
+        "en": "COCKTAIL BOWL",
+        "pl": "KULA KOKTAJLOWA"
+      },
+      "layout": "feature",
+      "photo": "cocktail-bowl",
+      "ratio": 2,
+      "items": [
+        {
+          "id": "cocktail-bowl-2-l",
+          "name": {
+            "en": "COCKTAIL BOWL 2 L",
+            "pl": "KULA KOKTAJLOWA 2 L"
+          },
+          "desc": {
+            "en": "Every cocktail from our menu is also available in a 2L Bowl.",
+            "pl": "Każdy koktajl z naszego menu możesz zamówić również w wersji 2-litrowej Kuli."
+          },
+          "price": 170
+        }
+      ]
+    },
+    {
+      "id": "korean-alcohols",
+      "title": {
+        "en": "KOREAN ALCOHOLS"
+      },
+      "layout": "feature",
+      "photo": "korean-alcohols",
+      "ratio": 1.5,
+      "items": [
+        {
+          "id": "soju",
+          "name": {
+            "en": "SOJU"
+          },
+          "desc": {
+            "en": "Fresh / Mango / Strawberry / Blueberry / Plum / Yogurt / Green Grape",
+            "pl": "Fresh / Mango / Truskawka / Jagoda / Śliwka / Jogurt / Winogrono"
+          },
+          "note": {
+            "en": "Flavours:",
+            "pl": "Smaki do wyboru:"
+          },
+          "prices": [
+            {
+              "id": "bottle",
+              "label": {
+                "en": "BOTTLE",
+                "pl": "BUTELKA"
+              },
+              "volume": "350 ml",
+              "price": 50
+            },
+            {
+              "id": "shots-1-shot",
+              "label": {
+                "en": "SHOTS",
+                "pl": "SZOTY"
+              },
+              "volume": "40 ml",
+              "amount": "1 shot",
+              "price": 10
+            },
+            {
+              "id": "shots-3-shots",
+              "label": {
+                "en": "SHOTS",
+                "pl": "SZOTY"
+              },
+              "volume": "40 ml",
+              "amount": "3 shots",
+              "price": 28
+            },
+            {
+              "id": "shots-6-shots",
+              "label": {
+                "en": "SHOTS",
+                "pl": "SZOTY"
+              },
+              "volume": "40 ml",
+              "amount": "6 shots",
+              "price": 56
+            }
+          ]
+        },
+        {
+          "id": "makgeolli",
+          "name": {
+            "en": "MAKGEOLLI"
+          },
+          "desc": {
+            "en": "Traditional Korean rice wine",
+            "pl": "Tradycyjne koreańskie wino ryżowe"
+          },
+          "note": {
+            "en": "Kooksoondang"
+          },
+          "volume": "750 ml",
+          "price": 55
+        }
+      ]
+    },
+    {
+      "id": "beer-tower",
+      "title": {
+        "en": "BEER TOWER",
+        "pl": "WIEŻA PIWA"
+      },
+      "layout": "columns",
+      "photo": "beer-tower",
+      "ratio": 1.5,
+      "groups": [
+        {
+          "title": {
+            "en": "BEER TOWER 4 L",
+            "pl": "WIEŻA PIWA 4 L"
+          },
+          "items": [
+            {
+              "id": "draft-beer",
+              "name": {
+                "en": "Draft beer",
+                "pl": "Piwo beczkowe"
+              },
+              "price": 110
+            },
+            {
+              "id": "somaek-tower",
+              "name": {
+                "en": "Somaek Tower"
+              },
+              "desc": {
+                "en": "Soju / draft beer",
+                "pl": "Soju / piwo beczkowe"
+              },
+              "price": 200
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beer",
+      "title": {
+        "en": "BEER",
+        "pl": "PIWO"
+      },
+      "layout": "columns",
+      "groups": [
+        {
+          "title": {
+            "en": "DRAFT BEER",
+            "pl": "PIWO BECZKOWE"
+          },
+          "items": [
+            {
+              "id": "guinness",
+              "name": {
+                "en": "Guinness"
+              },
+              "volume": "500 ml",
+              "price": 24
+            },
+            {
+              "id": "zatecky",
+              "name": {
+                "en": "Žatecký"
+              },
+              "volume": "500 ml",
+              "price": 15
+            }
+          ]
+        },
+        {
+          "title": {
+            "en": "BOTTLED BEER",
+            "pl": "PIWO BUTELKOWE"
+          },
+          "items": [
+            {
+              "id": "corona-extra",
+              "name": {
+                "en": "Corona Extra"
+              },
+              "volume": "330 ml",
+              "price": 15
+            },
+            {
+              "id": "corona-cero-0-0",
+              "name": {
+                "en": "Corona Cero 0.0%"
+              },
+              "volume": "330 ml",
+              "price": 15
+            }
+          ]
+        },
+        {
+          "title": {
+            "en": "SNACKS",
+            "pl": "PRZEKĄSKI"
+          },
+          "items": [
+            {
+              "id": "rosemary-nuts",
+              "name": {
+                "en": "Rosemary nuts",
+                "pl": "Orzechy z rozmarynem"
+              },
+              "price": 25
+            },
+            {
+              "id": "lays-oven-baked-grilled-vegetables",
+              "name": {
+                "en": "Lay’s Oven Baked - Grilled Vegetables",
+                "pl": "Lay’s Oven Baked - Grillowane warzywa"
+              },
+              "price": 15
+            },
+            {
+              "id": "lays-oven-baked-yoghurt-with-herbs",
+              "name": {
+                "en": "Lay’s Oven Baked - Yoghurt with Herbs",
+                "pl": "Lay’s Oven Baked - Jogurt z ziołami"
+              },
+              "price": 15
+            },
+            {
+              "id": "pretzel-sticks",
+              "name": {
+                "en": "Pretzel sticks",
+                "pl": "Paluszki"
+              },
+              "price": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sparkling-wines",
+      "title": {
+        "en": "SPARKLING WINES",
+        "pl": "WINA MUSUJĄCE"
+      },
+      "layout": "wines",
+      "photo": "sparkling-wines",
+      "ratio": 0.666,
+      "items": [
+        {
+          "id": "cava-brut-rose-josep-masachs",
+          "name": {
+            "en": "Cava Brut Rosé - Josep Masachs"
+          },
+          "desc": {
+            "en": "Spain / Catalonia / Dry / Grape: Trepat"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 27
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 125
+            }
+          ],
+          "abv": "11%"
+        },
+        {
+          "id": "prosecco-extra-dry-cabert-cantine-di-bertolio",
+          "name": {
+            "en": "Prosecco Extra Dry Cabert - Cantine di Bertolio"
+          },
+          "desc": {
+            "en": "Italy / Veneto / Semi-dry / Grape: Glera"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 30
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 139
+            }
+          ],
+          "abv": "11,5%"
+        }
+      ],
+      "columns": [
+        "150 ml",
+        "750 ml",
+        "alk. %"
+      ]
+    },
+    {
+      "id": "white-wines",
+      "title": {
+        "en": "WHITE WINES",
+        "pl": "WINA BIAŁE"
+      },
+      "layout": "wines",
+      "photo": "white-wines",
+      "ratio": 1.499,
+      "items": [
+        {
+          "id": "sauvignon-evidence-la-belle-pierre",
+          "name": {
+            "en": "Sauvignon Evidence - La Belle Pierre"
+          },
+          "desc": {
+            "en": "France / Languedoc / Dry / Grape: Sauvignon Blanc"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 26
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 119
+            }
+          ],
+          "abv": "12,5%"
+        },
+        {
+          "id": "riesling-koenigwingert-wachtenburg-winzer",
+          "name": {
+            "en": "Riesling Koenigwingert - Wachtenburg Winzer"
+          },
+          "desc": {
+            "en": "Germany / Palatinate / Semi-dry / Grape: Riesling"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 31
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 145
+            }
+          ],
+          "abv": "10,5%"
+        },
+        {
+          "id": "chardonnay-tolva-vicar",
+          "name": {
+            "en": "Chardonnay Tolva - Vicar"
+          },
+          "desc": {
+            "en": "Chile / Central Valley / Dry / Grape: Chardonnay"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 26
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 119
+            }
+          ],
+          "abv": "13%"
+        },
+        {
+          "id": "pinot-grigio-garganega-terre-passeri",
+          "name": {
+            "en": "Pinot Grigio - Garganega Terre Passeri"
+          },
+          "desc": {
+            "en": "Italy / Garda / Dry / Grape: Pinot Grigio, Garganega"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 24
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 99
+            }
+          ],
+          "abv": "12%"
+        },
+        {
+          "id": "vinho-verde-adega-de-ponte-barca",
+          "name": {
+            "en": "Vinho Verde - Adega de Ponte Barca"
+          },
+          "desc": {
+            "en": "Portugal / Minho / Semi-dry / Grape: Loureiro, Trajadura, Pederna"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 28
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 129
+            }
+          ],
+          "abv": "11%"
+        }
+      ],
+      "columns": [
+        "150 ml",
+        "750 ml",
+        "alk. %"
+      ]
+    },
+    {
+      "id": "red-wines",
+      "title": {
+        "en": "RED WINES",
+        "pl": "WINA CZERWONE"
+      },
+      "layout": "wines",
+      "photo": "red-wines",
+      "ratio": 1.5,
+      "items": [
+        {
+          "id": "primitivo-villa-schinosa",
+          "name": {
+            "en": "Primitivo - Villa Schinosa"
+          },
+          "desc": {
+            "en": "Italy / Puglia / Dry / Grape: Primitivo"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 38
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 165
+            }
+          ],
+          "abv": "14%"
+        },
+        {
+          "id": "pinot-noir-les-muriers-domaine-castelnau",
+          "name": {
+            "en": "Pinot Noir Les Muriers - Domaine Castelnau"
+          },
+          "desc": {
+            "en": "France / Languedoc / Dry / Grape: Pinot Noir"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 31
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 145
+            }
+          ],
+          "abv": "13,5%"
+        },
+        {
+          "id": "syrah-envyfol-lavau",
+          "name": {
+            "en": "Syrah EnvyFol - Lavau"
+          },
+          "desc": {
+            "en": "France / Languedoc / Dry / Grape: Syrah"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 26
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 119
+            }
+          ],
+          "abv": "14%"
+        },
+        {
+          "id": "dornfelder-wachtenburg-winzer",
+          "name": {
+            "en": "Dornfelder - Wachtenburg Winzer"
+          },
+          "desc": {
+            "en": "Germany / Palatinate / Semi-sweet / Grape: Dornfelder"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 31
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 145
+            }
+          ],
+          "abv": "11%"
+        },
+        {
+          "id": "merlot-tolva-vicar",
+          "name": {
+            "en": "Merlot Tolva - Vicar"
+          },
+          "desc": {
+            "en": "Chile / Central Valley / Dry / Grape: Merlot"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 26
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 119
+            }
+          ],
+          "abv": "13,5%"
+        }
+      ],
+      "columns": [
+        "150 ml",
+        "750 ml",
+        "alk. %"
+      ]
+    },
+    {
+      "id": "non-alcoholic-wines",
+      "title": {
+        "en": "NON-ALCOHOLIC WINES",
+        "pl": "WINA BEZALKOHOLOWE"
+      },
+      "layout": "wines",
+      "photo": "non-alcoholic-wines",
+      "ratio": 1.499,
+      "items": [
+        {
+          "id": "blanc-fines-vintense-neobulles",
+          "name": {
+            "en": "Blanc Fines Vintense - Neobulles"
+          },
+          "desc": {
+            "en": "Belgium / Semi-dry / Grape: Airen"
+          },
+          "prices": [
+            {
+              "id": "150-ml",
+              "volume": "150 ml",
+              "price": 28
+            },
+            {
+              "id": "750-ml",
+              "volume": "750 ml",
+              "price": 129
+            }
+          ],
+          "abv": "0%"
+        }
+      ],
+      "columns": [
+        "150 ml",
+        "750 ml",
+        "alk. %"
+      ]
+    },
+    {
+      "id": "soft-drinks",
+      "title": {
+        "en": "NON-ALCOHOLIC DRINKS",
+        "pl": "NAPOJE BEZALKOHOLOWE"
+      },
+      "layout": "columns",
+      "photo": "soft-drinks",
+      "ratio": 1.501,
+      "groups": [
+        {
+          "title": {
+            "en": "CLASSIC LEMONADE",
+            "pl": "LEMONIADA KLASYCZNA"
+          },
+          "photo": "lemonade",
+          "ratio": 0.667,
+          "items": [
+            {
+              "id": "classic-lemonade-400-ml",
+              "volume": "400 ml",
+              "price": 15
+            },
+            {
+              "id": "classic-lemonade-1-l",
+              "volume": "1 l",
+              "price": 35
+            }
+          ]
+        },
+        {
+          "title": {
+            "en": "SOFT DRINKS",
+            "pl": "NAPOJE"
+          },
+          "items": [
+            {
+              "id": "coca-cola-zero-cukru",
+              "name": {
+                "en": "Coca-Cola zero cukru"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "coca-cola-original-taste",
+              "name": {
+                "en": "Coca-Cola original taste"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "fanta",
+              "name": {
+                "en": "Fanta"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "sprite",
+              "name": {
+                "en": "Sprite"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "kinley-tonic-water",
+              "name": {
+                "en": "Kinley Tonic Water"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "kinley-pink-aromatic-berry",
+              "name": {
+                "en": "Kinley Pink Aromatic Berry"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "fuze-tea-cytrynowa",
+              "name": {
+                "en": "Fuze Tea cytrynowa"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            },
+            {
+              "id": "fuze-tea-brzoskwinia-i-hibiskus",
+              "name": {
+                "en": "Fuze Tea brzoskwinia i hibiskus"
+              },
+              "volume": "0,25 l",
+              "price": 10
+            }
+          ]
+        },
+        {
+          "title": {
+            "en": "WATER & JUICE",
+            "pl": "WODA I SOKI"
+          },
+          "items": [
+            {
+              "id": "kropla-beskidu-niegazowana",
+              "name": {
+                "en": "Kropla Beskidu niegazowana"
+              },
+              "volume": "0,33 l",
+              "price": 8
+            },
+            {
+              "id": "kropla-beskidu-delice-gazowana",
+              "name": {
+                "en": "Kropla Beskidu Delice gazowana"
+              },
+              "volume": "0,33 l",
+              "price": 8
+            },
+            {
+              "id": "cappy-pomaranczowy",
+              "name": {
+                "en": "Cappy pomarańczowy"
+              },
+              "volume": "0,25 l",
+              "price": 8
+            },
+            {
+              "id": "cappy-jabkowy",
+              "name": {
+                "en": "Cappy jabłkowy"
+              },
+              "volume": "0,25 l",
+              "price": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tea",
+      "title": {
+        "en": "TEA",
+        "pl": "HERBATY"
+      },
+      "layout": "columns",
+      "photo": "tea",
+      "ratio": 1.5,
+      "groups": [
+        {
+          "title": {
+            "en": "CLASSIC TEA",
+            "pl": "KLASYCZNE HERBATY"
+          },
+          "items": [
+            {
+              "id": "dilmah-ceylon-gold",
+              "name": {
+                "en": "Dilmah Ceylon Gold"
+              },
+              "price": 12
+            },
+            {
+              "id": "dilmah-earl-grey",
+              "name": {
+                "en": "Dilmah Earl Grey"
+              },
+              "price": 12
+            },
+            {
+              "id": "dilmah-pure-green",
+              "name": {
+                "en": "Dilmah Pure Green"
+              },
+              "price": 12
+            },
+            {
+              "id": "dilmah-mango-strawberry",
+              "name": {
+                "en": "Dilmah Mango & Strawberry"
+              },
+              "price": 12
+            },
+            {
+              "id": "dilmah-lychee",
+              "name": {
+                "en": "Dilmah Lychee"
+              },
+              "price": 12
+            },
+            {
+              "id": "dilmah-spicy-berry",
+              "name": {
+                "en": "Dilmah Spicy Berry"
+              },
+              "price": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tea-your-own",
+      "title": {
+        "en": "CREATE YOUR OWN TEA",
+        "pl": "STWÓRZ WŁASNĄ HERBATĘ"
+      },
+      "layout": "steps",
+      "photo": "tea-your-own",
+      "ratio": 1.777,
+      "price": 26,
+      "steps": [
+        {
+          "step": "01",
+          "title": {
+            "en": "CHOOSE YOUR TEA",
+            "pl": "01 WYBIERZ HERBATĘ"
+          },
+          "desc": {
+            "pl": [
+              "Ceylon Gold · Earl Grey · Pure Green Tea",
+              "Mango & Strawberry · Lychee · Spicy Berry"
+            ]
+          }
+        },
+        {
+          "step": "02",
+          "title": {
+            "en": "CHOOSE A PRESERVE",
+            "pl": "02 WYBIERZ KONFITURĘ"
+          },
+          "desc": {
+            "en": [
+              "raspberry · forest berries · cranberry · orange",
+              "rose petals · hibiscus"
+            ],
+            "pl": [
+              "malina · owoce leśne · żurawina · pomarańcza",
+              "płatki róż · hibiskus"
+            ]
+          }
+        },
+        {
+          "step": "03",
+          "title": {
+            "en": "CHOOSE UP TO 4 ADDITIONS",
+            "pl": "03 WYBIERZ DO 4 DODATKÓW"
+          },
+          "sub": {
+            "en": "Fruits & Spices",
+            "pl": "Owoce i przyprawy"
+          },
+          "desc": {
+            "en": [
+              "orange · lemon · fresh ginger · cinnamon · cloves",
+              "star anise · rosemary · mint"
+            ],
+            "pl": [
+              "pomarańcza · cytryna · świeży imbir · cynamon",
+              "goździki · anyż · rozmaryn · mięta"
+            ]
+          }
+        },
+        {
+          "step": "04",
+          "title": {
+            "en": "CHOOSE YOUR SWEETENER",
+            "pl": "04 WYBIERZ SPOSÓB SŁODZENIA"
+          },
+          "desc": {
+            "en": [
+              "honey · sugar · no sweetener"
+            ],
+            "pl": [
+              "miód · cukier · bez słodzenia"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

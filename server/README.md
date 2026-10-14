@@ -50,11 +50,17 @@ deleted the day after the date it was for, together with its cards in Telegram
 ## Dishes picked ahead
 
 Right after booking, the site asks once whether the guest already knows what
-they will order (`preorders.js`). It is not a payment: the staff get a card
-with the dishes by menu number, their Korean names, the total by menu prices and
-a note for the kitchen, and the guest pays at the table. The prices are read
-from the live menu here; whatever the browser sends as a price is ignored, and a
-dish that is not on the menu is refused.
+they will order (`preorders.js`), dishes and drinks alike. It is not a payment:
+the staff get a card with a Kitchen block (dishes by menu number) and a Bar
+block (drinks, with the glass, bottle or count), the total by menu prices and a
+note for the kitchen, in English only, and the guest pays at the table. The
+prices are read from the live menu and the live drinks list here; whatever the
+browser sends as a price is ignored, and anything not on either is refused.
+
+A drink is ordered by the id the drinks list gives it (`drinks.js`, mirrored by
+`src/data/drinks/index.ts`): `drink:<id>` for a drink with one price,
+`drink:<id>.<price id>` for a glass or a bottle of one, `drink:<section id>` for
+the tea that is put together.
 
 The guest can change the list, or take it back, from the confirmation or from
 "you already have a booking" on the reservation page, with the same token that
@@ -65,6 +71,16 @@ booking takes its dishes along. The list shows under the booking in `/today`,
 `/day` and `/all`, and the file with it is emptied the day after the visit.
 
 `PREORDER=off` switches the whole thing off; the site then never asks.
+
+## The drinks
+
+The bar's list is content like the menu: `drinks.json` in `content/live`, edited
+in the admin panel under Drinks and published with the rest. Each section keeps
+the layout of the printed drinks menu (cocktail cards, a feature with a
+photograph, columns of rows, a wine table, the steps of a tea); what is in them
+(names, descriptions, volumes, prices, options such as a glass or a bottle,
+what is hidden, the photographs) is the restaurant's to change. Uploaded drink
+photographs go to `/u/drinks/`, beside `/u/dishes/`.
 
 ## The list at noon
 

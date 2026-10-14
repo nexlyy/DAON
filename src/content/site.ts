@@ -13,6 +13,7 @@ import categoriesJson from './categories.json'
 import promoJson from './promo.json'
 import restaurantJson from './restaurant.json'
 import textsJson from './texts.json'
+import type { DrinksMenu } from '@/data/drinks/types'
 
 export interface RawText {
   en: string
@@ -56,6 +57,9 @@ export interface RawSnapshot {
    * the page asks for. Anything not in here reads as the site was built.
    */
   texts: Record<string, Record<string, string>>
+
+  /** The bar's list: sections as the printed drinks menu sets them. */
+  drinks: DrinksMenu
 }
 
 declare global {
@@ -77,4 +81,6 @@ export const site: RawSnapshot = {
   restaurant: injected?.restaurant ?? restaurantJson,
   promo: injected?.promo ?? promoJson,
   texts: injected?.texts ?? textsJson,
+  // Like the dishes, only ever the injected copy.
+  drinks: injected?.drinks ?? { sections: [] },
 }

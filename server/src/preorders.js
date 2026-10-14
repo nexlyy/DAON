@@ -12,12 +12,13 @@
 import { chmodSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import { variantOf } from './drinks.js'
 import { root } from './env.js'
 
 const FILE = resolve(root, 'data', 'preorders.json')
 const NL = '\n'
 
-export const LIMITS = { lines: 40, perDish: 20, total: 100, notes: 300 }
+export const LIMITS = { lines: 60, perDish: 20, total: 100, notes: 300 }
 
 // How long before the booking the website stops taking changes. After that
 // it is a phone call, because the kitchen may already have started.
@@ -36,22 +37,24 @@ export const stillOpen = (booking, now = Date.now()) =>
   booking.status === 'confirmed' && now < startsAt(booking) - CLOSES_BEFORE * 60 * 1000
 
 /**
- * Turns what the browser sent into lines the kitchen can read, in the order
- * the dishes stand on the menu. An empty list is allowed: it means the guest
- * took the whole pre-order back.
+ * Turns what the browser sent into lines the kitchen and the bar can read:
+ * the dishes in the order they stand on the menu, then the drinks in the
+ * order of the drinks list. An empty list is allowed: it means the guest took
+ * the whole pre-order back.
  */
-export function readItems(raw, dishes) {
+export function readItems(raw, dishes, offers = []) {
   if (!Array.isArray(raw)) return { error: 'items must be a list', code: 'items' }
   if (raw.length > LIMITS.lines) return { error: 'too many different dishes', code: 'items' }
 
   const onMenu = dishes.filter((dish) => !dish.hidden)
   const byId = new Map(onMenu.map((dish) => [dish.id, dish]))
+  const offered = new Map(offers.map((offer) => [offer.id, offer]))
   const counts = new Map()
 
   for (const item of raw) {
     const id = typeof item?.id === 'string' ? item.id : ''
     const quantity = Number(item?.quantity)
-    if (!byId.has(id)) return { error: `${id || 'a dish'} is not on the menu`, code: 'menu' }
+    if (!byId.has(id) && !offered.has(id)) return { error: `${id || 'a dish'} is not on the menu`, code: 'menu' }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > LIMITS.perDish) {
       return { error: 'quantity is out of range', code: 'items' }
     }
@@ -65,7 +68,7 @@ export function readItems(raw, dishes) {
   }
   if (total > LIMITS.total) return { error: 'too many dishes', code: 'items' }
 
-  const lines = onMenu
+  const food = onMenu
     .filter((dish) => counts.has(dish.id))
     .map((dish) => ({
       id: dish.id,
@@ -74,7 +77,17 @@ export function readItems(raw, dishes) {
       price: dish.price,
       quantity: counts.get(dish.id),
     }))
-  return { lines }
+  const drinks = offers
+    .filter((offer) => counts.has(offer.id))
+    .map((offer) => ({
+      id: offer.id,
+      kind: 'drink',
+      name: { en: offer.name?.en ?? offer.name?.pl ?? '', pl: offer.name?.pl ?? offer.name?.en ?? '' },
+      variant: variantOf(offer),
+      price: offer.price,
+      quantity: counts.get(offer.id),
+    }))
+  return { lines: [...food, ...drinks] }
 }
 
 export const totalOf = (lines) =>
@@ -84,7 +97,15 @@ export const totalOf = (lines) =>
 export const publicPreorder = (entry) =>
   entry
     ? {
-        lines: entry.lines.map(({ id, number, name, price, quantity }) => ({ id, number, name, price, quantity })),
+        lines: entry.lines.map(({ id, kind, number, name, variant, price, quantity }) => ({
+          id,
+          kind,
+          number,
+          name,
+          variant,
+          price,
+          quantity,
+        })),
         notes: entry.notes,
         total: totalOf(entry.lines),
         updatedAt: entry.updatedAt,

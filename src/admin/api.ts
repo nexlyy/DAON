@@ -5,6 +5,8 @@
  * write also carries the token the session was given when it signed in, which
  * is what stops a page on another site from posting here with that cookie.
  */
+import type { DrinksMenu } from '@/data/drinks/types'
+
 const BASE = `${(import.meta.env.VITE_BOOKING_API_URL as string | undefined) ?? '/api'}/admin`.replace(
   /([^:])\/\/+/g,
   '$1/',
@@ -33,6 +35,10 @@ export interface Category {
   calligraphy: string
   sourcePages: number[]
 }
+
+export type { DrinkItem, DrinkPrice, DrinkSection, DrinkStep, DrinksMenu } from '@/data/drinks/types'
+
+export type PhotoKind = 'dishes' | 'drinks'
 
 export interface Content {
   menu: { dishes: Dish[] }
@@ -67,6 +73,9 @@ export interface Content {
 
   /** Site wording the restaurant has rewritten, by locale and key. */
   texts: Record<string, Record<string, string>>
+
+  /** The bar's list. */
+  drinks: DrinksMenu
 }
 
 export type ContentFile = keyof Content
@@ -148,8 +157,8 @@ async function call<T>(method: string, path: string, body?: unknown, again = tru
 }
 
 /** Where a photograph is served from, whichever kind it is. */
-export const photoUrl = (photo: string) =>
-  photo.startsWith('u:') ? `/u/dishes/${photo.slice(2)}.webp` : `/images/dishes/${photo}.webp`
+export const photoUrl = (photo: string, kind: PhotoKind = 'dishes') =>
+  photo.startsWith('u:') ? `/u/${kind}/${photo.slice(2)}.webp` : `/images/${kind}/${photo}.webp`
 
 export const api = {
   signIn: (user: string, password: string) =>
@@ -187,8 +196,9 @@ export const api = {
   restore: (version: string) => call<State & { draft: Content }>('POST', '/restore', { version }),
 
   /** The bytes go up as they are; the server checks what they really are. */
-  uploadPhoto: async (dishId: string, blob: Blob) => {
-    const response = await fetch(`${BASE}/photo/${encodeURIComponent(dishId)}`, {
+  uploadPhoto: async (id: string, blob: Blob, kind: PhotoKind = 'dishes') => {
+    const where = kind === 'drinks' ? `drinks/${encodeURIComponent(id)}` : encodeURIComponent(id)
+    const response = await fetch(`${BASE}/photo/${where}`, {
       method: 'PUT',
       headers: { 'Content-Type': blob.type || 'application/octet-stream', 'X-Daon-Csrf': token() },
       body: blob,
@@ -203,7 +213,8 @@ export const api = {
     return data as unknown as State & { photo: string; resized: boolean }
   },
 
-  photos: () => call<{ photos: { photo: string; bytes: number; avif: boolean }[] }>('GET', '/photos'),
+  photos: (kind: PhotoKind = 'dishes') =>
+    call<{ photos: { photo: string; bytes: number; avif: boolean }[] }>('GET', `/photos?kind=${kind}`),
 
   log: (limit = 100) =>
     call<{ entries: { at: string; what: string; user?: string; ip?: string }[] }>(

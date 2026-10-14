@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { OrderLink } from '@/components/Order/OrderLink'
+import { BarTeaser } from '@/components/Bar/BarTeaser'
 import { Calligraphy } from '@/components/Media/Calligraphy'
 import { DishPhoto } from '@/components/Media/DishPhoto'
 import { categories } from '@/data/menu/categories'
@@ -141,6 +142,8 @@ export function HomePage() {
           </ul>
         </div>
       </section>
+
+      <BarTeaser />
 
       <section className={`section ${styles.visit}`} id="contact">
         <div className={`shell ${styles.visitInner}`}>

@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ApiError, api, type Content, type ContentFile, type State } from './api'
 import { Categories } from './Categories'
 import { Dishes } from './Dishes'
+import { Drinks } from './Drinks'
 import { Promotion } from './Promotion'
 import { Restaurant } from './Restaurant'
 import { Texts } from './Texts'
@@ -18,6 +19,7 @@ import styles from './admin.module.css'
 
 type Section =
   | 'dishes'
+  | 'drinks'
   | 'categories'
   | 'restaurant'
   | 'promotion'
@@ -151,6 +153,17 @@ export default function AdminPage() {
           {(
             [
               ['dishes', 'Dishes', content?.menu.dishes.length],
+              [
+                'drinks',
+                'Drinks',
+                content?.drinks?.sections.reduce(
+                  (total, section) =>
+                    total +
+                    (section.items?.length ?? 0) +
+                    (section.groups ?? []).reduce((sum, group) => sum + group.items.length, 0),
+                  0,
+                ),
+              ],
               ['categories', 'Categories', content?.categories.categories.length],
               ['restaurant', 'Hours & place', undefined],
               ['promotion', 'Promotion', undefined],
@@ -178,6 +191,7 @@ export default function AdminPage() {
           {preview && <PreviewReady preview={preview} onClose={() => setPreview(null)} />}
 
           {editing && section === 'dishes' && <Dishes editing={editing} />}
+          {editing && section === 'drinks' && <Drinks editing={editing} />}
           {editing && section === 'categories' && <Categories editing={editing} />}
           {editing && section === 'restaurant' && <Restaurant editing={editing} />}
           {editing && section === 'promotion' && <Promotion editing={editing} />}

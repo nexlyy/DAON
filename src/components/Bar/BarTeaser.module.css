@@ -1,0 +1,144 @@
+.bar {
+  background:
+    radial-gradient(ellipse 55% 60% at 85% 40%, rgba(242, 231, 207, 0.6), transparent 70%),
+    var(--paper);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 5.5rem);
+}
+
+.copy {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.title {
+  font-size: var(--step-3);
+}
+
+.lede {
+  max-width: 34rem;
+}
+
+.list {
+  width: min(100%, 30rem);
+  margin: 0.6rem 0 0.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(217, 195, 149, 0.45);
+}
+
+.name {
+  display: grid;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.detail {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+.dots {
+  flex: 1;
+  min-width: 1.5rem;
+  border-bottom: 1px dotted var(--clay);
+  transform: translateY(-0.3em);
+}
+
+.price {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-text);
+}
+
+.cta {
+  margin-top: 0.6rem;
+}
+
+/* Three cocktails in the round frames of the rest of the page, overlapping
+   like glasses set down together. */
+.media {
+  position: relative;
+  aspect-ratio: 1 / 0.92;
+}
+
+.photo {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  border: 6px solid var(--paper);
+  border-radius: 50%;
+  aspect-ratio: 1;
+  box-shadow: var(--shadow-lift);
+  background: var(--paper-deep);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo[data-place='0'] {
+  top: 0;
+  left: 6%;
+  width: 52%;
+  z-index: 2;
+}
+
+.photo[data-place='1'] {
+  top: 14%;
+  right: 0;
+  width: 42%;
+  z-index: 1;
+}
+
+.photo[data-place='2'] {
+  bottom: 0;
+  left: 34%;
+  width: 40%;
+  z-index: 3;
+}
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+
+  .media {
+    order: -1;
+    width: min(100%, 26rem);
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: var(--step-2);
+  }
+
+  .copy {
+    justify-items: stretch;
+  }
+
+  .cta {
+    justify-self: start;
+  }
+}

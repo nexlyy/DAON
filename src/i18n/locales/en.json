@@ -8,7 +8,9 @@
     "reservationDescription": "Book a table at DAON, Dworcowa 8, Katowice: pick a day, a time and your table on the floor plan.",
     "notFoundTitle": "Page not found — DAON",
     "privacyTitle": "Privacy policy — DAON Korean Restaurant, Katowice",
-    "privacyDescription": "What data DAON collects when you book a table, why, how long it is kept and what your rights are under the GDPR."
+    "privacyDescription": "What data DAON collects when you book a table, why, how long it is kept and what your rights are under the GDPR.",
+    "drinksTitle": "Drinks — DAON, Korean restaurant in Katowice",
+    "drinksDescription": "The drinks at DAON in Katowice: soju cocktails, makgeolli, draught beer, wine, lemonade and tea."
   },
   "nav": {
     "home": "Home",
@@ -24,7 +26,8 @@
       "text": "This page is also in English.",
       "switch": "English",
       "dismiss": "No, thanks"
-    }
+    },
+    "drinks": "Drinks"
   },
   "hero": {
     "eyebrow": "Korean Restaurant",
@@ -71,6 +74,12 @@
       "title": "Reserve a table",
       "body": "Pick a date, a time and the table you want to sit at. It takes under a minute.",
       "button": "Book a Table"
+    },
+    "bar": {
+      "eyebrow": "Bar",
+      "title": "Something to drink",
+      "lede": "Soju cocktails, Korean spirits, draught beer, wine and tea. All of it from the list that sits on the tables.",
+      "cta": "See the drinks"
     }
   },
   "menu": {
@@ -104,29 +113,26 @@
       "clear": "Clear filters",
       "done": "Done",
       "empty": "No dish matches these filters."
+    },
+    "switch": {
+      "label": "Menu",
+      "food": "Food",
+      "drinks": "Drinks"
     }
   },
   "drinks": {
     "title": "Drinks",
-    "subtitle": "The bar is not open yet. This page is not linked from the site and is not indexed.",
-    "lede": "The drinks list, taken line by line from the menu that sits on the tables. The bar is not open yet.",
-    "metaTitle": "Drinks — DAON",
+    "lede": "Soju cocktails, Korean spirits, draught beer, wine, and a tea you put together yourself.",
     "jump": "Jump to a section",
-    "loading": "Loading the drinks list…",
-    "missingTitle": "This link is not active",
-    "missingBody": "The drinks list is only reachable through a current link. Ask the restaurant for one.",
-    "errorTitle": "The list could not be loaded",
-    "errorBody": "Check the connection and try again.",
-    "retry": "Try again",
-    "footer": "Prices in Polish złoty. The list is not on the public site yet.",
-    "back": "Back to daon.pl",
+    "footer": "Prices in Polish złoty.",
     "searchLabel": "Search the drinks menu",
     "searchPlaceholder": "Name or ingredient, e.g. mango",
     "searchOpen": "Search",
     "searchClose": "Close search",
     "results": "Matching items: {count}",
     "noResults": "Nothing matches “{query}”.",
-    "clear": "Clear"
+    "clear": "Clear",
+    "book": "Book a table"
   },
   "order": {
     "title": "Order online",
@@ -296,17 +302,17 @@
     },
     "preorder": {
       "section": "Dishes for your table",
-      "invite": "Know what you'll order? Pick your dishes now and the staff will see them with your booking. You pay at the restaurant, as usual.",
+      "invite": "Know what you'll order? Pick your dishes and drinks now and the staff will see them with your booking. You pay at the restaurant, as usual.",
       "choose": "Choose dishes",
       "change": "Change the order",
       "finish": "Finish the order",
       "unsent": "Picked but not sent yet: {dishes} · {total}",
       "totalLine": "Total by the menu: {total}",
       "phoneOnly": "It's too late to change it online. Call us: {phone}.",
-      "bannerChoose": "Order dishes ahead",
+      "bannerChoose": "Order ahead",
       "bannerSaved": "Your dishes · {dishes}",
       "nudgeTitle": "Know what you'll order?",
-      "nudgeBody": "Pick your dishes now and the staff will see them with your booking. You pay at the restaurant.",
+      "nudgeBody": "Pick your dishes and drinks now and the staff will see them with your booking. You pay at the restaurant.",
       "nudgeYes": "Choose dishes",
       "nudgeLater": "Maybe later",
       "close": "Close",
@@ -323,7 +329,7 @@
       "review": "Next",
       "backToMenu": "Back to the menu",
       "yours": "Your order",
-      "empty": "Nothing picked yet. Add dishes from the menu.",
+      "empty": "Nothing picked yet. Add something from the menu.",
       "emptyRemove": "Everything is off the list. Save, and the restaurant will know you're not ordering ahead.",
       "notes": "Note for the kitchen",
       "notesPlaceholder": "E.g. allergies or a request for the kitchen",
@@ -338,7 +344,7 @@
       "sentTitle": "Sent to the restaurant",
       "changedTitle": "Changes saved",
       "removedTitle": "Order removed",
-      "sentBody": "The staff can see your dishes with booking {reference}. You pay at the restaurant, as usual.",
+      "sentBody": "The staff can see your order with booking {reference}. You pay at the restaurant, as usual.",
       "removedBody": "The restaurant knows you're not ordering ahead. You'll choose everything at the table.",
       "done": "Done",
       "dishes": {
@@ -351,6 +357,11 @@
         "menu": "One of these dishes is no longer on the menu. Refresh the page and choose again.",
         "rateLimit": "Too many tries in a short time. Try again in a few minutes, or call us: {phone}.",
         "generic": "It didn't go through. Try again, or call us: {phone}."
+      },
+      "items": {
+        "one": "{count} item",
+        "few": "{count} items",
+        "many": "{count} items"
       }
     }
   },

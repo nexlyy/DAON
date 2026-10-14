@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar/Navbar'
 import { Footer } from '@/components/Footer/Footer'
 import { LanguageHint } from '@/components/LanguageSwitcher/LanguageHint'
@@ -28,7 +28,10 @@ const PAGES: [string, ReactNode][] = [
   ['/contact', <HomePage />],
   ['/menu', <MenuPage />],
   ['/reservation', <ReservationPage />],
-  ['/drinks/:key', <DrinksPage />],
+  ['/drinks', <DrinksPage />],
+  // The address the list had while it was private: whoever kept the link
+  // lands on the public page.
+  ['/drinks/:key', <OldDrinksLink />],
   ['/privacy', <PrivacyPage />],
 ]
 
@@ -65,7 +68,7 @@ function Site() {
   }, [])
 
   useEffect(() => {
-    track('view', { page: page.startsWith('/drinks/') ? '/drinks' : page, locale })
+    track('view', { page, locale })
   }, [page])
 
   useEffect(() => {
@@ -102,6 +105,11 @@ function Site() {
       <LanguageHint />
     </>
   )
+}
+
+function OldDrinksLink() {
+  const { path } = useI18n()
+  return <Navigate to={path('/drinks')} replace />
 }
 
 const SECTIONS: Record<string, string> = {

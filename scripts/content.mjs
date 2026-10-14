@@ -18,6 +18,7 @@ const FILES = {
   restaurant: 'restaurant.json',
   promo: 'promo.json',
   texts: 'texts.json',
+  drinks: 'drinks.json',
 }
 
 const read = (dir, file) => JSON.parse(readFileSync(resolve(dir, file), 'utf8'))
@@ -48,6 +49,9 @@ export function readContent(dir) {
     restaurant: read(dir, FILES.restaurant),
     promo: read(dir, FILES.promo),
     texts: readIfThere(dir, FILES.texts, { pl: {}, en: {}, ko: {} }),
+    // The drinks came later than the rest; a directory from before them reads
+    // as a bar with nothing on the list.
+    drinks: readIfThere(dir, FILES.drinks, { sections: [] }),
   }
 }
 

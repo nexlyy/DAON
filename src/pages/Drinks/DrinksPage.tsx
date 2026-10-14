@@ -1,25 +1,19 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { DrinkPhoto } from '@/components/Media/DrinkPhoto'
+import { MenuSwitch } from '@/components/Menu/MenuSwitch'
 import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { Vine } from '@/components/Ornament/Vine'
+import { drinksMenu, pickText } from '@/data/drinks'
+import type { Bilingual, DrinkGroup, DrinkItem, DrinkPrice, DrinkSection, DrinkStep } from '@/data/drinks'
 import { translate } from '@/i18n/I18nProvider'
 import { useI18n } from '@/i18n/useI18n'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useStuck } from '@/hooks/useStuck'
-import type {
-  Bilingual,
-  DrinkGroup,
-  DrinkItem,
-  DrinkSection,
-  DrinksMenu,
-} from './types'
 import styles from './DrinksPage.module.css'
 
-type Status = 'loading' | 'ready' | 'missing' | 'error'
-
-const bundleUrl = (key: string) => `/d/${encodeURIComponent(key)}/drinks.json`
-const imageUrl = (key: string, photo: string, ext: string, tier?: 'sm') =>
-  `/d/${encodeURIComponent(key)}/images/${tier ? `${tier}/` : ''}${photo}.${ext}`
+type Pick = (value?: Bilingual | string) => string
+type Lines = (value?: Bilingual | DrinkStep['desc']) => string[]
 
 const anchor = (id: string) => `drinks-${id}`
 
@@ -35,7 +29,7 @@ const textsOf = (value: unknown): string[] => {
 }
 
 const itemTexts = (item: DrinkItem) =>
-  textsOf([item.name, item.title, item.sub, item.desc, item.note, item.prices?.map((price) => price.label)])
+  textsOf([item.name, item.desc, item.note, item.prices?.map((price) => [price.label, price.amount])])
 
 function filterSection(section: DrinkSection, matches: (texts: string[]) => boolean) {
   if (matches(textsOf(section.title))) return section
@@ -52,7 +46,7 @@ function filterSection(section: DrinkSection, matches: (texts: string[]) => bool
       return groups.length > 0 ? { ...section, photo: undefined, groups } : null
     }
     case 'steps':
-      return section.items?.some((item) => matches(itemTexts(item))) ? section : null
+      return section.steps?.some((step) => matches(textsOf([step.title, step.sub, step.desc]))) ? section : null
     default: {
       const items = (section.items ?? []).filter((item) => matches(itemTexts(item)))
       return items.length > 0 ? { ...section, items } : null
@@ -67,59 +61,36 @@ const countOf = (section: DrinkSection) =>
       ? (section.groups ?? []).reduce((total, group) => total + group.items.length, 0)
       : (section.items ?? []).length
 
+/**
+ * Shots of soju are one cell on the printed menu with three prices in it: the
+ * entries that share a label and a volume are set together again here.
+ */
+function priceCells(prices: DrinkPrice[]) {
+  const cells: { key: string; label?: Bilingual; volume?: string; entries: DrinkPrice[] }[] = []
+  for (const entry of prices) {
+    const key = `${entry.label?.en ?? entry.label?.pl ?? ''}|${entry.volume ?? ''}`
+    const last = cells[cells.length - 1]
+    if (last && last.key === key) last.entries.push(entry)
+    else cells.push({ key, label: entry.label, volume: entry.volume, entries: [entry] })
+  }
+  return cells
+}
+
 export function DrinksPage() {
   const { t, locale, path } = useI18n()
-  const { key = '' } = useParams()
-  const [status, setStatus] = useState<Status>('loading')
-  const [menu, setMenu] = useState<DrinksMenu | null>(null)
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
 
   useDocumentMeta({
-    title: t('drinks.metaTitle'),
-    description: t('drinks.subtitle'),
+    title: t('meta.drinksTitle'),
+    description: t('meta.drinksDescription'),
     path: '/drinks',
-    noindex: true,
   })
 
-  const load = useCallback(() => {
-    let cancelled = false
-    setStatus('loading')
+  const pick = useCallback<Pick>((value) => pickText(locale, value), [locale])
 
-    fetch(bundleUrl(key), { headers: { accept: 'application/json' }, cache: 'no-cache' })
-      .then((response) => {
-        if (response.status === 404 || response.status === 403) return null
-        if (!response.ok) throw new Error(String(response.status))
-        return response.json() as Promise<DrinksMenu>
-      })
-      .then((data) => {
-        if (cancelled) return
-        setMenu(data)
-        setStatus(data ? 'ready' : 'missing')
-      })
-      .catch(() => {
-        if (!cancelled) setStatus('error')
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [key])
-
-  useEffect(load, [load])
-
-  const pick = useCallback(
-    (value?: Bilingual | string) => {
-      if (!value) return ''
-      if (typeof value === 'string') return value
-      if (locale === 'pl') return value.pl || value.en || ''
-      return value.en || value.pl || ''
-    },
-    [locale],
-  )
-
-  const lines = useCallback(
-    (value?: DrinkItem['desc']) => {
+  const lines = useCallback<Lines>(
+    (value) => {
       if (!value) return []
       const chosen = locale === 'pl' ? value.pl ?? value.en : value.en ?? value.pl
       if (!chosen) return []
@@ -130,27 +101,16 @@ export function DrinksPage() {
 
   const needle = fold(deferredQuery.trim())
   const sections = useMemo(() => {
-    const all = menu?.sections ?? []
+    const all = drinksMenu.sections
     if (!needle) return all
     const stem = needle.length >= 5 && /[aeiouy]$/.test(needle) ? needle.slice(0, -1) : needle
     const matches = (texts: string[]) => texts.some((text) => fold(text).includes(stem))
     return all
       .map((section) => filterSection(section, matches))
       .filter((section): section is DrinkSection => section !== null)
-  }, [menu, needle])
+  }, [needle])
 
   const found = needle ? sections.reduce((total, section) => total + countOf(section), 0) : null
-
-  if (status !== 'ready' || !menu) {
-    return (
-      <Notice
-        status={status}
-        onRetry={() => {
-          load()
-        }}
-      />
-    )
-  }
 
   return (
     <>
@@ -169,63 +129,20 @@ export function DrinksPage() {
         )}
 
         {sections.map((section) => (
-          <Section
-            key={section.id}
-            section={section}
-            bundleKey={key}
-            pick={pick}
-            lines={lines}
-          />
+          <Section key={section.id} section={section} pick={pick} lines={lines} />
         ))}
       </div>
 
       <section className={`shell ${styles.foot}`}>
         <GoldDivider />
-        <p className={styles.footNote}>{pick(menu.note)}</p>
+        {drinksMenu.note && <p className={styles.footNote}>{pick(drinksMenu.note)}</p>}
         <p className={styles.footNote}>{t('drinks.footer')}</p>
-        <Link className={styles.back} to={path('/')}>
-          {t('drinks.back')}
+        <Link className={styles.back} to={path('/reservation')}>
+          {t('drinks.book')}
         </Link>
       </section>
     </>
   )
-}
-
-function Notice({ status, onRetry }: { status: Status; onRetry: () => void }) {
-  const { t, path } = useI18n()
-
-  if (status === 'loading') {
-    return (
-      <section className={`shell ${styles.notice}`}>
-        <p className={styles.noticeBody}>{t('drinks.loading')}</p>
-      </section>
-    )
-  }
-
-  const missing = status === 'missing'
-  return (
-    <section className={`shell ${styles.notice}`}>
-      <h1 className={styles.noticeTitle}>
-        {t(missing ? 'drinks.missingTitle' : 'drinks.errorTitle')}
-      </h1>
-      <p className={styles.noticeBody}>
-        {t(missing ? 'drinks.missingBody' : 'drinks.errorBody')}
-      </p>
-      {!missing && (
-        <button type="button" className={styles.retry} onClick={onRetry}>
-          {t('drinks.retry')}
-        </button>
-      )}
-      <Link className={styles.back} to={path('/')}>
-        {t('drinks.back')}
-      </Link>
-    </section>
-  )
-}
-
-interface Shared {
-  bundleKey: string
-  pick: (value?: Bilingual | string) => string
 }
 
 function Masthead() {
@@ -250,6 +167,7 @@ function Masthead() {
 
         <GoldDivider className={styles.rule} />
         <p className={`lede ${styles.lede}`}>{t('drinks.lede')}</p>
+        <MenuSwitch />
       </div>
     </header>
   )
@@ -277,7 +195,7 @@ function SectionRail({
   onQuery,
 }: {
   sections: DrinkSection[]
-  pick: Shared['pick']
+  pick: Pick
   query: string
   onQuery: (value: string) => void
 }) {
@@ -490,19 +408,14 @@ function SearchIcon() {
   )
 }
 
-function Section({
-  section,
-  bundleKey,
-  pick,
-  lines,
-}: {
-  section: DrinkSection
-  lines: (value?: DrinkItem['desc']) => string[]
-} & Shared) {
+function Section({ section, pick, lines }: { section: DrinkSection; pick: Pick; lines: Lines }) {
+  const { formatPrice } = useI18n()
   const title = pick(section.title)
   const other = section.title.pl && section.title.en && section.title.pl !== title
     ? section.title.pl
     : undefined
+  const volumes = (section.columns ?? []).slice(0, -1)
+  const abvLabel = (section.columns ?? []).at(-1)
 
   return (
     <section className={styles.section} id={anchor(section.id)}>
@@ -515,14 +428,7 @@ function Section({
       {section.layout === 'cards' && (
         <div className={styles.cards}>
           {section.items?.map((item, index) => (
-            <Card
-              key={pick(item.name) + index}
-              item={item}
-              index={index}
-              bundleKey={bundleKey}
-              pick={pick}
-              lines={lines}
-            />
+            <Card key={item.id} item={item} index={index} pick={pick} lines={lines} />
           ))}
         </div>
       )}
@@ -531,23 +437,18 @@ function Section({
         <div className={styles.feature}>
           {section.photo && (
             <div className={styles.featureMedia}>
-              <Photo
-                bundleKey={bundleKey}
-                photo={section.photo}
-                alt={title}
-                ratio={section.ratio}
-              />
+              <DrinkPhoto photo={section.photo} alt={title} ratio={section.ratio} />
             </div>
           )}
           <ul className={styles.featureList}>
-            {section.items?.map((item, index) => (
-              <li className={styles.featureItem} key={pick(item.name) + index}>
+            {section.items?.map((item) => (
+              <li className={styles.featureItem} key={item.id}>
                 <div className={styles.rowHead}>
                   <h3 className={styles.itemName}>{pick(item.name)}</h3>
-                  {item.price && (
+                  {typeof item.price === 'number' && (
                     <span className={styles.price}>
                       {item.volume && <em className={styles.volume}>{item.volume}</em>}
-                      {item.price}
+                      {formatPrice(item.price)}
                     </span>
                   )}
                 </div>
@@ -557,15 +458,21 @@ function Section({
                     {line}
                   </p>
                 ))}
-                {item.prices && (
+                {item.prices && item.prices.length > 0 && (
                   <dl className={styles.priceGrid}>
-                    {item.prices.map((entry) => (
-                      <div className={styles.priceCell} key={entry.price}>
+                    {priceCells(item.prices).map((cell) => (
+                      <div className={styles.priceCell} key={cell.key}>
                         <dt>
-                          {pick(entry.label)}
-                          {entry.volume && <em className={styles.volume}>{entry.volume}</em>}
+                          {pick(cell.label)}
+                          {cell.volume && <em className={styles.volume}>{cell.volume}</em>}
                         </dt>
-                        <dd>{entry.price}</dd>
+                        <dd>
+                          {cell.entries
+                            .map((entry) =>
+                              entry.amount ? `${entry.amount} – ${formatPrice(entry.price)}` : formatPrice(entry.price),
+                            )
+                            .join(' · ')}
+                        </dd>
                       </div>
                     ))}
                   </dl>
@@ -580,22 +487,11 @@ function Section({
         <div className={styles.groups}>
           {section.photo && (
             <div className={styles.groupsMedia}>
-              <Photo
-                bundleKey={bundleKey}
-                photo={section.photo}
-                alt={title}
-                ratio={section.ratio}
-              />
+              <DrinkPhoto photo={section.photo} alt={title} ratio={section.ratio} />
             </div>
           )}
           {section.groups?.map((group) => (
-            <Group
-              key={pick(group.title)}
-              group={group}
-              bundleKey={bundleKey}
-              pick={pick}
-              lines={lines}
-            />
+            <Group key={pick(group.title)} group={group} pick={pick} lines={lines} />
           ))}
         </div>
       )}
@@ -604,12 +500,7 @@ function Section({
         <div className={styles.wines}>
           {section.photo && (
             <div className={styles.winesMedia}>
-              <Photo
-                bundleKey={bundleKey}
-                photo={section.photo}
-                alt={title}
-                ratio={section.ratio}
-              />
+              <DrinkPhoto photo={section.photo} alt={title} ratio={section.ratio} />
             </div>
           )}
           <table className={styles.wineTable}>
@@ -627,7 +518,7 @@ function Section({
             </thead>
             <tbody>
               {section.items?.map((item) => (
-                <tr key={pick(item.name)}>
+                <tr key={item.id}>
                   <th scope="row">
                     <span className={styles.itemName}>{pick(item.name)}</span>
                     {lines(item.desc).map((line) => (
@@ -636,11 +527,15 @@ function Section({
                       </span>
                     ))}
                   </th>
-                  {item.values?.map((value, index) => (
-                    <td key={`${value}-${index}`} data-label={section.columns?.[index]}>
-                      {value}
-                    </td>
-                  ))}
+                  {volumes.map((column, index) => {
+                    const entry = item.prices?.find((price) => price.volume === column) ?? item.prices?.[index]
+                    return (
+                      <td key={column} data-label={column}>
+                        {entry ? formatPrice(entry.price) : '—'}
+                      </td>
+                    )
+                  })}
+                  {abvLabel && <td data-label={abvLabel}>{item.abv ?? '—'}</td>}
                 </tr>
               ))}
             </tbody>
@@ -652,24 +547,19 @@ function Section({
         <div className={styles.steps}>
           {section.photo && (
             <div className={styles.stepsMedia}>
-              <Photo
-                bundleKey={bundleKey}
-                photo={section.photo}
-                alt={title}
-                ratio={section.ratio}
-              />
+              <DrinkPhoto photo={section.photo} alt={title} ratio={section.ratio} />
             </div>
           )}
-          {section.price && <p className={styles.stepsPrice}>{section.price}</p>}
+          {typeof section.price === 'number' && <p className={styles.stepsPrice}>{formatPrice(section.price)}</p>}
           <ol className={styles.stepList}>
-            {section.items?.map((item) => (
-              <li className={styles.step} key={pick(item.title)}>
+            {section.steps?.map((step, index) => (
+              <li className={styles.step} key={step.step ?? index}>
                 <h3 className={styles.stepTitle}>
-                  {item.step && <span className={styles.stepNumber}>{item.step}</span>}
-                  {pick(item.title).replace(/^\d+\s+/, '')}
+                  {step.step && <span className={styles.stepNumber}>{step.step}</span>}
+                  {pick(step.title).replace(/^\d+\s+/, '')}
                 </h3>
-                {item.sub && <p className={styles.itemNote}>{pick(item.sub)}</p>}
-                {lines(item.desc).map((line) => (
+                {step.sub && <p className={styles.itemNote}>{pick(step.sub)}</p>}
+                {lines(step.desc).map((line) => (
                   <p className={styles.itemDesc} key={line}>
                     {line}
                   </p>
@@ -683,38 +573,32 @@ function Section({
   )
 }
 
-function Group({
-  group,
-  bundleKey,
-  pick,
-  lines,
-}: {
-  group: DrinkGroup
-  lines: (value?: DrinkItem['desc']) => string[]
-} & Shared) {
+function Group({ group, pick, lines }: { group: DrinkGroup; pick: Pick; lines: Lines }) {
+  const { formatPrice } = useI18n()
   return (
     <section className={styles.group}>
       <h3 className={styles.groupTitle}>{pick(group.title)}</h3>
       {group.photo && (
         <div className={styles.groupMedia}>
-          <Photo
-            bundleKey={bundleKey}
-            photo={group.photo}
-            alt={pick(group.title)}
-            ratio={group.ratio}
-          />
+          <DrinkPhoto photo={group.photo} alt={pick(group.title)} ratio={group.ratio} />
         </div>
       )}
       <ul className={styles.rows}>
-        {group.items.map((item, index) => (
-          <li className={styles.row} key={pick(item.name) + item.volume + index}>
+        {group.items.map((item) => (
+          <li className={styles.row} key={item.id}>
             <div className={styles.rowHead}>
               <span className={styles.itemName}>
                 {pick(item.name)}
                 {item.volume && <em className={styles.volume}>{item.volume}</em>}
               </span>
               <span className={styles.dots} aria-hidden="true" />
-              <span className={styles.price}>{item.price}</span>
+              <span className={styles.price}>
+                {typeof item.price === 'number'
+                  ? formatPrice(item.price)
+                  : (item.prices ?? [])
+                      .map((entry) => [entry.volume, formatPrice(entry.price)].filter(Boolean).join(' '))
+                      .join(' · ')}
+              </span>
             </div>
             {lines(item.desc).map((line) => (
               <p className={styles.itemDesc} key={line}>
@@ -728,36 +612,21 @@ function Group({
   )
 }
 
-function Card({
-  item,
-  index,
-  bundleKey,
-  pick,
-  lines,
-}: {
-  item: DrinkItem
-  index: number
-  lines: (value?: DrinkItem['desc']) => string[]
-} & Shared) {
+function Card({ item, index, pick, lines }: { item: DrinkItem; index: number; pick: Pick; lines: Lines }) {
+  const { formatPrice } = useI18n()
   const name = pick(item.name)
 
   return (
     <article className={styles.card} style={{ animationDelay: `${(index % 9) * 55}ms` }}>
       {item.photo && (
         <div className={styles.cardMedia}>
-          <Photo
-            bundleKey={bundleKey}
-            photo={item.photo}
-            alt={name}
-            ratio={item.ratio}
-            priority={index < 3}
-          />
+          <DrinkPhoto photo={item.photo} alt={name} ratio={item.ratio} priority={index < 3} />
         </div>
       )}
       <div className={styles.cardBody}>
         <div className={styles.rowHead}>
           <h3 className={styles.itemName}>{name}</h3>
-          <span className={styles.price}>{item.price}</span>
+          {typeof item.price === 'number' && <span className={styles.price}>{formatPrice(item.price)}</span>}
         </div>
         {lines(item.desc).map((line) => (
           <p className={styles.itemDesc} key={line}>
@@ -766,41 +635,5 @@ function Card({
         ))}
       </div>
     </article>
-  )
-}
-
-function Photo({
-  bundleKey,
-  photo,
-  alt,
-  ratio = 1.5,
-  priority = false,
-}: {
-  photo: string
-  alt: string
-  ratio?: number
-  priority?: boolean
-} & Pick<Shared, 'bundleKey'>) {
-  const sizes = '(max-width: 720px) 100vw, 420px'
-  const width = 1000
-  const height = Math.round(width / ratio)
-
-  const set = (ext: string) =>
-    [`${imageUrl(bundleKey, photo, ext, 'sm')} 360w`, `${imageUrl(bundleKey, photo, ext)} 1000w`].join(', ')
-
-  return (
-    <picture>
-      <source type="image/avif" srcSet={set('avif')} sizes={sizes} />
-      <source type="image/webp" srcSet={set('webp')} sizes={sizes} />
-      <img
-        src={imageUrl(bundleKey, photo, 'webp')}
-        alt={alt}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : 'lazy'}
-        fetchPriority={priority ? 'high' : undefined}
-        decoding="async"
-      />
-    </picture>
   )
 }

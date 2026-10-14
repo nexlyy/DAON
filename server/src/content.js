@@ -33,7 +33,7 @@ const META = resolve(DRAFT, 'meta.json')
 
 const KEPT_VERSIONS = 60
 
-export const FILES = ['menu', 'categories', 'allergens', 'restaurant', 'promo', 'texts']
+export const FILES = ['menu', 'categories', 'allergens', 'restaurant', 'promo', 'texts', 'drinks']
 
 const fileOf = (dir, name) => resolve(dir, `${name}.json`)
 
@@ -404,6 +404,158 @@ function checkTexts(input) {
   return out
 }
 
+// --- the drinks ---------------------------------------------------------------
+
+const LAYOUTS = ['cards', 'feature', 'columns', 'wines', 'steps']
+
+/** Lines of text in each language: the steps of the tea you put together. */
+const lines = (value, where) => {
+  if (value === undefined || value === null) return undefined
+  if (typeof value !== 'object' || Array.isArray(value)) fail(where, 'is not a set of languages')
+  const out = {}
+  for (const locale of LOCALES) {
+    const list = value[locale]
+    if (list === undefined) continue
+    if (!Array.isArray(list) || list.length > 12) fail(`${where}.${locale}`, 'is not a list of up to 12 lines')
+    const kept = list.map((line, at) => text(line, `${where}.${locale} line ${at + 1}`, { max: 200 })).filter(Boolean)
+    if (kept.length > 0) out[locale] = kept
+  }
+  return Object.keys(out).length > 0 ? out : undefined
+}
+
+/**
+ * The bar's list. A drink and a section share one set of names, because a
+ * guest's pre-order points at either: the tea you put together is ordered by
+ * its section.
+ */
+function checkDrinks(input) {
+  if (!input || !Array.isArray(input.sections)) fail('drinks', 'has no list of sections')
+  if (input.sections.length > 40) fail('drinks', 'holds more than 40 sections')
+
+  const ids = new Set()
+  const claim = (value, where) => {
+    const id = text(value, where, { max: 60, required: true })
+    if (!SLUG.test(id)) fail(where, 'may hold only lowercase letters, digits and dashes')
+    if (ids.has(id)) fail(where, `"${id}" is used twice`)
+    ids.add(id)
+    return id
+  }
+  const photoOf = (value, where) => {
+    const photo = text(value, where, { max: 70 })
+    if (photo && !PHOTO.test(photo)) fail(where, 'is not a photograph name')
+    return photo
+  }
+  const ratioOf = (value, where) => (value === undefined ? undefined : number(value, where, { min: 0.2, max: 5 }))
+  const priceOf = (value, where) => number(value, where, { min: 0, max: 100000 })
+
+  const drink = (raw, where) => {
+    if (!raw || typeof raw !== 'object') fail(where, 'is not a drink')
+    const id = claim(raw.id, `${where} id`)
+
+    let prices
+    if (raw.prices !== undefined) {
+      if (!Array.isArray(raw.prices) || raw.prices.length > 8) fail(`${where} prices`, 'is not a list of up to 8')
+      const seen = new Set()
+      prices = raw.prices.map((entry, at) => {
+        const here = `${where} price ${at + 1}`
+        const key = text(entry?.id, `${here} id`, { max: 40, required: true })
+        if (!SLUG.test(key)) fail(`${here} id`, 'may hold only lowercase letters, digits and dashes')
+        if (seen.has(key)) fail(`${here} id`, `"${key}" is used twice`)
+        seen.add(key)
+        return strip({
+          id: key,
+          label: localized(entry.label, `${here} label`, { max: 60 }),
+          volume: text(entry.volume, `${here} volume`, { max: 30 }),
+          amount: text(entry.amount, `${here} amount`, { max: 30 }),
+          price: priceOf(entry.price, `${here} price`),
+        })
+      })
+      if (prices.length === 0) prices = undefined
+    }
+
+    const single = raw.price === undefined || raw.price === null ? undefined : priceOf(raw.price, `${where} price`)
+    if (single === undefined && !prices) fail(where, 'has no price')
+
+    return strip({
+      id,
+      name: localized(raw.name, `${where} name`, { max: 120 }),
+      desc: localized(raw.desc, `${where} description`, { max: 600 }),
+      note: localized(raw.note, `${where} note`, { max: 120 }),
+      volume: text(raw.volume, `${where} volume`, { max: 30 }),
+      price: single,
+      prices,
+      abv: text(raw.abv, `${where} alcohol`, { max: 12 }),
+      photo: photoOf(raw.photo, `${where} photo`),
+      ratio: ratioOf(raw.ratio, `${where} ratio`),
+      hidden: flag(raw.hidden, `${where} hidden`),
+    })
+  }
+
+  const drinks = (list, where) => {
+    if (!Array.isArray(list) || list.length > 80) fail(where, 'is not a list of up to 80 drinks')
+    return list.map((one, at) => drink(one, `${where}, drink ${at + 1}`))
+  }
+
+  const sections = input.sections.map((raw, index) => {
+    const where = `drinks section ${index + 1}`
+    if (!raw || typeof raw !== 'object') fail(where, 'is not a section')
+    const id = claim(raw.id, `${where} id`)
+    if (!LAYOUTS.includes(raw.layout)) fail(`${where} layout`, `is not one of ${LAYOUTS.join(', ')}`)
+
+    const section = {
+      id,
+      title: localized(raw.title, `${where} title`, { max: 120, required: true }),
+      layout: raw.layout,
+      photo: photoOf(raw.photo, `${where} photo`),
+      ratio: ratioOf(raw.ratio, `${where} ratio`),
+      hidden: flag(raw.hidden, `${where} hidden`),
+    }
+
+    if (raw.layout === 'columns') {
+      if (!Array.isArray(raw.groups) || raw.groups.length === 0 || raw.groups.length > 12) {
+        fail(`${where} groups`, 'is not a list of 1 to 12 groups')
+      }
+      section.groups = raw.groups.map((group, at) => {
+        const here = `${where} group ${at + 1}`
+        return strip({
+          title: localized(group?.title, `${here} title`, { max: 120, required: true }),
+          photo: photoOf(group.photo, `${here} photo`),
+          ratio: ratioOf(group.ratio, `${here} ratio`),
+          items: drinks(group.items, here),
+        })
+      })
+    } else if (raw.layout === 'steps') {
+      section.price = priceOf(raw.price, `${where} price`)
+      if (!Array.isArray(raw.steps) || raw.steps.length === 0 || raw.steps.length > 10) {
+        fail(`${where} steps`, 'is not a list of 1 to 10 steps')
+      }
+      section.steps = raw.steps.map((step, at) => {
+        const here = `${where} step ${at + 1}`
+        return strip({
+          step: text(step?.step, `${here} number`, { max: 4 }),
+          title: localized(step.title, `${here} title`, { max: 120 }),
+          sub: localized(step.sub, `${here} subtitle`, { max: 120 }),
+          desc: lines(step.desc, `${here} lines`),
+        })
+      })
+    } else {
+      section.items = drinks(raw.items, where)
+      if (raw.layout === 'wines') {
+        if (!Array.isArray(raw.columns) || raw.columns.length < 2 || raw.columns.length > 5) {
+          fail(`${where} columns`, 'is not a list of 2 to 5 headings')
+        }
+        section.columns = raw.columns.map((column, at) =>
+          text(column, `${where} column ${at + 1}`, { max: 20, required: true }),
+        )
+      }
+    }
+
+    return strip(section)
+  })
+
+  return strip({ note: localized(input.note, 'drinks note', { max: 200 }), sections })
+}
+
 const CHECKS = {
   menu: checkMenu,
   categories: (input) => checkCategories(input),
@@ -411,6 +563,7 @@ const CHECKS = {
   restaurant: (input) => checkRestaurant(input),
   promo: (input) => checkPromo(input),
   texts: (input) => checkTexts(input),
+  drinks: (input) => checkDrinks(input),
 }
 
 // --- the store ---------------------------------------------------------------
@@ -454,6 +607,7 @@ export function createContent() {
       // The wording file arrived later than the others; an older directory has
       // none, which means nothing is overridden.
       if (name === 'texts') return { pl: {}, en: {}, ko: {} }
+      if (name === 'drinks') return { sections: [] }
       throw failure
     }
   }
@@ -502,6 +656,7 @@ export function createContent() {
     checkRestaurant(draft.restaurant)
     checkPromo(draft.promo)
     checkTexts(draft.texts)
+    checkDrinks(draft.drinks)
     return draft
   }
 

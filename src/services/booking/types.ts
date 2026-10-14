@@ -57,8 +57,12 @@ export interface PreorderItem {
 
 /** A dish as the restaurant received it: name and price as they stood then. */
 export interface PreorderLine extends PreorderItem {
-  number: string
-  name: { en: string; pl: string; ko: string }
+  /** Set for a drink; a dish has none. */
+  kind?: 'drink'
+  number?: string
+  name: { en: string; pl?: string; ko?: string }
+  /** A drink's glass, bottle or count, in English: "150 ml", "SHOTS · 40 ml · 3 shots". */
+  variant?: string
   price: number
 }
 

@@ -32,6 +32,9 @@ export function Footer() {
             <Link to={path('/menu')} className={styles.link}>
               {t('nav.menu')}
             </Link>
+            <Link to={path('/drinks')} className={styles.link}>
+              {t('nav.drinks')}
+            </Link>
             <Link to={path('/about')} className={styles.link}>
               {t('nav.about')}
             </Link>

@@ -10,9 +10,12 @@ import { useI18n } from '@/i18n/useI18n'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import styles from './Navbar.module.css'
 
+// The drinks share the menu's place in the header (there is no room for a
+// sixth word in Polish) and get a line of their own in the drawer.
 const links = [
   { to: '/', key: 'nav.home', end: true },
-  { to: '/menu', key: 'nav.menu' },
+  { to: '/menu', key: 'nav.menu', also: '/drinks' },
+  { to: '/drinks', key: 'nav.drinks', drawerOnly: true },
   { to: '/about', key: 'nav.about' },
   { to: '/reservation', key: 'nav.reservation' },
   { to: '/contact', key: 'nav.contact' },
@@ -128,8 +131,8 @@ export function Navbar() {
           </Link>
 
           <nav className={styles.desktopNav} aria-label={t('nav.home')}>
-            {links.map((link) => (
-              <NavItem key={link.to} to={path(link.to)} end={link.end}>
+            {links.filter((link) => !link.drawerOnly).map((link) => (
+              <NavItem key={link.to} to={path(link.to)} end={link.end} also={link.also && path(link.also)}>
                 {t(link.key)}
               </NavItem>
             ))}
@@ -197,13 +200,16 @@ export function Navbar() {
   )
 }
 
-function NavItem({ to, end, children }: { to: string; end?: boolean; children: ReactNode }) {
+function NavItem({ to, end, also, children }: { to: string; end?: boolean; also?: string; children: ReactNode }) {
+  const { pathname } = useLocation()
+  const alsoActive = Boolean(also) && (pathname === also || pathname.startsWith(`${also}/`))
   return (
     <NavLink
       to={to}
       end={end}
+      aria-current={alsoActive ? 'page' : undefined}
       className={({ isActive }) =>
-        isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink
+        isActive || alsoActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink
       }
     >
       {children}

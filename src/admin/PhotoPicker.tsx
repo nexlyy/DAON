@@ -7,7 +7,7 @@
  * the phone sends one square picture instead of a twelve-megapixel one.
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { api, photoUrl } from './api'
+import { api, photoUrl, type PhotoKind } from './api'
 import { Button, Message } from './ui'
 import styles from './admin.module.css'
 
@@ -18,8 +18,11 @@ export function PhotoPicker({
   dishId,
   photo,
   onPhoto,
+  kind = 'dishes',
 }: {
+  /** The dish or drink the picture is named after. */
   dishId: string
+  kind?: PhotoKind
   photo?: string
   onPhoto: (photo: string) => void
 }) {
@@ -89,7 +92,7 @@ export function PhotoPicker({
       )
       if (!blob) throw new Error('This browser could not make a WebP picture.')
 
-      const saved = await api.uploadPhoto(dishId, blob)
+      const saved = await api.uploadPhoto(dishId, blob, kind)
       onPhoto(saved.photo)
       setFile(null)
       setNote(
@@ -114,7 +117,7 @@ export function PhotoPicker({
       {!file && (
         <div className={styles.photoRow}>
           {photo ? (
-            <img className={styles.photoNow} src={photoUrl(photo)} alt="" width={96} height={96} />
+            <img className={styles.photoNow} src={photoUrl(photo, kind)} alt="" width={96} height={96} />
           ) : (
             <span className={styles.photoNone}>no photograph</span>
           )}

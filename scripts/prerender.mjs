@@ -72,6 +72,7 @@ const PAGES = [
     title: 'reservationTitle',
     description: 'reservationDescription',
   },
+  { path: '/drinks', file: 'drinks/index.html', canonical: '/drinks', title: 'drinksTitle', description: 'drinksDescription' },
   { path: '/privacy', file: 'privacy/index.html', canonical: '/privacy', title: 'privacyTitle', description: 'privacyDescription' },
   { path: '/about', file: 'about/index.html', canonical: '/', title: 'title', description: 'description' },
   { path: '/contact', file: 'contact/index.html', canonical: '/', title: 'title', description: 'description' },

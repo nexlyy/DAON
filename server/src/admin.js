@@ -584,13 +584,13 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
       }
     }
 
-    const uploading = /^\/photo\/([a-z0-9-]{1,60})$/.exec(path)
+    // /photo/<dish> as before, /photo/drinks/<drink>. The name only has to be a
+    // name: a dish or a drink added a minute ago and not saved yet can have its
+    // picture too, and the picture is not in use until a save points at it.
+    const uploading = /^\/photo\/(?:(dishes|drinks)\/)?([a-z0-9-]{1,60})$/.exec(path)
     if (uploading && request.method === 'PUT') {
-      const dishId = uploading[1]
-      const dishes = content.readDraft().menu.dishes
-      if (!dishes.some((dish) => dish.id === dishId)) {
-        return json(request, response, 404, { error: 'there is no dish with that name' })
-      }
+      const kind = uploading[1] ?? 'dishes'
+      const id = uploading[2]
       let bytes
       try {
         bytes = await readBody(request, photos.maxBytes + 1024)
@@ -598,8 +598,8 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
         return json(request, response, 413, { error: 'that picture is too large' })
       }
       try {
-        const written = await photos.save(dishId, bytes)
-        note({ what: 'photograph uploaded', user: session.user, ip, dish: dishId })
+        const written = await photos.save(id, bytes, kind)
+        note({ what: 'photograph uploaded', user: session.user, ip, [kind === 'drinks' ? 'drink' : 'dish']: id })
         return json(request, response, 200, { ...state(session), ...written })
       } catch (failure) {
         return json(request, response, 400, { error: failure.message })
@@ -607,7 +607,8 @@ export function createAdmin({ content, render, photos, notifyStaff, onPublished,
     }
 
     if (path === '/photos' && request.method === 'GET') {
-      return json(request, response, 200, { photos: photos.list() })
+      const kind = url.searchParams.get('kind') === 'drinks' ? 'drinks' : 'dishes'
+      return json(request, response, 200, { photos: photos.list(kind) })
     }
 
     if (path === '/history' && request.method === 'GET') {

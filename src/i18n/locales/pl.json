@@ -8,7 +8,9 @@
     "reservationDescription": "Zarezerwuj stolik w DAON przy ul. Dworcowej 8 w Katowicach: wybierz dzień, godzinę i stolik na planie sali.",
     "notFoundTitle": "Nie znaleziono strony — DAON",
     "privacyTitle": "Polityka prywatności — DAON, restauracja koreańska w Katowicach",
-    "privacyDescription": "Jakie dane zbiera DAON przy rezerwacji stolika, po co, jak długo je przechowujemy i jakie masz prawa zgodnie z RODO."
+    "privacyDescription": "Jakie dane zbiera DAON przy rezerwacji stolika, po co, jak długo je przechowujemy i jakie masz prawa zgodnie z RODO.",
+    "drinksTitle": "Napoje — DAON, restauracja koreańska w Katowicach",
+    "drinksDescription": "Karta napojów DAON w Katowicach: koktajle na soju, makgeolli, piwo z beczki, wina, lemoniady i herbaty."
   },
   "nav": {
     "home": "Strona główna",
@@ -24,7 +26,8 @@
       "text": "Ta strona jest też po polsku.",
       "switch": "Polski",
       "dismiss": "Nie, dziękuję"
-    }
+    },
+    "drinks": "Napoje"
   },
   "hero": {
     "eyebrow": "Restauracja koreańska",
@@ -71,6 +74,12 @@
       "title": "Zarezerwuj stolik",
       "body": "Wybierz datę, godzinę i stolik, przy którym chcesz usiąść. Zajmie to mniej niż minutę.",
       "button": "Zarezerwuj stolik"
+    },
+    "bar": {
+      "eyebrow": "Bar",
+      "title": "Coś do picia",
+      "lede": "Koktajle na soju, koreańskie alkohole, piwo z beczki, wina i herbaty. Wszystko z karty, która leży na stolikach.",
+      "cta": "Karta napojów"
     }
   },
   "menu": {
@@ -104,29 +113,26 @@
       "clear": "Wyczyść filtry",
       "done": "Gotowe",
       "empty": "Żadne danie nie spełnia wybranych filtrów."
+    },
+    "switch": {
+      "label": "Karta",
+      "food": "Kuchnia",
+      "drinks": "Napoje"
     }
   },
   "drinks": {
     "title": "Napoje",
-    "subtitle": "Bar jeszcze nie działa. Ta strona nie jest podlinkowana na stronie ani indeksowana.",
-    "lede": "Karta napojów przepisana z menu, które leży w restauracji. Bar jeszcze nie działa.",
-    "metaTitle": "Napoje — DAON",
+    "lede": "Koktajle na soju, koreańskie alkohole, piwo z beczki, wina i herbata, którą komponujesz sam.",
     "jump": "Przejdź do sekcji",
-    "loading": "Wczytywanie karty napojów…",
-    "missingTitle": "Ten link nie jest aktywny",
-    "missingBody": "Karta napojów jest dostępna tylko przez aktualny link. Poproś o niego restaurację.",
-    "errorTitle": "Nie udało się wczytać karty",
-    "errorBody": "Sprawdź połączenie i spróbuj ponownie.",
-    "retry": "Spróbuj ponownie",
-    "footer": "Ceny w złotych. Karta nie jest jeszcze publikowana na stronie.",
-    "back": "Wróć na daon.pl",
+    "footer": "Ceny w złotych.",
     "searchLabel": "Szukaj w karcie napojów",
     "searchPlaceholder": "Nazwa lub składnik, np. mango",
     "searchOpen": "Szukaj",
     "searchClose": "Zamknij wyszukiwanie",
     "results": "Pasujące pozycje: {count}",
     "noResults": "Nic nie pasuje do „{query}”.",
-    "clear": "Wyczyść"
+    "clear": "Wyczyść",
+    "book": "Zarezerwuj stolik"
   },
   "order": {
     "title": "Zamów online",
@@ -296,17 +302,17 @@
     },
     "preorder": {
       "section": "Zamówienie do stolika",
-      "invite": "Wiesz już, co zamówisz? Wybierz dania teraz, a obsługa zobaczy je razem z rezerwacją. Płacisz na miejscu, jak zwykle.",
+      "invite": "Wiesz już, co zamówisz? Wybierz dania i napoje teraz, a obsługa zobaczy je razem z rezerwacją. Płacisz na miejscu, jak zwykle.",
       "choose": "Wybierz dania",
       "change": "Zmień zamówienie",
       "finish": "Dokończ zamówienie",
       "unsent": "Wybrane, ale jeszcze niewysłane: {dishes} · {total}",
       "totalLine": "Razem według menu: {total}",
       "phoneOnly": "Na zmiany online jest już za późno. Zadzwoń: {phone}.",
-      "bannerChoose": "Zamów dania wcześniej",
+      "bannerChoose": "Zamów wcześniej",
       "bannerSaved": "Twoje dania · {dishes}",
       "nudgeTitle": "Wiesz już, co zamówisz?",
-      "nudgeBody": "Wybierz dania teraz, a obsługa zobaczy je razem z rezerwacją. Płacisz na miejscu.",
+      "nudgeBody": "Wybierz dania i napoje teraz, a obsługa zobaczy je razem z rezerwacją. Płacisz na miejscu.",
       "nudgeYes": "Wybierz dania",
       "nudgeLater": "Może później",
       "close": "Zamknij",
@@ -323,7 +329,7 @@
       "review": "Dalej",
       "backToMenu": "Wróć do menu",
       "yours": "Twoje zamówienie",
-      "empty": "Nic jeszcze nie wybrano. Dodaj dania z menu.",
+      "empty": "Nic jeszcze nie wybrano. Dodaj coś z menu.",
       "emptyRemove": "Wszystko usunięte z listy. Zapisz, a restauracja dowie się, że nic nie zamawiasz wcześniej.",
       "notes": "Uwagi dla kuchni",
       "notesPlaceholder": "Np. alergie albo prośba do kuchni",
@@ -338,7 +344,7 @@
       "sentTitle": "Wysłane do restauracji",
       "changedTitle": "Zmiany zapisane",
       "removedTitle": "Zamówienie usunięte",
-      "sentBody": "Obsługa widzi Twoje dania razem z rezerwacją {reference}. Płacisz na miejscu, jak zwykle.",
+      "sentBody": "Obsługa widzi Twoje zamówienie razem z rezerwacją {reference}. Płacisz na miejscu, jak zwykle.",
       "removedBody": "Restauracja wie, że nic nie zamawiasz wcześniej. Wszystko wybierzesz przy stoliku.",
       "done": "Gotowe",
       "dishes": {
@@ -351,6 +357,11 @@
         "menu": "Któregoś z tych dań nie ma już w menu. Odśwież stronę i wybierz jeszcze raz.",
         "rateLimit": "Za dużo prób w krótkim czasie. Spróbuj za kilka minut albo zadzwoń: {phone}.",
         "generic": "Nie udało się wysłać. Spróbuj jeszcze raz albo zadzwoń: {phone}."
+      },
+      "items": {
+        "one": "{count} pozycja",
+        "few": "{count} pozycje",
+        "many": "{count} pozycji"
       }
     }
   },

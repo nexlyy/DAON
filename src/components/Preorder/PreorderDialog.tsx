@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DishPhoto } from '@/components/Media/DishPhoto'
+import { DrinkPhoto } from '@/components/Media/DrinkPhoto'
 import { FlameIcon, LeafIcon } from '@/components/Menu/DishTags'
+import { drinksMenu, pickText, variantText, type DrinkOffer } from '@/data/drinks'
 import { categories } from '@/data/menu/categories'
 import { dishes } from '@/data/menu/dishes'
 import type { Dish } from '@/data/menu/types'
@@ -9,7 +11,7 @@ import { restaurant } from '@/data/restaurant'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { countKey, guestsKey } from '@/i18n/plural'
 import { useI18n } from '@/i18n/useI18n'
-import { MAX_PER_DISH, MAX_TOTAL, pickedDishes, totalOf, type Picks } from './picks'
+import { MAX_PER_DISH, MAX_TOTAL, offers, pickedLines, totalOf, type Picks } from './picks'
 import styles from './PreorderDialog.module.css'
 
 export type Done = 'sent' | 'changed' | 'removed'
@@ -34,6 +36,9 @@ const fold = (text: string) =>
   text.normalize('NFD').replace(/\p{M}/gu, '').replace(/ł/g, 'l').toLowerCase().trim()
 
 const shown = categories.filter((category) => dishes.some((dish) => dish.categoryId === category.id))
+const bars = drinksMenu.sections.filter((section) => offers.some((offer) => offer.sectionId === section.id))
+
+type Kind = 'food' | 'drinks'
 
 export function PreorderDialog({
   booking,
@@ -51,12 +56,21 @@ export function PreorderDialog({
 }: Props) {
   const { t, resolve, formatDate, formatPrice, locale } = useI18n()
   const [query, setQuery] = useState('')
+  const [kind, setKind] = useState<Kind>('food')
   const [category, setCategory] = useState<string>('all')
+  const [section, setSection] = useState<string>('all')
   const [view, setView] = useState<'menu' | 'review'>('menu')
   const panelRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
   useLockBodyScroll(true)
+
+  // Read through refs, so the trap is set up once per opening: re-running it
+  // when a save starts sent the focus behind the dialog and back.
+  const closeRef = useRef(onClose)
+  const savingRef = useRef(saving)
+  closeRef.current = onClose
+  savingRef.current = saving
 
   // Escape closes, Tab stays inside, and focus goes back where it came from.
   useEffect(() => {
@@ -65,7 +79,7 @@ export function PreorderDialog({
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (!saving) onClose()
+        if (!savingRef.current) closeRef.current()
         return
       }
       if (event.key !== 'Tab') return
@@ -91,7 +105,7 @@ export function PreorderDialog({
       document.removeEventListener('keydown', onKeyDown)
       opener?.focus?.({ preventScroll: true })
     }
-  }, [onClose, saving])
+  }, [])
 
   const needle = fold(query)
   const found = useMemo(() => {
@@ -112,16 +126,45 @@ export function PreorderDialog({
     [found],
   )
 
-  const picked = pickedDishes(picks)
+  // A search looks through the drinks as well, whichever half is open.
+  const drinkGroups = useMemo(() => {
+    const matching = needle
+      ? offers.filter((offer) =>
+          [offer.name.pl, offer.name.en, offer.variant?.amount].some((text) => text && fold(text).includes(needle)),
+        )
+      : offers.filter((offer) => section === 'all' || offer.sectionId === section)
+    return bars
+      .map((one) => ({ section: one, offers: matching.filter((offer) => offer.sectionId === one.id) }))
+      .filter((group) => group.offers.length > 0)
+  }, [needle, section])
+
+  const showFood = needle ? true : kind === 'food'
+  const showDrinks = needle ? true : kind === 'drinks'
+  const nothing = (!showFood || groups.length === 0) && (!showDrinks || drinkGroups.length === 0)
+
+  const picked = pickedLines(picks)
   const count = picked.reduce((sum, { quantity }) => sum + quantity, 0)
   const total = totalOf(picks)
-  const dishesLabel = t(countKey(locale, count, 'reservation.preorder.dishes'), { count })
+  const withDrinks = picked.some((line) => line.kind === 'drink')
+  const dishesLabel = t(
+    countKey(locale, count, withDrinks ? 'reservation.preorder.items' : 'reservation.preorder.dishes'),
+    { count },
+  )
 
   const pickCategory = (id: string) => {
-    setCategory(id)
+    if (kind === 'food') setCategory(id)
+    else setSection(id)
     setQuery('')
     listRef.current?.scrollTo({ top: 0 })
   }
+
+  const pickKind = (next: Kind) => {
+    setKind(next)
+    setQuery('')
+    listRef.current?.scrollTo({ top: 0 })
+  }
+
+  const chosen = kind === 'food' ? category : section
 
   const when = [
     formatDate(new Date(`${booking.date}T00:00:00`), { weekday: 'long', day: 'numeric', month: 'long' }),
@@ -181,32 +224,59 @@ export function PreorderDialog({
                     }}
                   />
                 </label>
+                {bars.length > 0 && (
+                  <div className={styles.kinds} role="group" aria-label={t('menu.switch.label')}>
+                    {(['food', 'drinks'] as const).map((one) => (
+                      <button
+                        key={one}
+                        type="button"
+                        className={styles.kind}
+                        aria-pressed={kind === one}
+                        onClick={() => pickKind(one)}
+                      >
+                        {t(`menu.switch.${one}`)}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className={styles.chips} role="group" aria-label={t('reservation.preorder.categories')}>
                   <button
                     type="button"
                     className={styles.chip}
-                    aria-pressed={!needle && category === 'all'}
+                    aria-pressed={!needle && chosen === 'all'}
                     onClick={() => pickCategory('all')}
                   >
                     {t('reservation.preorder.all')}
                   </button>
-                  {shown.map((one) => (
-                    <button
-                      key={one.id}
-                      type="button"
-                      className={styles.chip}
-                      aria-pressed={!needle && category === one.id}
-                      onClick={() => pickCategory(one.id)}
-                    >
-                      {resolve(one.name)}
-                    </button>
-                  ))}
+                  {kind === 'food'
+                    ? shown.map((one) => (
+                        <button
+                          key={one.id}
+                          type="button"
+                          className={styles.chip}
+                          aria-pressed={!needle && category === one.id}
+                          onClick={() => pickCategory(one.id)}
+                        >
+                          {resolve(one.name)}
+                        </button>
+                      ))
+                    : bars.map((one) => (
+                        <button
+                          key={one.id}
+                          type="button"
+                          className={styles.chip}
+                          aria-pressed={!needle && section === one.id}
+                          onClick={() => pickCategory(one.id)}
+                        >
+                          {pickText(locale, one.title)}
+                        </button>
+                      ))}
                 </div>
               </div>
 
               <div className={styles.list} ref={listRef}>
-                {groups.length === 0 && <p className={styles.nothing}>{t('reservation.preorder.noResults')}</p>}
-                {groups.map((group) => (
+                {nothing && <p className={styles.nothing}>{t('reservation.preorder.noResults')}</p>}
+                {showFood && groups.map((group) => (
                   <div key={group.category.id} className={styles.group}>
                     <p className={styles.groupName}>
                       {resolve(group.category.name)}
@@ -223,6 +293,21 @@ export function PreorderDialog({
                     ))}
                   </div>
                 ))}
+                {showDrinks &&
+                  drinkGroups.map((group) => (
+                    <div key={group.section.id} className={styles.group}>
+                      <p className={styles.groupName}>{pickText(locale, group.section.title)}</p>
+                      {group.offers.map((offer) => (
+                        <DrinkRow
+                          key={offer.id}
+                          offer={offer}
+                          quantity={picks[offer.id] ?? 0}
+                          full={count >= MAX_TOTAL}
+                          onQuantity={onQuantity}
+                        />
+                      ))}
+                    </div>
+                  ))}
               </div>
 
               <div className={styles.bar}>
@@ -262,22 +347,29 @@ export function PreorderDialog({
                   </p>
                 ) : (
                   <ul className={styles.lines}>
-                    {picked.map(({ dish, quantity }) => (
-                      <li key={dish.id} className={styles.line}>
-                        <span className={styles.lineName}>
-                          <span className={styles.lineNo}>{dish.number}</span>
-                          {resolve(dish.name)}
-                        </span>
-                        <span className={styles.linePrice}>{formatPrice(dish.price * quantity)}</span>
-                        <Stepper
-                          name={resolve(dish.name)}
-                          quantity={quantity}
-                          full={count >= MAX_TOTAL}
-                          onChange={(next) => onQuantity(dish.id, next)}
-                          compact
-                        />
-                      </li>
-                    ))}
+                    {picked.map((line) => {
+                      const name = line.kind === 'dish' ? resolve(line.dish.name) : pickText(locale, line.offer.name)
+                      const detail = line.kind === 'drink' ? variantText(locale, line.offer) : ''
+                      return (
+                        <li key={line.id} className={styles.line}>
+                          <span className={styles.lineName}>
+                            {line.kind === 'dish' && <span className={styles.lineNo}>{line.dish.number}</span>}
+                            <span>
+                              {name}
+                              {detail && <span className={styles.lineDetail}>{detail}</span>}
+                            </span>
+                          </span>
+                          <span className={styles.linePrice}>{formatPrice(line.price * line.quantity)}</span>
+                          <Stepper
+                            name={detail ? `${name}, ${detail}` : name}
+                            quantity={line.quantity}
+                            full={count >= MAX_TOTAL}
+                            onChange={(next) => onQuantity(line.id, next)}
+                            compact
+                          />
+                        </li>
+                      )
+                    })}
                   </ul>
                 )}
 
@@ -386,6 +478,52 @@ function DishRow({
         <Stepper name={name} quantity={quantity} full={full} onChange={(next) => onQuantity(dish.id, next)} />
       </div>
     </div>
+  )
+}
+
+function DrinkRow({
+  offer,
+  quantity,
+  full,
+  onQuantity,
+}: {
+  offer: DrinkOffer
+  quantity: number
+  full: boolean
+  onQuantity: (id: string, quantity: number) => void
+}) {
+  const { formatPrice, locale } = useI18n()
+  const name = pickText(locale, offer.name)
+  const detail = variantText(locale, offer)
+
+  return (
+    <div className={styles.row} data-picked={quantity > 0 || undefined}>
+      <div className={styles.thumb} aria-hidden="true">
+        {offer.photo ? <DrinkPhoto photo={offer.photo} alt="" ratio={offer.ratio} sizes="64px" /> : <GlassIcon />}
+      </div>
+      <div className={styles.info}>
+        <p className={styles.name}>{name}</p>
+        {detail && <p className={styles.meta}>{detail}</p>}
+      </div>
+      <div className={styles.side}>
+        <span className={styles.price}>{formatPrice(offer.price)}</span>
+        <Stepper
+          name={detail ? `${name}, ${detail}` : name}
+          quantity={quantity}
+          full={full}
+          onChange={(next) => onQuantity(offer.id, next)}
+        />
+      </div>
+    </div>
+  )
+}
+
+function GlassIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">
+      <path d="M6 3h12l-1.4 8.2a4.7 4.7 0 0 1-9.2 0L6 3Z" strokeLinejoin="round" />
+      <path d="M12 16v5M8.5 21h7" strokeLinecap="round" />
+    </svg>
   )
 }
 

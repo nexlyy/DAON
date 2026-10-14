@@ -3,7 +3,7 @@ import type { Editing } from './AdminPage'
 import { useLocalCopy } from './AdminPage'
 import type { Dish } from './api'
 import { PhotoPicker } from './PhotoPicker'
-import { Button, Check, Field, Lines, Message, Save, Text } from './ui'
+import { Amount, Button, Check, Field, Lines, Message, Save, Text } from './ui'
 import styles from './admin.module.css'
 
 const TAGS: [string, string][] = [
@@ -84,6 +84,11 @@ export function Dishes({ editing }: { editing: Editing }) {
       hidden: true,
     }
     setMenu({ dishes: [...menu.dishes, dish] })
+    // A new dish starts hidden; with the filters as they were it would have
+    // been added somewhere nobody could see it.
+    setQuery('')
+    setWithHidden(true)
+    if (category && category !== dish.categoryId) setCategory('')
     setOpenId(dish.id)
   }
 
@@ -144,10 +149,10 @@ export function Dishes({ editing }: { editing: Editing }) {
             ))}
           </select>
         </Field>
-        <Text
+        <Amount
           label={`Price in ${editing.content.restaurant.place.currency}`}
-          value={String(open.price)}
-          onChange={(value) => change(open.id, { price: Number(value.replace(',', '.')) || 0 })}
+          value={open.price}
+          onChange={(value) => change(open.id, { price: value ?? 0 })}
         />
         <Text
           label="Portion"

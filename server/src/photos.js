@@ -1,5 +1,5 @@
 /**
- * Photographs of dishes, as uploaded from the admin panel.
+ * Photographs of dishes and drinks, as uploaded from the admin panel.
  *
  * They cannot live where the rest of the site lives: publishing from the
  * repository replaces that whole directory, and a deploy would take every
@@ -29,9 +29,15 @@ import { resolve } from 'node:path'
 import { root } from './env.js'
 
 const UPLOADS = process.env.DAON_UPLOADS ?? '/var/www/daon-uploads'
-const DISHES = resolve(UPLOADS, 'dishes')
-const SMALL = resolve(DISHES, 'sm')
 const KEPT = resolve(root, 'content', 'photos')
+
+// Each kind of picture keeps to its own directory under /u/, the large ones at
+// the top and the phone size in sm/.
+export const KINDS = ['dishes', 'drinks']
+const dirsOf = (kind) => {
+  const large = resolve(UPLOADS, kind)
+  return { large, small: resolve(large, 'sm') }
+}
 
 const LARGE_PX = 640
 const SMALL_PX = 320
@@ -67,8 +73,8 @@ export function kindOf(bytes) {
 export function createPhotos() {
   let ffmpeg = true
 
-  const ready = () => {
-    mkdirSync(SMALL, { recursive: true })
+  const ready = (kind) => {
+    mkdirSync(dirsOf(kind).small, { recursive: true })
     mkdirSync(resolve(KEPT, 'original'), { recursive: true })
   }
 
@@ -91,26 +97,28 @@ export function createPhotos() {
   }
 
   /**
-   * Writes one dish photograph at the two sizes and two formats the site asks
-   * for, and hands back the name to put in the menu.
+   * Writes one photograph at the two sizes and two formats the site asks for,
+   * and hands back the name to put in the menu or the drinks list.
    */
-  const save = async (dishId, bytes) => {
+  const save = async (id, bytes, kind = 'dishes') => {
+    if (!KINDS.includes(kind)) throw new Error('that is not a kind of picture the site keeps')
     if (bytes.length > MAX_BYTES) throw new Error('that picture is larger than 12 MB')
-    const kind = kindOf(bytes)
-    if (!kind) throw new Error('that file is not a JPEG, PNG, WebP or AVIF picture')
+    const type = kindOf(bytes)
+    if (!type) throw new Error('that file is not a JPEG, PNG, WebP or AVIF picture')
 
-    ready()
+    ready(kind)
+    const { large, small } = dirsOf(kind)
 
     const stamp = createHash('sha256').update(bytes).digest('hex').slice(0, 8)
-    const name = `${dishId}-${stamp}`.replace(/[^a-z0-9-]/gi, '').toLowerCase().slice(0, 60)
+    const name = `${id}-${stamp}`.replace(/[^a-z0-9-]/gi, '').toLowerCase().slice(0, 60)
 
-    const original = resolve(KEPT, 'original', `${name}.${kind}`)
+    const original = resolve(KEPT, 'original', `${name}.${type}`)
     writeFileSync(original, bytes)
 
     const wrote = []
     for (const [dir, size] of [
-      [DISHES, LARGE_PX],
-      [SMALL, SMALL_PX],
+      [large, LARGE_PX],
+      [small, SMALL_PX],
     ]) {
       for (const format of ['webp', 'avif']) {
         const target = resolve(dir, `${name}.${format}`)
@@ -127,10 +135,12 @@ export function createPhotos() {
           // Without ffmpeg there is nothing to resize with. Keeping what the
           // panel sent is worse than a proper set but better than no picture,
           // and the panel says so.
-          if (format === 'webp' && kind === 'webp') {
+          // Only a missing ffmpeg turns it off; one picture it could not read
+          // says nothing about the next.
+          if (/ENOENT/.test(failure.message)) ffmpeg = false
+          if (format === 'webp' && type === 'webp') {
             copyFileSync(original, target)
             wrote.push(`${size}.webp as sent`)
-            ffmpeg = false
           } else if (format === 'webp') {
             throw new Error(`could not read that picture: ${failure.message}`)
           }
@@ -146,47 +156,57 @@ export function createPhotos() {
    * change is taken back, then removed.
    */
   const sweep = (live) => {
-    if (!existsSync(DISHES)) return { removed: 0 }
+    const drinks = live.drinks?.sections ?? []
+    const named = [
+      ...(live.menu?.dishes ?? []).map((dish) => dish.photo),
+      ...drinks.flatMap((section) => [
+        section.photo,
+        ...(section.items ?? []).map((item) => item.photo),
+        ...(section.groups ?? []).flatMap((group) => [group.photo, ...group.items.map((item) => item.photo)]),
+      ]),
+    ]
     const used = new Set(
-      (live.menu?.dishes ?? [])
-        .map((dish) => dish.photo)
-        .filter((photo) => typeof photo === 'string' && photo.startsWith('u:'))
-        .map((photo) => photo.slice(2)),
+      named.filter((photo) => typeof photo === 'string' && photo.startsWith('u:')).map((photo) => photo.slice(2)),
     )
 
     let removed = 0
-    for (const dir of [DISHES, SMALL]) {
-      for (const file of readdirSync(dir, { withFileTypes: true })) {
-        if (!file.isFile()) continue
-        const name = file.name.replace(/\.(webp|avif)$/, '')
-        if (name === file.name || used.has(name)) continue
-        const path = resolve(dir, file.name)
-        try {
-          if (Date.now() - statSync(path).mtimeMs < UNREFERENCED_KEPT_MS) continue
-          unlinkSync(path)
-          removed += 1
-        } catch {
-          // Already gone, which is the point.
+    for (const kind of KINDS) {
+      const { large, small } = dirsOf(kind)
+      for (const dir of [large, small]) {
+        if (!existsSync(dir)) continue
+        for (const file of readdirSync(dir, { withFileTypes: true })) {
+          if (!file.isFile()) continue
+          const name = file.name.replace(/\.(webp|avif)$/, '')
+          if (name === file.name || used.has(name)) continue
+          const path = resolve(dir, file.name)
+          try {
+            if (Date.now() - statSync(path).mtimeMs < UNREFERENCED_KEPT_MS) continue
+            unlinkSync(path)
+            removed += 1
+          } catch {
+            // Already gone, which is the point.
+          }
         }
       }
     }
     return { removed }
   }
 
-  /** What the panel shows in its photo library: what exists, and for which dish. */
-  const list = () => {
-    if (!existsSync(DISHES)) return []
-    return readdirSync(DISHES)
+  /** What the panel shows in its photo library: what exists, of one kind. */
+  const list = (kind = 'dishes') => {
+    const { large } = dirsOf(KINDS.includes(kind) ? kind : 'dishes')
+    if (!existsSync(large)) return []
+    return readdirSync(large)
       .filter((file) => file.endsWith('.webp'))
       .map((file) => {
         const name = file.slice(0, -5)
         let size = 0
         try {
-          size = statSync(resolve(DISHES, file)).size
+          size = statSync(resolve(large, file)).size
         } catch {
           size = 0
         }
-        return { photo: `u:${name}`, bytes: size, avif: existsSync(resolve(DISHES, `${name}.avif`)) }
+        return { photo: `u:${name}`, bytes: size, avif: existsSync(resolve(large, `${name}.avif`)) }
       })
   }
 

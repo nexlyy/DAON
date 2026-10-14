@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { pickText, variantText } from '@/data/drinks'
 import { dishes } from '@/data/menu/dishes'
 import { restaurant } from '@/data/restaurant'
 import { countKey } from '@/i18n/plural'
@@ -9,7 +10,7 @@ import { bookingApi } from '@/services/booking'
 import type { Preorder as Saved } from '@/services/booking'
 import { BookingError } from '@/services/booking/types'
 import { PreorderDialog, type Done } from './PreorderDialog'
-import { countOf, picksOf, totalOf, type Picks } from './picks'
+import { countOf, findOffer, offers, picksOf, totalOf, type Picks } from './picks'
 import styles from './Preorder.module.css'
 
 export interface PreorderTarget {
@@ -113,7 +114,7 @@ export function Preorder({ booking, variant, fresh = false, buttonClassName }: P
 
   const closing =
     typeof closesBefore === 'number' ? closingOf(booking.date, booking.time, closesBefore) : null
-  const available = Boolean(closing?.open) && dishes.length > 0 && saved !== undefined
+  const available = Boolean(closing?.open) && dishes.length + offers.length > 0 && saved !== undefined
 
   // The question comes a moment after the confirmation has been read, once
   // per booking, and never over a pre-order that already exists.
@@ -188,8 +189,15 @@ export function Preorder({ booking, variant, fresh = false, buttonClassName }: P
   const dishesLabel = (count: number) => t(countKey(locale, count, 'reservation.preorder.dishes'), { count })
   const unsent = edited && countOf(picks) > 0
   const nameOf = (line: Saved['lines'][number]) => {
+    const offer = findOffer(line.id)
+    if (offer) {
+      const detail = variantText(locale, offer)
+      return `${pickText(locale, offer.name)}${detail ? ` · ${detail}` : ''}`
+    }
     const current = dishes.find((dish) => dish.id === line.id)
-    return current ? resolve(current.name) : line.name[locale as 'en' | 'pl' | 'ko'] ?? line.name.en
+    if (current) return resolve(current.name)
+    const name = line.name[locale as 'en' | 'pl' | 'ko'] ?? line.name.en
+    return line.variant ? `${name} · ${line.variant}` : name
   }
 
   const dialog = open && (

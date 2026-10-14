@@ -149,7 +149,11 @@ export function Restaurant({ editing }: { editing: Editing }) {
               <Text
                 label="Last seating before closing (minutes)"
                 value={String(rules.lastSeatingBeforeClose ?? 90)}
-                onChange={(value) => setRule('lastSeatingBeforeClose', Number(value) || 90)}
+                onChange={(value) => {
+                  // 0 is a real answer here: seating right up to closing time.
+                  const minutes = Number(value)
+                  setRule('lastSeatingBeforeClose', value.trim() !== '' && Number.isFinite(minutes) ? minutes : 90)
+                }}
               />
               <Text
                 label="A table is held for (minutes)"

@@ -14,6 +14,7 @@ import { GoldDivider } from '@/components/Ornament/GoldDivider'
 import { allergenNumbers, widespreadAllergens } from '@/data/menu/allergens'
 import type { Allergen } from '@/data/menu/allergens'
 import { MenuPromoNotice } from '@/components/Promo/BirthdayBand'
+import { MenuSwitch } from '@/components/Menu/MenuSwitch'
 import styles from './MenuPage.module.css'
 
 const TAG_ORDER: DishTag[] = ['vegetarian', 'extraSpicy', 'mildAvailable', 'sharing']
@@ -91,6 +92,7 @@ export function MenuPage() {
           <p className="eyebrow">{t('menu.eyebrow')}</p>
           <h1 className={styles.title}>{t('menu.title')}</h1>
           <p className={`lede ${styles.subtitle}`}>{t('menu.subtitle')}</p>
+          <MenuSwitch />
           <MenuPromoNotice />
         </div>
       </section>

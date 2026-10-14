@@ -1,5 +1,6 @@
 import { floorPlan, resolveTableGroup, tableById } from '@/data/tables/floorPlan'
 import { hoursFor, reservation as reservationConfig } from '@/data/restaurant'
+import { drinkOffers, variantText } from '@/data/drinks'
 import { dishes } from '@/data/menu/dishes'
 import { BookingError } from './types'
 import type {
@@ -224,15 +225,28 @@ export function createMockBookingApi(): BookingApi {
     async savePreorder(own: OwnBooking, request: PreorderRequest) {
       await wait(LATENCY_MS * 2)
       const rows = readPreorders()
-      const lines = dishes
-        .filter((dish) => request.items.some((item) => item.id === dish.id))
-        .map((dish) => ({
-          id: dish.id,
-          number: dish.number,
-          name: { en: dish.name.en, pl: dish.name.pl ?? dish.name.en, ko: dish.name.ko ?? dish.name.en },
-          price: dish.price,
-          quantity: request.items.find((item) => item.id === dish.id)?.quantity ?? 1,
-        }))
+      const quantityOf = (id: string) => request.items.find((item) => item.id === id)?.quantity ?? 1
+      const lines = [
+        ...dishes
+          .filter((dish) => request.items.some((item) => item.id === dish.id))
+          .map((dish) => ({
+            id: dish.id,
+            number: dish.number,
+            name: { en: dish.name.en, pl: dish.name.pl ?? dish.name.en, ko: dish.name.ko ?? dish.name.en },
+            price: dish.price,
+            quantity: quantityOf(dish.id),
+          })),
+        ...drinkOffers()
+          .filter((offer) => request.items.some((item) => item.id === offer.id))
+          .map((offer) => ({
+            id: offer.id,
+            kind: 'drink' as const,
+            name: { en: offer.name.en ?? offer.name.pl ?? '', pl: offer.name.pl ?? offer.name.en },
+            variant: variantText('en', offer) || undefined,
+            price: offer.price,
+            quantity: quantityOf(offer.id),
+          })),
+      ]
       if (lines.length === 0) {
         delete rows[own.reference]
         writePreorders(rows)

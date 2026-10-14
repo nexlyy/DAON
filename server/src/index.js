@@ -20,6 +20,7 @@ import { cardKeyboard, createBot } from './bot.js'
 import { cancelToken, tokenMatches } from './cancel.js'
 import { isClosed } from './closures.js'
 import { createContent } from './content.js'
+import { drinkOffers } from './drinks.js'
 import { createPhotos } from './photos.js'
 import {
   CLOSES_BEFORE,
@@ -410,6 +411,14 @@ const liveDishes = () => {
   }
 }
 
+const liveDrinks = () => {
+  try {
+    return drinkOffers(content.readLiveFile('drinks'))
+  } catch {
+    return []
+  }
+}
+
 function tellPreorder(booking, before, after) {
   const key = preorderCards(booking.reference)
   const seen = toStaff(booking)
@@ -480,7 +489,8 @@ async function handle(request, response, url) {
   if (request.method === 'GET' && url.pathname === '/config') {
     return send(request, response, 200, {
       email: guestMail.enabled,
-      preorder: preorderEnabled() && liveDishes().length > 0 ? { closesBefore: CLOSES_BEFORE } : null,
+      preorder:
+        preorderEnabled() && liveDishes().length + liveDrinks().length > 0 ? { closesBefore: CLOSES_BEFORE } : null,
     })
   }
 
@@ -582,7 +592,7 @@ async function handle(request, response, url) {
       return send(request, response, 409, { error: 'too late to change the dishes online', code: 'closed' })
     }
 
-    const { lines, error, code } = readItems(raw.items, liveDishes())
+    const { lines, error, code } = readItems(raw.items, liveDishes(), liveDrinks())
     if (error) return send(request, response, 400, { error, code })
     const notes = lines.length > 0 ? text(raw.notes, 300) : ''
 

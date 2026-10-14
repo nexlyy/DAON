@@ -35,9 +35,17 @@ const dishCount = (lines) => lines.reduce((sum, line) => sum + line.quantity, 0)
 const preorderTotal = (lines) =>
   Math.round(lines.reduce((sum, line) => sum + line.price * line.quantity, 0) * 100) / 100
 
-/** "2× #01 Jeyuk Bokkeum, 1× #44 Samgyeobsal — 185 zł", for lists and booking cards. */
+const isDrink = (line) => line.kind === 'drink'
+
+/** "#01 Jeyuk Bokkeum" for a dish, "SEOUL KISS" or "Primitivo (150 ml)" for a drink. */
+const lineName = (line) =>
+  isDrink(line)
+    ? `${line.name.en}${line.variant ? ` (${line.variant})` : ''}`
+    : `#${line.number} ${line.name.en}`
+
+/** "2× #01 Jeyuk Bokkeum, 1× SEOUL KISS — 223 zł", for lists and booking cards. */
 export const preorderShort = (preorder) =>
-  `${preorder.lines.map((line) => `${line.quantity}× #${line.number} ${line.name.en}`).join(', ')} — ${money(
+  `${preorder.lines.map((line) => `${line.quantity}× ${lineName(line)}`).join(', ')} — ${money(
     preorderTotal(preorder.lines),
   )}`
 
@@ -82,11 +90,25 @@ export function preorderMessage(booking, preorder, state = 'new') {
     filled(booking.name),
   ].join(' · ')
 
-  const lines = preorder.lines.map((line) =>
+  const row = (line) =>
     strike(
-      `${line.quantity} × <b>#${escapeHtml(line.number)}</b> ${escapeHtml(line.name.en)} — ${money(line.price * line.quantity)}`,
-    ),
-  )
+      isDrink(line)
+        ? `${line.quantity} × <b>${escapeHtml(line.name.en)}</b>${line.variant ? ` (${escapeHtml(line.variant)})` : ''} — ${money(line.price * line.quantity)}`
+        : `${line.quantity} × <b>#${escapeHtml(line.number)}</b> ${escapeHtml(line.name.en)} — ${money(line.price * line.quantity)}`,
+    )
+  const food = preorder.lines.filter((line) => !isDrink(line))
+  const drinks = preorder.lines.filter(isDrink)
+  // Kitchen and bar get their own heading once both are on the card.
+  const lines =
+    drinks.length === 0
+      ? food.map(row)
+      : [
+          ...(food.length ? [strike('<i>Kitchen</i>'), ...food.map(row), ''] : []),
+          strike('<i>Bar</i>'),
+          ...drinks.map(row),
+        ]
+  const count = dishCount(preorder.lines)
+  const noun = drinks.length === 0 ? (count === 1 ? 'dish' : 'dishes') : count === 1 ? 'item' : 'items'
 
   return [
     `${PREORDER_HEADS[state] ?? PREORDER_HEADS.new} · <code>${escapeHtml(booking.reference)}</code>`,
@@ -95,7 +117,7 @@ export function preorderMessage(booking, preorder, state = 'new') {
     '',
     ...lines,
     '',
-    strike(`${dishCount(preorder.lines)} dish${dishCount(preorder.lines) === 1 ? '' : 'es'} · by the menu <b>${money(preorderTotal(preorder.lines))}</b>`),
+    strike(`${count} ${noun} · by the menu <b>${money(preorderTotal(preorder.lines))}</b>`),
     ...(preorder.notes ? [strike(`Kitchen note: ${escapeHtml(preorder.notes)}`)] : []),
     ...(live ? ['<i>Not paid. The guest pays at the restaurant as usual.</i>'] : []),
   ].join(NL)
@@ -190,17 +212,29 @@ const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one :
  * What the kitchen should expect today: every pre-ordered dish added up across
  * the bookings, in menu number order.
  */
-function kitchenLines(bookings) {
-  const dishes = new Map()
+function addedUp(bookings, wanted) {
+  const all = new Map()
   for (const booking of bookings) {
-    for (const line of booking.preorder?.lines ?? []) {
-      const known = dishes.get(line.id)
-      dishes.set(line.id, { ...line, quantity: (known?.quantity ?? 0) + line.quantity })
+    for (const line of (booking.preorder?.lines ?? []).filter(wanted)) {
+      const known = all.get(line.id)
+      all.set(line.id, { ...line, quantity: (known?.quantity ?? 0) + line.quantity })
     }
   }
-  return [...dishes.values()]
+  return [...all.values()]
+}
+
+function kitchenLines(bookings) {
+  return addedUp(bookings, (line) => !isDrink(line))
     .sort((a, b) => String(a.number).localeCompare(String(b.number), 'en', { numeric: true }))
     .map((line) => `${line.quantity} × <b>#${escapeHtml(line.number)}</b> ${escapeHtml(line.name.en)}`)
+}
+
+/** The same for the bar, in the order the drinks list sets them. */
+function barLines(bookings) {
+  return addedUp(bookings, isDrink).map(
+    (line) =>
+      `${line.quantity} × <b>${escapeHtml(line.name.en)}</b>${line.variant ? ` (${escapeHtml(line.variant)})` : ''}`,
+  )
 }
 
 /**
@@ -234,9 +268,11 @@ export function dailyReport(date, bookings, { closed = null, waiting = 0 } = {})
   ].join(NL)
 
   const kitchen = kitchenLines(bookings)
+  const bar = barLines(bookings)
   const blocks = [
     ...bookings.map((booking) => row(booking)),
     ...(kitchen.length ? [['🍽 <b>Pre-ordered, all tables together</b>', ...kitchen].join(NL)] : []),
+    ...(bar.length ? [['🍸 <b>Pre-ordered at the bar</b>', ...bar].join(NL)] : []),
     ...(waitingLine.length ? [waitingLine.join(NL)] : []),
   ]
   return chunked(blocks, head)

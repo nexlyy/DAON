@@ -1,0 +1,46 @@
+.switch {
+  display: inline-flex;
+  padding: 0.3rem;
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-soft);
+}
+
+.option {
+  min-width: 7.5rem;
+  padding: 0.62em 1.5em;
+  border-radius: var(--radius-pill);
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  transition:
+    background-color 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+.option[aria-current='page'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (hover: hover) {
+  .option:not([aria-current='page']):hover {
+    color: var(--ink);
+    background: var(--gold-wash);
+  }
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 420px) {
+  .option {
+    min-width: 6.4rem;
+    padding-inline: 1.1em;
+  }
+}
