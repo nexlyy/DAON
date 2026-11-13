@@ -150,7 +150,7 @@ Address, phone, e-mail, opening hours and the outbound links all live in
 `src/data/restaurant.ts`; no component holds a copy. Monday is `null` there,
 which is what closes the day in the calendar and stops any slot being generated
 for it. `reservation.lastSeatingBeforeClose` keeps the last seating 90 minutes
-before closing, so Tuesday runs 13:00–20:30 and Saturday 12:00–21:30.
+before closing, so Tuesday runs 14:00–20:30 and Saturday 12:00–21:30.
 
 ## Still to confirm
 
